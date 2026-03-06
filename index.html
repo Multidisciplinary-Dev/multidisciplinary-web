@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD Ultimate Studio | Professional IDE</title>
+    <title>MD Ultimate Studio | The Multi-Dev Empire</title>
     
     <meta property="og:title" content="MD Ultimate Studio">
-    <meta property="og:image" content="https://i.postimg.cc/85zX6F6z/md-logo-pro.png"> <meta property="og:description" content="Professional Web & Python Editor.">
+    <meta property="og:image" content="https://i.postimg.cc/85zX6F6z/md-logo-pro.png">
+    <meta property="og:description" content="Professional IDE, Game Engine, and Marketplace.">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/dracula.min.css">
@@ -18,124 +19,77 @@
     <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
 
     <style>
-        :root { --accent: #00d2ff; --bg: #0b0e14; }
-        body { background: var(--bg); color: white; margin: 0; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; }
+        :root { --accent: #00d2ff; --pink: #ff0080; --bg: #050510; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* Nav & Tabs */
-        nav { background: #000; padding: 10px 20px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--accent); }
-        .tabs button { background: #1a1a2e; border: 1px solid #333; color: white; padding: 8px 20px; cursor: pointer; border-radius: 5px; margin-right: 5px; }
-        .tabs button.active { background: var(--accent); color: black; font-weight: bold; }
+        /* 🌌 Space & Symbols Background */
+        canvas#space-bg { position: fixed; top: 0; left: 0; z-index: -1; }
 
-        /* Workspace Layout */
-        .workspace { flex: 1; display: flex; overflow: hidden; }
-        .editors { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #333; }
-        .viewer { flex: 1; background: white; position: relative; }
+        /* 🚪 Flexible Auth Overlay */
+        #auth-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
+        .auth-card { background: rgba(20,20,40,0.8); padding: 40px; border-radius: 20px; border: 1px solid var(--accent); width: 350px; text-align: center; }
+        .input-field { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
+
+        /* 📱 Main UI Layout */
+        #main-app { display: none; height: 100vh; flex-direction: column; }
+        nav { background: #000; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 2px solid var(--accent); }
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: 250px; background: rgba(0,0,0,0.5); border-right: 1px solid #222; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { padding: 12px; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background: var(--accent); color: black; font-weight: bold; }
+
+        /* Viewports */
+        .viewport { flex: 1; display: none; padding: 20px; overflow-y: auto; position: relative; }
+        .viewport.active { display: block; }
+
+        /* Editors */
+        .editor-container { display: flex; flex-direction: column; height: 85%; gap: 10px; }
+        .cm-wrap { flex: 1; border: 1px solid #333; overflow: hidden; }
+        .CodeMirror { height: 100% !important; }
+        #console { background: #000; color: #0f0; padding: 10px; height: 150px; overflow-y: auto; font-family: monospace; border: 1px solid #333; }
+
+        /* Marketplace & Profile */
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .card { background: #111; border: 1px solid #333; border-radius: 12px; padding: 15px; }
+        .btn-buy { background: var(--pink); border: none; color: white; padding: 8px; border-radius: 5px; cursor: pointer; width: 100%; }
+
+        /* Game Stage */
+        #game-canvas { background: white; width: 100%; height: 500px; border-radius: 15px; position: relative; overflow: hidden; }
+        .sprite { position: absolute; width: 60px; cursor: move; touch-action: none; }
         
-        .CodeMirror { height: 100% !important; font-size: 14px; }
-        iframe { width: 100%; height: 100%; border: none; }
-        #console { background: #000; color: #b2ff59; padding: 15px; font-family: monospace; overflow-y: auto; height: 100%; display: none; }
-
-        .run-btn { background: #00c853; border: none; padding: 10px 30px; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; }
+        .avatar-circle { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
     </style>
 </head>
 <body>
 
-<nav>
-    <div class="tabs">
-        <button id="web-tab" class="active" onclick="switchMode('web')">Web Editor (HTML/JS)</button>
-        <button id="py-tab" onclick="switchMode('python')">Python Engine</button>
-    </div>
-    <button class="run-btn" onclick="runProject()">▶ RUN</button>
-</nav>
+<canvas id="space-bg"></canvas>
 
-<div class="workspace">
-    <div class="editors">
-        <div id="web-editors-group" style="height: 100%; display: flex; flex-direction: column;">
-            <div style="height: 33.3%"><textarea id="html-code"><h1>Hello World</h1></textarea></div>
-            <div style="height: 33.3%"><textarea id="css-code">h1 { color: red; }</textarea></div>
-            <div style="height: 33.3%"><textarea id="js-code">console.log("Web Mode Active");</textarea></div>
+<div id="auth-screen">
+    <div class="auth-card">
+        <h2 style="color:var(--accent)">MD STUDIO EMPIRE</h2>
+        <input type="text" id="user-name" class="input-field" placeholder="Full Name or Username">
+        <input type="text" id="user-contact" class="input-field" placeholder="Email, Phone or FB Link">
+        <div style="margin: 10px 0;">
+            <label style="font-size:11px; color:#888;">Profile Picture (Optional)</label>
+            <input type="file" id="user-img-input" style="display:none" onchange="previewAvatar(event)">
+            <button onclick="document.getElementById('user-img-input').click()" class="input-field" style="background:#222; cursor:pointer">Upload Image</button>
         </div>
-        <div id="python-editor-group" style="height: 100%; display: none;">
-            <textarea id="python-code">print("Hello from MD Python Engine!")
-import math
-print(f"Square root of 16 is {math.sqrt(16)}")</textarea>
-        </div>
-    </div>
-
-    <div class="viewer">
-        <iframe id="web-preview"></iframe>
-        <div id="console">Initializing Python... Wait a moment.</div>
+        <button onclick="enterApp()" style="width:100%; padding:15px; background:linear-gradient(45deg, var(--accent), var(--pink)); border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">LAUNCH ENGINE</button>
     </div>
 </div>
 
-<script>
-    // 1. Initialize CodeMirror for all languages
-    const config = { theme: "dracula", lineNumbers: true, indentUnit: 4 };
-    const htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-code'), { ...config, mode: "xml" });
-    const cssEditor = CodeMirror.fromTextArea(document.getElementById('css-code'), { ...config, mode: "css" });
-    const jsEditor = CodeMirror.fromTextArea(document.getElementById('js-code'), { ...config, mode: "javascript" });
-    const pyEditor = CodeMirror.fromTextArea(document.getElementById('python-code'), { ...config, mode: "python" });
+<div id="main-app">
+    <nav>
+        <div style="font-weight:900; color:var(--accent);">MD ULTIMATE v5.0</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <span id="display-name">Developer</span>
+            <img id="display-avatar" class="avatar-circle" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+        </div>
+    </nav>
 
-    // 2. Python Engine (Pyodide) Setup
-    let pyodide;
-    async function loadPy() {
-        pyodide = await loadPyodide();
-        document.getElementById('console').innerText = ">>> Python Ready. Write code and press RUN.";
-    }
-    loadPy();
-
-    // 3. Tab Switching Script
-    function switchMode(mode) {
-        const webGroup = document.getElementById('web-editors-group');
-        const pyGroup = document.getElementById('python-editor-group');
-        const iframe = document.getElementById('web-preview');
-        const consoleDiv = document.getElementById('console');
-
-        document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-
-        if(mode === 'web') {
-            webGroup.style.display = 'flex'; pyGroup.style.display = 'none';
-            iframe.style.display = 'block'; consoleDiv.style.display = 'none';
-            document.getElementById('web-tab').classList.add('active');
-        } else {
-            webGroup.style.display = 'none'; pyGroup.style.display = 'block';
-            iframe.style.display = 'none'; consoleDiv.style.display = 'block';
-            document.getElementById('py-tab').classList.add('active');
-            pyEditor.refresh(); // Refresh CodeMirror after unhide
-        }
-    }
-
-    // 4. Run Function (Hybrid Web + Python)
-    async function runProject() {
-        const activeMode = document.getElementById('web-tab').classList.contains('active') ? 'web' : 'py';
-
-        if(activeMode === 'web') {
-            const html = htmlEditor.getValue();
-            const css = `<style>${cssEditor.getValue()}</style>`;
-            const js = `<script>${jsEditor.getValue()}<\/script>`;
-            const output = document.getElementById('web-preview').contentWindow.document;
-            output.open();
-            output.write(html + css + js);
-            output.close();
-        } else {
-            const code = pyEditor.getValue();
-            const consoleDiv = document.getElementById('console');
-            consoleDiv.innerText = "Running...\n";
-            try {
-                pyodide.runPython(`
-                    import sys
-                    import io
-                    sys.stdout = io.StringIO()
-                `);
-                await pyodide.runPythonAsync(code);
-                const stdout = pyodide.runPython("sys.stdout.getvalue()");
-                consoleDiv.innerText += stdout + "\n>>> Execution Complete.";
-            } catch (err) {
-                consoleDiv.innerText += "❌ Error: " + err;
-            }
-        }
-    }
-</script>
-</body>
-</html>
-
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="nav-item active" onclick="tab('web-section')">🌐 Web IDE (JSFiddle)</div>
+            <div class="nav-
