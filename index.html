@@ -3,95 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="3bmeo95fVOvb1v15Y8AFd1ywPWHGrMFe-YFOqMDOorg" />
-    
-    <meta name="description" content="أدوات Multidisciplinary Developer المجانية: مولد كلمات سر، مصلح أكواد، وفحص IP.">
-    <meta name="keywords" content="برمجة, مصلح أكواد, توليد كلمة سر, IP Tracker, أدوات مبرمجين">
-    <meta name="author" content="Multidisciplinary Developer">
-    
-    <title>Multidisciplinary Dev Hub | Professional Tools</title>
-    
+    <title>Multidisciplinary Dev Hub | Scratch & Game Studio</title>
     <style>
-        body { background-color: #0a0a1a; color: white; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding-bottom: 50px; }
-        nav { background: #1a1a2e; padding: 20px; border-bottom: 3px solid #e94560; font-size: 26px; font-weight: bold; color: #e94560; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .container { margin: 25px auto; padding: 25px; border: 1px solid #e94560; width: 90%; max-width: 600px; border-radius: 20px; background: #16213e; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        body { background-color: #0a0a1a; color: white; text-align: center; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 50px; }
+        nav { background: #1a1a2e; padding: 20px; border-bottom: 3px solid #e94560; font-size: 26px; font-weight: bold; color: #e94560; }
+        .container { margin: 20px auto; padding: 20px; border: 1px solid #e94560; width: 90%; max-width: 700px; border-radius: 20px; background: #16213e; }
         .ad-space { background: #0f3460; border: 1px dashed #4ecca3; margin: 15px 0; padding: 10px; color: #4ecca3; font-size: 12px; border-radius: 10px; min-height: 50px; }
-        .affiliate-btn { background: #4ecca3; color: #1a1a2e; padding: 10px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 10px; }
-        textarea, input { width: 100%; background: #1a1a2e; color: #4ecca3; border: 1px solid #e94560; padding: 12px; border-radius: 10px; box-sizing: border-box; margin-top: 10px; font-family: monospace; }
-        button { background: linear-gradient(45deg, #e94560, #950740); color: white; padding: 12px; border: none; cursor: pointer; border-radius: 10px; margin-top: 15px; font-weight: bold; width: 100%; transition: 0.3s; }
-        button:hover { transform: scale(1.02); box-shadow: 0 0 15px #e94560; }
-        #console-output { background: #000; color: #0f0; text-align: left; padding: 15px; min-height: 80px; margin-top: 15px; border-radius: 10px; font-size: 14px; border: 1px solid #333; overflow-x: auto; }
+        #gameCanvas { background: #ffffff; border-radius: 10px; cursor: crosshair; margin-top: 10px; border: 4px solid #1a1a2e; width: 100%; height: 300px; }
+        .scratch-blocks { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; background: #1a1a2e; padding: 15px; border-radius: 15px; border: 1px solid #f1c40f; }
+        .block { background: #f1c40f; color: #000; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; border: none; }
+        .block:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(241, 196, 15, 0.4); }
+        .block.blue { background: #3498db; color: white; }
+        .block.purple { background: #9b59b6; color: white; }
+        .studio-controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
     <nav>Multidisciplinary Dev Hub</nav>
 
-    <div class="ad-space" id="top-ad">
+    <div class="ad-space">
         <script async="async" data-cfasync="false" src="https://pl28860380.effectivegatecpm.com/cdc37c03ed697e2040d2452101dfaba0/invoke.js"></script>
         <div id="container-cdc37c03ed697e2040d2452101dfaba0"></div>
     </div>
 
-    <div class="container">
-        <h3>🔐 Strong Password Gen</h3>
-        <p style="font-size: 14px; color: #ccc;">ولد كلمة سر احترافية يصعب اختراقها بنقرة واحدة.</p>
-        <input type="text" id="pass-display" readonly placeholder="********">
-        <button onclick="genPass()">Generate Secure Password</button>
-    </div>
+    <div class="container" style="border-color: #f1c40f;">
+        <h3>🧩 Scratch Lite & Game Studio</h3>
+        <p style="font-size: 14px; color: #ccc;">ارسم العنصر أولاً داخل المربع الأبيض، ثم استخدم المكعبات لتحريكه!</p>
+        
+        <div class="studio-controls">
+            <input type="color" id="obj-color" value="#e94560">
+            <select id="obj-shape">
+                <option value="rect">مربع (Player)</option>
+                <option value="circle">دائرة (Ball)</option>
+                <option value="heart">قلب (Bonus)</option>
+            </select>
+            <button onclick="clearCanvas()" style="background:#555; color:white; padding:5px 10px; border-radius:5px; border:none; cursor:pointer;">مسح</button>
+        </div>
 
-    <div class="container" style="border-color: #4ecca3;">
-        <h4>🔥 مهارات موصى بها</h4>
-        <p style="font-size: 13px;">تعلم البرمجة من أفضل الكورسات العالمية</p>
-        <a href="#" class="affiliate-btn">تسوق أفضل العروض (Affiliate Link)</a>
-    </div>
+        <canvas id="gameCanvas" width="500" height="300"></canvas>
 
-    <div class="container">
-        <h3>🛠️ Professional Code Fixer</h3>
-        <p style="font-size: 14px; color: #ccc;">اكتب كود الـ JS الخاص بك هنا لفحصه وتشغيله فورًا.</p>
-        <textarea id="code-input" placeholder="console.log('Hello Dev!');"></textarea>
-        <button onclick="runCode()">Run & Fix Code</button>
-        <div id="console-output">النتيجة (Output):<br></div>
-    </div>
-
-    <div class="ad-space">Space for Google Ads (When Approved)</div>
-
-    <div class="container">
-        <h3>🌐 Real IP Tracker</h3>
-        <p style="font-size: 14px; color: #ccc;">تحقق من عنوان الـ IP الخاص بك وحالة اتصالك بالإنترنت.</p>
-        <div id="ip-display" style="font-size: 18px; color: #4ecca3; margin: 10px 0;">بانتظار الفحص...</div>
-        <button onclick="getRealIP()">Show My Real IP</button>
+        <div class="scratch-blocks">
+            <button class="block blue" onclick="moveObject('right')">تحرك يمين ➔</button>
+            <button class="block blue" onclick="moveObject('left')">تحرك يسار ⬅</button>
+            <button class="block purple" onclick="changeObjectColor()">تغيير اللون 🎨</button>
+            <button class="block" onclick="playScratchSound()">تشغيل صوت 🔊</button>
+        </div>
     </div>
 
     <script>
-        function genPass() {
-            const chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            let pass = "";
-            for (let i = 0; i < 16; i++) pass += chars[Math.floor(Math.random() * chars.length)];
-            document.getElementById('pass-display').value = pass;
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        // إعدادات العنصر الافتراضي
+        let currentObj = { x: 250, y: 150, size: 40, color: '#e94560', shape: 'rect' };
+
+        // وظيفة الرسم
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = currentObj.color;
+            if (currentObj.shape === 'rect') {
+                ctx.fillRect(currentObj.x - 20, currentObj.y - 20, 40, 40);
+            } else if (currentObj.shape === 'circle') {
+                ctx.beginPath(); 
+                ctx.arc(currentObj.x, currentObj.y, 20, 0, Math.PI*2); 
+                ctx.fill();
+            } else if (currentObj.shape === 'heart') {
+                drawHeart(currentObj.x, currentObj.y, 40);
+            }
         }
 
-        function runCode() {
-            const code = document.getElementById('code-input').value;
-            const output = document.getElementById('console-output');
-            output.innerHTML = "النتيجة (Output):<br>";
-            try {
-                const oldLog = console.log;
-                console.log = function(msg) { output.innerHTML += "> " + msg + "<br>"; };
-                eval(code);
-                console.log = oldLog;
-            } catch (e) { output.innerHTML += "<span style='color:red;'>Error: " + e.message + "</span>"; }
+        // الرسم بالماوس
+        canvas.addEventListener('mousedown', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            currentObj.x = e.clientX - rect.left;
+            currentObj.y = e.clientY - rect.top;
+            currentObj.color = document.getElementById('obj-color').value;
+            currentObj.shape = document.getElementById('obj-shape').value;
+            draw();
+        });
+
+        // أوامر سكراتش (الحركة)
+        function moveObject(dir) {
+            if (dir === 'right') currentObj.x += 20;
+            if (dir === 'left') currentObj.x -= 20;
+            draw();
         }
 
-        async function getRealIP() {
-            const display = document.getElementById('ip-display');
-            display.innerText = "جاري جلب البيانات...";
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                display.innerText = "Your IP: " + data.ip;
-            } catch (e) { display.innerText = "عفوًا، تعذر جلب الـ IP!"; }
+        function changeObjectColor() {
+            currentObj.color = '#' + Math.floor(Math.random()*16777215).toString(16);
+            draw();
         }
+
+        function playScratchSound() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            osc.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+
+        function drawHeart(x, y, size) {
+            ctx.beginPath();
+            ctx.moveTo(x, y + size/4);
+            ctx.quadraticCurveTo(x, y, x + size/4, y);
+            ctx.quadraticCurveTo(x + size/2, y, x + size/2, y + size/4);
+            ctx.quadraticCurveTo(x + size/2, y + size/2, x, y + size);
+            ctx.quadraticCurveTo(x - size/2, y + size/2, x - size/2, y + size/4);
+            ctx.quadraticCurveTo(x - size/2, y, x - size/4, y);
+            ctx.quadraticCurveTo(x, y, x, y + size/4);
+            ctx.fill();
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // تشغيل الرسم لأول مرة
+        draw();
     </script>
 </body>
 </html>
-
-
