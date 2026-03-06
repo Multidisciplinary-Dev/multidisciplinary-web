@@ -9,18 +9,23 @@
         body { background-color: #1a1a2e; color: white; text-align: center; font-family: sans-serif; margin: 0; padding: 0; }
         nav { background: #16213e; padding: 15px; border-bottom: 2px solid #e94560; font-size: 24px; font-weight: bold; color: #e94560; }
         .container { margin: 20px auto; padding: 20px; border: 1px solid #e94560; width: 90%; max-width: 500px; border-radius: 15px; background: #0f3460; }
-        textarea { width: 100%; height: 100px; background: #1a1a2e; color: #4ecca3; border: 1px solid #e94560; padding: 10px; border-radius: 8px; box-sizing: border-box; }
-        button { background-color: #e94560; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 8px; margin-top: 10px; font-weight: bold; }
-        #console-output { background: #000; color: #0f0; text-align: left; padding: 10px; height: 80px; overflow-y: auto; margin-top: 10px; border-radius: 8px; font-size: 13px; border: 1px solid #333; }
-        .ip-text { font-size: 18px; color: #4ecca3; margin: 10px 0; }
+        textarea { width: 100%; height: 80px; background: #1a1a2e; color: #4ecca3; border: 1px solid #e94560; padding: 10px; border-radius: 8px; box-sizing: border-box; }
+        input { width: 100%; padding: 10px; background: #1a1a2e; color: white; border: 1px solid #4ecca3; border-radius: 8px; text-align: center; margin-bottom: 10px; box-sizing: border-box; }
+        button { background-color: #e94560; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 8px; margin-top: 5px; font-weight: bold; width: 100%; }
+        #console-output { background: #000; color: #0f0; text-align: left; padding: 10px; height: 60px; overflow-y: auto; margin-top: 10px; border-radius: 8px; font-size: 13px; border: 1px solid #333; }
     </style>
 </head>
 <body>
     <nav>Multidisciplinary Dev Hub</nav>
 
     <div class="container">
+        <h3>🔐 Strong Password Gen</h3>
+        <input type="text" id="pass-display" readonly placeholder="********">
+        <button onclick="genPass()">Generate Password</button>
+    </div>
+
+    <div class="container">
         <h3>🛠️ Code Fixer (Console)</h3>
-        <p>اكتبي كود JS هنا (مثل console.log(2+2))</p>
         <textarea id="code-input" placeholder="console.log('Hello World');"></textarea>
         <button onclick="runCode()">Run Code</button>
         <div id="console-output">النتيجة ستظهر هنا...</div>
@@ -28,11 +33,18 @@
 
     <div class="container">
         <h3>🌐 Real IP Tracker</h3>
-        <div class="ip-text" id="ip-display">بانتظار الفحص...</div>
+        <div id="ip-display" style="margin-bottom:10px;">بانتظار الفحص...</div>
         <button onclick="getRealIP()">Show My Real IP</button>
     </div>
 
     <script>
+        function genPass() {
+            let chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let pass = "";
+            for (let i = 0; i < 12; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+            document.getElementById('pass-display').value = pass;
+        }
+
         function runCode() {
             let code = document.getElementById('code-input').value;
             let output = document.getElementById('console-output');
