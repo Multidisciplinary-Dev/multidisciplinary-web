@@ -1,53 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multidisciplinary Dev Tools</title>
+    <meta name="description" content="أدوات Multidisciplinary Developer لتصحيح الأكواد وتوليد كلمات السر وفحص الشبكة.">
+    <title>Multidisciplinary Dev Hub</title>
     <style>
-        body { background-color: #1a1a2e; color: white; text-align: center; font-family: sans-serif; margin: 0; }
-        nav { background: #0f3460; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e94560; }
-        nav ul { list-style: none; display: flex; gap: 20px; padding: 0; margin: 0; }
-        nav ul li a { color: white; text-decoration: none; font-weight: bold; }
-        nav .logo { font-size: 20px; font-weight: bold; color: #e94560; }
-        .container { margin-top: 50px; padding: 20px; border: 2px solid #e94560; display: inline-block; border-radius: 15px; background: #16213e; }
-        button { background-color: #e94560; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        #password-display, #ip-display { font-size: 24px; margin: 20px; color: #0f3460; background: white; padding: 10px; border-radius: 5px; min-width: 250px; word-wrap: break-word; }
+        body { background-color: #1a1a2e; color: white; text-align: center; font-family: sans-serif; margin: 0; padding: 0; }
+        nav { background: #16213e; padding: 15px; border-bottom: 2px solid #e94560; font-size: 24px; font-weight: bold; color: #e94560; }
+        .container { margin: 20px auto; padding: 20px; border: 1px solid #e94560; width: 90%; max-width: 500px; border-radius: 15px; background: #0f3460; }
+        textarea { width: 100%; height: 100px; background: #1a1a2e; color: #4ecca3; border: 1px solid #e94560; padding: 10px; border-radius: 8px; box-sizing: border-box; }
+        button { background-color: #e94560; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 8px; margin-top: 10px; font-weight: bold; }
+        #console-output { background: #000; color: #0f0; text-align: left; padding: 10px; height: 80px; overflow-y: auto; margin-top: 10px; border-radius: 8px; font-size: 13px; border: 1px solid #333; }
+        .ip-text { font-size: 18px; color: #4ecca3; margin: 10px 0; }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="logo">Multidisciplinary Dev</div>
-        <ul>
-            <li><a href="#">Password Gen</a></li>
-            <li><a href="#">IP Tool</a></li>
-        </ul>
-    </nav>
+    <nav>Multidisciplinary Dev Hub</nav>
+
     <div class="container">
-        <h1>Multidisciplinary Developer Tools</h1>
-        <p>Strong Password Generator</p>
-        <div id="password-display">********</div>
-        <button onclick="generatePass()">Generate Password</button>
+        <h3>🛠️ Code Fixer (Console)</h3>
+        <p>اكتبي كود JS هنا (مثل console.log(2+2))</p>
+        <textarea id="code-input" placeholder="console.log('Hello World');"></textarea>
+        <button onclick="runCode()">Run Code</button>
+        <div id="console-output">النتيجة ستظهر هنا...</div>
     </div>
-    <br>
+
     <div class="container">
-        <h1>IP Info Tool</h1>
-        <p>Your Virtual IP Address is:</p>
-        <div id="ip-display">192.168.1.1</div>
-        <button onclick="showIP()">Check IP</button>
+        <h3>🌐 Real IP Tracker</h3>
+        <div class="ip-text" id="ip-display">بانتظار الفحص...</div>
+        <button onclick="getRealIP()">Show My Real IP</button>
     </div>
+
     <script>
-        function generatePass() {
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-            let password = "";
-            for (let i = 0; i < 12; i++) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            document.getElementById("password-display").innerText = password;
+        function runCode() {
+            let code = document.getElementById('code-input').value;
+            let output = document.getElementById('console-output');
+            output.innerHTML = "";
+            try {
+                let oldLog = console.log;
+                console.log = function(msg) { output.innerHTML += "> " + msg + "<br>"; };
+                eval(code);
+                console.log = oldLog;
+            } catch (e) { output.innerHTML = "Error: " + e.message; }
         }
-        function showIP() {
-            document.getElementById("ip-display").innerText = "192.168.1.254";
-            alert("Checking Connection... Ping successful!");
+
+        async function getRealIP() {
+            let display = document.getElementById('ip-display');
+            display.innerText = "جاري الفحص...";
+            try {
+                let res = await fetch('https://api.ipify.org?format=json');
+                let data = await res.json();
+                display.innerText = "Your IP: " + data.ip;
+            } catch (e) { display.innerText = "فشل الاتصال!"; }
         }
     </script>
 </body>
