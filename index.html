@@ -3,170 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD Creative Studio | Professional Dev OS</title>
-    <meta name="description" content="Professional engine for touch-based games, AI drawing, and sequential text scripting.">
+    <title>MD Ultimate Studio | Professional IDE</title>
+    
+    <meta property="og:title" content="MD Ultimate Studio">
+    <meta property="og:image" content="https://i.postimg.cc/85zX6F6z/md-logo-pro.png"> <meta property="og:description" content="Professional Web & Python Editor.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/css/css.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+
     <style>
-        :root { --neon: #00d2ff; --pink: #ff0080; --dark: #050510; --glass: rgba(255, 255, 255, 0.05); }
-        body { background: var(--dark); color: white; font-family: 'Consolas', monospace; margin: 0; overflow: hidden; height: 100vh; }
+        :root { --accent: #00d2ff; --bg: #0b0e14; }
+        body { background: var(--bg); color: white; margin: 0; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; }
         
-        /* 🌌 Deep Space Moving Background */
-        canvas#spaceCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        /* Nav & Tabs */
+        nav { background: #000; padding: 10px 20px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--accent); }
+        .tabs button { background: #1a1a2e; border: 1px solid #333; color: white; padding: 8px 20px; cursor: pointer; border-radius: 5px; margin-right: 5px; }
+        .tabs button.active { background: var(--accent); color: black; font-weight: bold; }
 
-        nav { background: rgba(10, 10, 30, 0.9); padding: 12px 25px; border-bottom: 2px solid var(--neon); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .logo { font-size: 24px; font-weight: 900; background: linear-gradient(to right, var(--neon), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; letter-spacing: 2px; }
-
-        .container { display: grid; grid-template-columns: 280px 1fr 320px; gap: 15px; padding: 15px; height: calc(100vh - 80px); position: relative; z-index: 10; }
-
-        /* Sidebar: Assets & Audio */
-        .sidebar { background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(0,210,255,0.1); overflow-y: auto; backdrop-filter: blur(10px); }
-        .asset-item { width: 70px; height: 70px; background: #111; margin: 10px; border-radius: 12px; cursor: pointer; border: 1px solid #333; transition: 0.3s; padding: 5px; }
-        .asset-item:hover { border-color: var(--neon); transform: scale(1.1); box-shadow: 0 0 15px var(--neon); }
-
-        /* Professional Creative Stage */
-        .stage { background: #fff; border-radius: 20px; position: relative; overflow: hidden; border: 5px solid #222; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(0,210,255,0.2); }
-        #display-text { font-size: 28px; color: #111; font-weight: 800; text-align: center; white-space: pre-wrap; z-index: 5; text-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
-        .sprite { position: absolute; width: 100px; cursor: move; touch-action: none; z-index: 2; }
-
-        /* Right Panel: Logic & Security */
-        .right-panel { display: flex; flex-direction: column; gap: 10px; }
-        .card { background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        textarea { width: 100%; height: 130px; background: #000; color: #4ecca3; border: 1px solid #444; border-radius: 10px; font-family: 'Consolas', monospace; padding: 10px; font-size: 13px; }
+        /* Workspace Layout */
+        .workspace { flex: 1; display: flex; overflow: hidden; }
+        .editors { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #333; }
+        .viewer { flex: 1; background: white; position: relative; }
         
-        .btn-pro { background: linear-gradient(45deg, var(--neon), var(--pink)); border: none; padding: 12px; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px; transition: 0.3s; }
-        .btn-pro:hover { transform: scale(1.03); box-shadow: 0 0 20px var(--neon); }
-        .status-tag { font-size: 11px; color: var(--neon); background: #000; padding: 5px 10px; border-radius: 20px; display: inline-block; }
+        .CodeMirror { height: 100% !important; font-size: 14px; }
+        iframe { width: 100%; height: 100%; border: none; }
+        #console { background: #000; color: #b2ff59; padding: 15px; font-family: monospace; overflow-y: auto; height: 100%; display: none; }
+
+        .run-btn { background: #00c853; border: none; padding: 10px 30px; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<canvas id="spaceCanvas"></canvas>
-
 <nav>
-    <div class="logo">MD CREATIVE ENGINE</div>
-    <div class="status-tag" id="ip-display">IP: Scanning Security...</div>
-    <button class="btn-pro" style="width:auto; padding: 5px 20px;" onclick="alert('Syncing with Developer Cloud...')">My Account</button>
+    <div class="tabs">
+        <button id="web-tab" class="active" onclick="switchMode('web')">Web Editor (HTML/JS)</button>
+        <button id="py-tab" onclick="switchMode('python')">Python Engine</button>
+    </div>
+    <button class="run-btn" onclick="runProject()">▶ RUN</button>
 </nav>
 
-<div class="container">
-    <div class="sidebar">
-        <h4 style="color:var(--neon)">📦 Multi-Asset Store</h4>
-        <div style="display:flex; flex-wrap:wrap; justify-content:center;">
-            <img src="https://cdn-icons-png.flaticon.com/512/3069/3069172.png" class="asset-item" onclick="spawn(this.src)">
-            <img src="https://cdn-icons-png.flaticon.com/512/1043/1043431.png" class="asset-item" onclick="spawn(this.src)">
-            <img src="https://cdn-icons-png.flaticon.com/512/2530/2530882.png" class="asset-item" onclick="spawn(this.src)">
-            <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" class="asset-item" onclick="spawn(this.src)">
+<div class="workspace">
+    <div class="editors">
+        <div id="web-editors-group" style="height: 100%; display: flex; flex-direction: column;">
+            <div style="height: 33.3%"><textarea id="html-code"><h1>Hello World</h1></textarea></div>
+            <div style="height: 33.3%"><textarea id="css-code">h1 { color: red; }</textarea></div>
+            <div style="height: 33.3%"><textarea id="js-code">console.log("Web Mode Active");</textarea></div>
         </div>
-        <hr style="border:0.5px solid #333; margin:20px 0;">
-        <h4 style="color:var(--pink)">🎤 Voice & Sound</h4>
-        <button class="btn-pro" style="background:#222;" onclick="startRecording()">Start Voice Record</button>
-        <button class="btn-pro" style="background:#222; margin-top:5px;" onclick="alert('Sound Library Loaded!')">Sound Library</button>
+        <div id="python-editor-group" style="height: 100%; display: none;">
+            <textarea id="python-code">print("Hello from MD Python Engine!")
+import math
+print(f"Square root of 16 is {math.sqrt(16)}")</textarea>
+        </div>
     </div>
 
-    <div class="stage" id="mainStage">
-        <div id="display-text">System Ready. <br> Run Script or Spawn Assets...</div>
-    </div>
-
-    <div class="right-panel">
-        <div class="card">
-            <h4 style="color:var(--neon)">📜 Creative Logic (Text/Gift)</h4>
-            <p style="font-size:10px; color:#aaa;">Separate sentences with commas for sequence:</p>
-            <textarea id="script-input" placeholder="Hello Developer, Welcome to the Studio, Your Gift is Drawing..."></textarea>
-            <button class="btn-pro" onclick="runSequence()">Run Text Sequence</button>
-        </div>
-
-        <div class="card">
-            <h4 style="color:var(--pink)">🎨 AI Drawing Engine</h4>
-            <input type="text" id="draw-url" placeholder="Paste Image URL to Code-Draw" style="width:100%; background:#111; color:white; border:1px solid #444; padding:8px; border-radius:5px;">
-            <button class="btn-pro" onclick="startAIDrawing()">Start Precision Drawing</button>
-        </div>
-
-        <div class="card">
-            <h4 style="color:var(--neon)">🛡️ Security & Export</h4>
-            <button class="btn-pro" style="background:#333;" onclick="checkIP()">Scan IP Privacy</button>
-            <button class="btn-pro" style="background:#333; margin-top:5px;" onclick="genKey()">Server Key Gen</button>
-            <button class="btn-pro" style="margin-top:15px;" onclick="downloadProject()">📥 Download Project (.zip)</button>
-        </div>
+    <div class="viewer">
+        <iframe id="web-preview"></iframe>
+        <div id="console">Initializing Python... Wait a moment.</div>
     </div>
 </div>
 
 <script>
-    // --- 🌌 Dynamic Space Matrix Background ---
-    const sc = document.getElementById('spaceCanvas'); const sctx = sc.getContext('2d');
-    sc.width = window.innerWidth; sc.height = window.innerHeight;
-    let particles = []; let codes = ['{', '}', 'if', 'var', 'ctx', '()', ';', '1', '0'];
-    for(let i=0; i<60; i++) particles.push({x:Math.random()*sc.width, y:Math.random()*sc.height, s:Math.random()*0.8+0.2, c:codes[Math.floor(Math.random()*codes.length)]});
-    function drawSpace() {
-        sctx.clearRect(0,0,sc.width, sc.height); sctx.fillStyle = "rgba(0, 210, 255, 0.2)";
-        sctx.font = "14px monospace";
-        particles.forEach(p => {
-            sctx.fillText(p.c, p.x, p.y); p.y += p.s;
-            if(p.y > sc.height) p.y = 0;
-        });
-        requestAnimationFrame(drawSpace);
-    } drawSpace();
+    // 1. Initialize CodeMirror for all languages
+    const config = { theme: "dracula", lineNumbers: true, indentUnit: 4 };
+    const htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-code'), { ...config, mode: "xml" });
+    const cssEditor = CodeMirror.fromTextArea(document.getElementById('css-code'), { ...config, mode: "css" });
+    const jsEditor = CodeMirror.fromTextArea(document.getElementById('js-code'), { ...config, mode: "javascript" });
+    const pyEditor = CodeMirror.fromTextArea(document.getElementById('python-code'), { ...config, mode: "python" });
 
-    // --- 🎮 Professional Touch & Drag Logic ---
-    function spawn(src) {
-        const img = document.createElement('img');
-        img.src = src; img.className = 'sprite';
-        img.style.left = '50px'; img.style.top = '50px';
-        
-        let isDown = false;
-        img.onmousedown = () => isDown = true;
-        window.onmouseup = () => isDown = false;
-        window.onmousemove = (e) => {
-            if(isDown) {
-                img.style.left = (e.clientX - mainStage.offsetLeft - 50) + 'px';
-                img.style.top = (e.clientY - mainStage.offsetTop - 50) + 'px';
+    // 2. Python Engine (Pyodide) Setup
+    let pyodide;
+    async function loadPy() {
+        pyodide = await loadPyodide();
+        document.getElementById('console').innerText = ">>> Python Ready. Write code and press RUN.";
+    }
+    loadPy();
+
+    // 3. Tab Switching Script
+    function switchMode(mode) {
+        const webGroup = document.getElementById('web-editors-group');
+        const pyGroup = document.getElementById('python-editor-group');
+        const iframe = document.getElementById('web-preview');
+        const consoleDiv = document.getElementById('console');
+
+        document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+
+        if(mode === 'web') {
+            webGroup.style.display = 'flex'; pyGroup.style.display = 'none';
+            iframe.style.display = 'block'; consoleDiv.style.display = 'none';
+            document.getElementById('web-tab').classList.add('active');
+        } else {
+            webGroup.style.display = 'none'; pyGroup.style.display = 'block';
+            iframe.style.display = 'none'; consoleDiv.style.display = 'block';
+            document.getElementById('py-tab').classList.add('active');
+            pyEditor.refresh(); // Refresh CodeMirror after unhide
+        }
+    }
+
+    // 4. Run Function (Hybrid Web + Python)
+    async function runProject() {
+        const activeMode = document.getElementById('web-tab').classList.contains('active') ? 'web' : 'py';
+
+        if(activeMode === 'web') {
+            const html = htmlEditor.getValue();
+            const css = `<style>${cssEditor.getValue()}</style>`;
+            const js = `<script>${jsEditor.getValue()}<\/script>`;
+            const output = document.getElementById('web-preview').contentWindow.document;
+            output.open();
+            output.write(html + css + js);
+            output.close();
+        } else {
+            const code = pyEditor.getValue();
+            const consoleDiv = document.getElementById('console');
+            consoleDiv.innerText = "Running...\n";
+            try {
+                pyodide.runPython(`
+                    import sys
+                    import io
+                    sys.stdout = io.StringIO()
+                `);
+                await pyodide.runPythonAsync(code);
+                const stdout = pyodide.runPython("sys.stdout.getvalue()");
+                consoleDiv.innerText += stdout + "\n>>> Execution Complete.";
+            } catch (err) {
+                consoleDiv.innerText += "❌ Error: " + err;
             }
-        };
-        // Touch support
-        img.ontouchmove = (e) => {
-            let t = e.touches[0];
-            img.style.left = (t.clientX - mainStage.offsetLeft - 50) + 'px';
-            img.style.top = (t.clientY - mainStage.offsetTop - 50) + 'px';
-        };
-        document.getElementById('mainStage').appendChild(img);
-        document.getElementById('display-text').innerText = ""; // Clear initial text
+        }
     }
-
-    // --- 📜 Sequential Text Logic (Gift Mode) ---
-    function runSequence() {
-        const input = document.getElementById('script-input').value;
-        const display = document.getElementById('display-text');
-        const lines = input.split(',').map(l => l.trim());
-        let idx = 0;
-        
-        function next() {
-            if(idx < lines.length) {
-                display.style.opacity = 0;
-                setTimeout(() => {
-                    display.innerText = lines[idx];
-                    display.style.opacity = 1; idx++;
-                    setTimeout(next, 2500); 
-                }, 500);
-            }
-        } next();
-    }
-
-    // --- 🎨 AI Drawing from URL ---
-    function startAIDrawing() {
-        const url = document.getElementById('draw-url').value;
-        if(!url) return alert("Please provide an image link!");
-        const stage = document.getElementById('mainStage');
-        stage.innerHTML = `<img src="${url}" style="max-width:80%; border:3px solid var(--neon); border-radius:15px; box-shadow:0 0 30px #000;"> <br> <div style="color:var(--neon); margin-top:10px;">Precision Drawing Engine: Active (100%)</div>`;
-    }
-
-    // --- 🛡️ Pro Features ---
-    async function checkIP() {
-        const r = await fetch('https://api.ipify.org?format=json');
-        const d = await r.json();
-        document.getElementById('ip-display').innerText = `IP: ${d.ip} | STATUS: EXPOSED`;
-        alert("Privacy Alert: Your IP is Leaked. Encryption Recommended.");
-    }
-    function genKey() { alert("Server Key: " + Math.random().toString(36).toUpperCase().substring(2, 12)); }
-    function downloadProject() { alert("Preparing project files... Downloading multidisciplinary_dev_pack.zip"); }
-    function startRecording() { alert("Microphone Connected. Recording your custom audio asset..."); }
 </script>
 </body>
 </html>
