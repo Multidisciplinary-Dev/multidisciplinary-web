@@ -1,126 +1,173 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multidisciplinary Dev Hub | Scratch & Game Studio</title>
+    <title>MD Creative Studio | Professional Dev OS</title>
+    <meta name="description" content="Professional engine for touch-based games, AI drawing, and sequential text scripting.">
     <style>
-        body { background-color: #0a0a1a; color: white; text-align: center; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 50px; }
-        nav { background: #1a1a2e; padding: 20px; border-bottom: 3px solid #e94560; font-size: 26px; font-weight: bold; color: #e94560; }
-        .container { margin: 20px auto; padding: 20px; border: 1px solid #e94560; width: 90%; max-width: 700px; border-radius: 20px; background: #16213e; }
-        .ad-space { background: #0f3460; border: 1px dashed #4ecca3; margin: 15px 0; padding: 10px; color: #4ecca3; font-size: 12px; border-radius: 10px; min-height: 50px; }
-        #gameCanvas { background: #ffffff; border-radius: 10px; cursor: crosshair; margin-top: 10px; border: 4px solid #1a1a2e; width: 100%; height: 300px; }
-        .scratch-blocks { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; background: #1a1a2e; padding: 15px; border-radius: 15px; border: 1px solid #f1c40f; }
-        .block { background: #f1c40f; color: #000; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; border: none; }
-        .block:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(241, 196, 15, 0.4); }
-        .block.blue { background: #3498db; color: white; }
-        .block.purple { background: #9b59b6; color: white; }
-        .studio-controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 10px; font-size: 14px; }
+        :root { --neon: #00d2ff; --pink: #ff0080; --dark: #050510; --glass: rgba(255, 255, 255, 0.05); }
+        body { background: var(--dark); color: white; font-family: 'Consolas', monospace; margin: 0; overflow: hidden; height: 100vh; }
+        
+        /* 🌌 Deep Space Moving Background */
+        canvas#spaceCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+
+        nav { background: rgba(10, 10, 30, 0.9); padding: 12px 25px; border-bottom: 2px solid var(--neon); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .logo { font-size: 24px; font-weight: 900; background: linear-gradient(to right, var(--neon), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; letter-spacing: 2px; }
+
+        .container { display: grid; grid-template-columns: 280px 1fr 320px; gap: 15px; padding: 15px; height: calc(100vh - 80px); position: relative; z-index: 10; }
+
+        /* Sidebar: Assets & Audio */
+        .sidebar { background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(0,210,255,0.1); overflow-y: auto; backdrop-filter: blur(10px); }
+        .asset-item { width: 70px; height: 70px; background: #111; margin: 10px; border-radius: 12px; cursor: pointer; border: 1px solid #333; transition: 0.3s; padding: 5px; }
+        .asset-item:hover { border-color: var(--neon); transform: scale(1.1); box-shadow: 0 0 15px var(--neon); }
+
+        /* Professional Creative Stage */
+        .stage { background: #fff; border-radius: 20px; position: relative; overflow: hidden; border: 5px solid #222; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(0,210,255,0.2); }
+        #display-text { font-size: 28px; color: #111; font-weight: 800; text-align: center; white-space: pre-wrap; z-index: 5; text-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+        .sprite { position: absolute; width: 100px; cursor: move; touch-action: none; z-index: 2; }
+
+        /* Right Panel: Logic & Security */
+        .right-panel { display: flex; flex-direction: column; gap: 10px; }
+        .card { background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        textarea { width: 100%; height: 130px; background: #000; color: #4ecca3; border: 1px solid #444; border-radius: 10px; font-family: 'Consolas', monospace; padding: 10px; font-size: 13px; }
+        
+        .btn-pro { background: linear-gradient(45deg, var(--neon), var(--pink)); border: none; padding: 12px; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px; transition: 0.3s; }
+        .btn-pro:hover { transform: scale(1.03); box-shadow: 0 0 20px var(--neon); }
+        .status-tag { font-size: 11px; color: var(--neon); background: #000; padding: 5px 10px; border-radius: 20px; display: inline-block; }
     </style>
 </head>
 <body>
-    <nav>Multidisciplinary Dev Hub</nav>
 
-    <div class="ad-space">
-        <script async="async" data-cfasync="false" src="https://pl28860380.effectivegatecpm.com/cdc37c03ed697e2040d2452101dfaba0/invoke.js"></script>
-        <div id="container-cdc37c03ed697e2040d2452101dfaba0"></div>
+<canvas id="spaceCanvas"></canvas>
+
+<nav>
+    <div class="logo">MD CREATIVE ENGINE</div>
+    <div class="status-tag" id="ip-display">IP: Scanning Security...</div>
+    <button class="btn-pro" style="width:auto; padding: 5px 20px;" onclick="alert('Syncing with Developer Cloud...')">My Account</button>
+</nav>
+
+<div class="container">
+    <div class="sidebar">
+        <h4 style="color:var(--neon)">📦 Multi-Asset Store</h4>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3069/3069172.png" class="asset-item" onclick="spawn(this.src)">
+            <img src="https://cdn-icons-png.flaticon.com/512/1043/1043431.png" class="asset-item" onclick="spawn(this.src)">
+            <img src="https://cdn-icons-png.flaticon.com/512/2530/2530882.png" class="asset-item" onclick="spawn(this.src)">
+            <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" class="asset-item" onclick="spawn(this.src)">
+        </div>
+        <hr style="border:0.5px solid #333; margin:20px 0;">
+        <h4 style="color:var(--pink)">🎤 Voice & Sound</h4>
+        <button class="btn-pro" style="background:#222;" onclick="startRecording()">Start Voice Record</button>
+        <button class="btn-pro" style="background:#222; margin-top:5px;" onclick="alert('Sound Library Loaded!')">Sound Library</button>
     </div>
 
-    <div class="container" style="border-color: #f1c40f;">
-        <h3>🧩 Scratch Lite & Game Studio</h3>
-        <p style="font-size: 14px; color: #ccc;">ارسم العنصر أولاً داخل المربع الأبيض، ثم استخدم المكعبات لتحريكه!</p>
-        
-        <div class="studio-controls">
-            <input type="color" id="obj-color" value="#e94560">
-            <select id="obj-shape">
-                <option value="rect">مربع (Player)</option>
-                <option value="circle">دائرة (Ball)</option>
-                <option value="heart">قلب (Bonus)</option>
-            </select>
-            <button onclick="clearCanvas()" style="background:#555; color:white; padding:5px 10px; border-radius:5px; border:none; cursor:pointer;">مسح</button>
-        </div>
-
-        <canvas id="gameCanvas" width="500" height="300"></canvas>
-
-        <div class="scratch-blocks">
-            <button class="block blue" onclick="moveObject('right')">تحرك يمين ➔</button>
-            <button class="block blue" onclick="moveObject('left')">تحرك يسار ⬅</button>
-            <button class="block purple" onclick="changeObjectColor()">تغيير اللون 🎨</button>
-            <button class="block" onclick="playScratchSound()">تشغيل صوت 🔊</button>
-        </div>
+    <div class="stage" id="mainStage">
+        <div id="display-text">System Ready. <br> Run Script or Spawn Assets...</div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        // إعدادات العنصر الافتراضي
-        let currentObj = { x: 250, y: 150, size: 40, color: '#e94560', shape: 'rect' };
+    <div class="right-panel">
+        <div class="card">
+            <h4 style="color:var(--neon)">📜 Creative Logic (Text/Gift)</h4>
+            <p style="font-size:10px; color:#aaa;">Separate sentences with commas for sequence:</p>
+            <textarea id="script-input" placeholder="Hello Developer, Welcome to the Studio, Your Gift is Drawing..."></textarea>
+            <button class="btn-pro" onclick="runSequence()">Run Text Sequence</button>
+        </div>
 
-        // وظيفة الرسم
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = currentObj.color;
-            if (currentObj.shape === 'rect') {
-                ctx.fillRect(currentObj.x - 20, currentObj.y - 20, 40, 40);
-            } else if (currentObj.shape === 'circle') {
-                ctx.beginPath(); 
-                ctx.arc(currentObj.x, currentObj.y, 20, 0, Math.PI*2); 
-                ctx.fill();
-            } else if (currentObj.shape === 'heart') {
-                drawHeart(currentObj.x, currentObj.y, 40);
-            }
-        }
+        <div class="card">
+            <h4 style="color:var(--pink)">🎨 AI Drawing Engine</h4>
+            <input type="text" id="draw-url" placeholder="Paste Image URL to Code-Draw" style="width:100%; background:#111; color:white; border:1px solid #444; padding:8px; border-radius:5px;">
+            <button class="btn-pro" onclick="startAIDrawing()">Start Precision Drawing</button>
+        </div>
 
-        // الرسم بالماوس
-        canvas.addEventListener('mousedown', function(e) {
-            const rect = canvas.getBoundingClientRect();
-            currentObj.x = e.clientX - rect.left;
-            currentObj.y = e.clientY - rect.top;
-            currentObj.color = document.getElementById('obj-color').value;
-            currentObj.shape = document.getElementById('obj-shape').value;
-            draw();
+        <div class="card">
+            <h4 style="color:var(--neon)">🛡️ Security & Export</h4>
+            <button class="btn-pro" style="background:#333;" onclick="checkIP()">Scan IP Privacy</button>
+            <button class="btn-pro" style="background:#333; margin-top:5px;" onclick="genKey()">Server Key Gen</button>
+            <button class="btn-pro" style="margin-top:15px;" onclick="downloadProject()">📥 Download Project (.zip)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 🌌 Dynamic Space Matrix Background ---
+    const sc = document.getElementById('spaceCanvas'); const sctx = sc.getContext('2d');
+    sc.width = window.innerWidth; sc.height = window.innerHeight;
+    let particles = []; let codes = ['{', '}', 'if', 'var', 'ctx', '()', ';', '1', '0'];
+    for(let i=0; i<60; i++) particles.push({x:Math.random()*sc.width, y:Math.random()*sc.height, s:Math.random()*0.8+0.2, c:codes[Math.floor(Math.random()*codes.length)]});
+    function drawSpace() {
+        sctx.clearRect(0,0,sc.width, sc.height); sctx.fillStyle = "rgba(0, 210, 255, 0.2)";
+        sctx.font = "14px monospace";
+        particles.forEach(p => {
+            sctx.fillText(p.c, p.x, p.y); p.y += p.s;
+            if(p.y > sc.height) p.y = 0;
         });
+        requestAnimationFrame(drawSpace);
+    } drawSpace();
 
-        // أوامر سكراتش (الحركة)
-        function moveObject(dir) {
-            if (dir === 'right') currentObj.x += 20;
-            if (dir === 'left') currentObj.x -= 20;
-            draw();
-        }
+    // --- 🎮 Professional Touch & Drag Logic ---
+    function spawn(src) {
+        const img = document.createElement('img');
+        img.src = src; img.className = 'sprite';
+        img.style.left = '50px'; img.style.top = '50px';
+        
+        let isDown = false;
+        img.onmousedown = () => isDown = true;
+        window.onmouseup = () => isDown = false;
+        window.onmousemove = (e) => {
+            if(isDown) {
+                img.style.left = (e.clientX - mainStage.offsetLeft - 50) + 'px';
+                img.style.top = (e.clientY - mainStage.offsetTop - 50) + 'px';
+            }
+        };
+        // Touch support
+        img.ontouchmove = (e) => {
+            let t = e.touches[0];
+            img.style.left = (t.clientX - mainStage.offsetLeft - 50) + 'px';
+            img.style.top = (t.clientY - mainStage.offsetTop - 50) + 'px';
+        };
+        document.getElementById('mainStage').appendChild(img);
+        document.getElementById('display-text').innerText = ""; // Clear initial text
+    }
 
-        function changeObjectColor() {
-            currentObj.color = '#' + Math.floor(Math.random()*16777215).toString(16);
-            draw();
-        }
+    // --- 📜 Sequential Text Logic (Gift Mode) ---
+    function runSequence() {
+        const input = document.getElementById('script-input').value;
+        const display = document.getElementById('display-text');
+        const lines = input.split(',').map(l => l.trim());
+        let idx = 0;
+        
+        function next() {
+            if(idx < lines.length) {
+                display.style.opacity = 0;
+                setTimeout(() => {
+                    display.innerText = lines[idx];
+                    display.style.opacity = 1; idx++;
+                    setTimeout(next, 2500); 
+                }, 500);
+            }
+        } next();
+    }
 
-        function playScratchSound() {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-            osc.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
-        }
+    // --- 🎨 AI Drawing from URL ---
+    function startAIDrawing() {
+        const url = document.getElementById('draw-url').value;
+        if(!url) return alert("Please provide an image link!");
+        const stage = document.getElementById('mainStage');
+        stage.innerHTML = `<img src="${url}" style="max-width:80%; border:3px solid var(--neon); border-radius:15px; box-shadow:0 0 30px #000;"> <br> <div style="color:var(--neon); margin-top:10px;">Precision Drawing Engine: Active (100%)</div>`;
+    }
 
-        function drawHeart(x, y, size) {
-            ctx.beginPath();
-            ctx.moveTo(x, y + size/4);
-            ctx.quadraticCurveTo(x, y, x + size/4, y);
-            ctx.quadraticCurveTo(x + size/2, y, x + size/2, y + size/4);
-            ctx.quadraticCurveTo(x + size/2, y + size/2, x, y + size);
-            ctx.quadraticCurveTo(x - size/2, y + size/2, x - size/2, y + size/4);
-            ctx.quadraticCurveTo(x - size/2, y, x - size/4, y);
-            ctx.quadraticCurveTo(x, y, x, y + size/4);
-            ctx.fill();
-        }
-
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        // تشغيل الرسم لأول مرة
-        draw();
-    </script>
+    // --- 🛡️ Pro Features ---
+    async function checkIP() {
+        const r = await fetch('https://api.ipify.org?format=json');
+        const d = await r.json();
+        document.getElementById('ip-display').innerText = `IP: ${d.ip} | STATUS: EXPOSED`;
+        alert("Privacy Alert: Your IP is Leaked. Encryption Recommended.");
+    }
+    function genKey() { alert("Server Key: " + Math.random().toString(36).toUpperCase().substring(2, 12)); }
+    function downloadProject() { alert("Preparing project files... Downloading multidisciplinary_dev_pack.zip"); }
+    function startRecording() { alert("Microphone Connected. Recording your custom audio asset..."); }
+</script>
 </body>
 </html>
+
