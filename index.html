@@ -1,71 +1,82 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="أدوات Multidisciplinary Developer لتصحيح الأكواد وتوليد كلمات السر وفحص الشبكة.">
- <meta name="google-site-verification" content="3bmeo95fVOvb1v15Y8AFd1ywPWHGrMFe-YFOqMDOorg" /> 
-    <title>Multidisciplinary Dev Hub</title>
-    <style> 
-        body { background-color: #1a1a2e; color: white; text-align: center; font-family: sans-serif; margin: 0; padding: 0; }
-        nav { background: #16213e; padding: 15px; border-bottom: 2px solid #e94560; font-size: 24px; font-weight: bold; color: #e94560; }
-        .container { margin: 20px auto; padding: 20px; border: 1px solid #e94560; width: 90%; max-width: 500px; border-radius: 15px; background: #0f3460; }
-        textarea { width: 100%; height: 80px; background: #1a1a2e; color: #4ecca3; border: 1px solid #e94560; padding: 10px; border-radius: 8px; box-sizing: border-box; }
-        input { width: 100%; padding: 10px; background: #1a1a2e; color: white; border: 1px solid #4ecca3; border-radius: 8px; text-align: center; margin-bottom: 10px; box-sizing: border-box; }
-        button { background-color: #e94560; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 8px; margin-top: 5px; font-weight: bold; width: 100%; }
-        #console-output { background: #000; color: #0f0; text-align: left; padding: 10px; height: 60px; overflow-y: auto; margin-top: 10px; border-radius: 8px; font-size: 13px; border: 1px solid #333; }
+    <meta name="google-site-verification" content="3bmeo95fVOvb1v15Y8AFd1ywPWHGrMFe-YFOqMDOorg" />
+    <meta name="description" content="أدوات Multidisciplinary Developer: مولد كلمات سر قوية، مصلح أكواد JavaScript، وفحص الـ IP الحقيقي مجانًا.">
+    <meta name="keywords" content="Password Generator, Code Fixer, IP Tracker, مصلح أكواد, توليد كلمة سر">
+    
+    <title>Multidisciplinary Dev Hub | Professional Tools</title>
+    
+    <style>
+        body { background-color: #0a0a1a; color: white; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding-bottom: 50px; }
+        nav { background: #1a1a2e; padding: 20px; border-bottom: 3px solid #e94560; font-size: 26px; font-weight: bold; color: #e94560; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .container { margin: 25px auto; padding: 25px; border: 1px solid #e94560; width: 90%; max-width: 600px; border-radius: 20px; background: #16213e; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .ad-space { background: #0f3460; border: 1px dashed #4ecca3; margin: 15px 0; padding: 10px; color: #4ecca3; font-size: 12px; border-radius: 10px; }
+        textarea, input { width: 100%; background: #1a1a2e; color: #4ecca3; border: 1px solid #e94560; padding: 12px; border-radius: 10px; box-sizing: border-box; margin-top: 10px; font-family: monospace; }
+        button { background: linear-gradient(45deg, #e94560, #950740); color: white; padding: 12px; border: none; cursor: pointer; border-radius: 10px; margin-top: 15px; font-weight: bold; width: 100%; transition: 0.3s; }
+        button:hover { transform: scale(1.02); box-shadow: 0 0 15px #e94560; }
+        #console-output { background: #000; color: #0f0; text-align: left; padding: 15px; min-height: 80px; margin-top: 15px; border-radius: 10px; font-size: 14px; border: 1px solid #333; overflow-x: auto; }
     </style>
 </head>
 <body>
     <nav>Multidisciplinary Dev Hub</nav>
 
+    <div class="ad-space">الإعلانات ستظهر هنا (Google Ads Area)</div>
+
     <div class="container">
         <h3>🔐 Strong Password Gen</h3>
+        <p style="font-size: 14px; color: #ccc;">ولد كلمة سر احترافية يصعب اختراقها بنقرة واحدة.</p>
         <input type="text" id="pass-display" readonly placeholder="********">
-        <button onclick="genPass()">Generate Password</button>
+        <button onclick="genPass()">Generate Secure Password</button>
     </div>
 
     <div class="container">
-        <h3>🛠️ Code Fixer (Console)</h3>
-        <textarea id="code-input" placeholder="console.log('Hello World');"></textarea>
-        <button onclick="runCode()">Run Code</button>
-        <div id="console-output">النتيجة ستظهر هنا...</div>
+        <h3>🛠️ Professional Code Fixer</h3>
+        <p style="font-size: 14px; color: #ccc;">اكتب كود الـ JS الخاص بك هنا لفحصه وتشغيله فورًا.</p>
+        <textarea id="code-input" placeholder="console.log('Hello Dev!');"></textarea>
+        <button onclick="runCode()">Run & Fix Code</button>
+        <div id="console-output">النتيجة (Output):<br></div>
     </div>
+
+    <div class="ad-space">Space for AdSense Ads</div>
 
     <div class="container">
         <h3>🌐 Real IP Tracker</h3>
-        <div id="ip-display" style="margin-bottom:10px;">بانتظار الفحص...</div>
+        <p style="font-size: 14px; color: #ccc;">تحقق من عنوان الـ IP الخاص بك وحالة اتصالك بالإنترنت.</p>
+        <div id="ip-display" style="font-size: 18px; color: #4ecca3; margin: 10px 0;">بانتظار الفحص...</div>
         <button onclick="getRealIP()">Show My Real IP</button>
     </div>
 
     <script>
         function genPass() {
-            let chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             let pass = "";
-            for (let i = 0; i < 12; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+            for (let i = 0; i < 16; i++) pass += chars[Math.floor(Math.random() * chars.length)];
             document.getElementById('pass-display').value = pass;
         }
 
         function runCode() {
-            let code = document.getElementById('code-input').value;
-            let output = document.getElementById('console-output');
-            output.innerHTML = "";
+            const code = document.getElementById('code-input').value;
+            const output = document.getElementById('console-output');
+            output.innerHTML = "النتيجة (Output):<br>";
             try {
-                let oldLog = console.log;
+                const oldLog = console.log;
                 console.log = function(msg) { output.innerHTML += "> " + msg + "<br>"; };
                 eval(code);
                 console.log = oldLog;
-            } catch (e) { output.innerHTML = "Error: " + e.message; }
+            } catch (e) { output.innerHTML += "<span style='color:red;'>Error: " + e.message + "</span>"; }
         }
 
         async function getRealIP() {
-            let display = document.getElementById('ip-display');
-            display.innerText = "جاري الفحص...";
+            const display = document.getElementById('ip-display');
+            display.innerText = "جاري جلب البيانات...";
             try {
-                let res = await fetch('https://api.ipify.org?format=json');
-                let data = await res.json();
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
                 display.innerText = "Your IP: " + data.ip;
-            } catch (e) { display.innerText = "فشل الاتصال!"; }
+            } catch (e) { display.innerText = "عفوًا، تعذر جلب الـ IP!"; }
         }
     </script>
 </body>
