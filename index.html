@@ -3,164 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD-Empire | The Final Frontier</title>
+    <title>MD Studio | Your AI Empire</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/xml/xml.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/python/python.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root { 
-            --cyan: #00f2ff; 
-            --pink: #ff007f; 
-            --dark: #020205; 
-            --glass: rgba(0, 242, 255, 0.05); 
-            --neon-glow: 0 0 15px var(--cyan);
+            --cyan: #00f2ff; --pink: #ff007f; --dark: #05050a; 
+            --glass: rgba(255, 255, 255, 0.05); --border: rgba(0, 210, 255, 0.3);
         }
         
         body, html { 
-            margin: 0; padding: 0; height: 100%; 
-            background: var(--dark); 
-            color: white; 
-            font-family: 'Rajdhani', sans-serif; 
-            overflow: hidden; 
+            margin: 0; padding: 0; height: 100%; background: var(--dark); 
+            color: white; font-family: 'Rajdhani', sans-serif; overflow: hidden; 
         }
 
-        h1, .neon-font { font-family: 'Orbitron', sans-serif; text-shadow: var(--neon-glow); }
-        
-        /* 🌌 خلفية النجوم المتحركة المحسنة */
-        #stars-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #0a0a1a, #000); }
-        .star { position: absolute; background: white; border-radius: 50%; animation: moveStars linear infinite; }
-        @keyframes moveStars { from { transform: translateY(0); } to { transform: translateY(-100vh); } }
+        /* 🌌 Space Particles Background */
+        #space-canvas { position: fixed; top: 0; left: 0; z-index: -1; background: radial-gradient(circle, #101025, #000); }
 
-        /* 📱 تقسيم الواجهة (لحل مشكلة "العشوائية") */
-        .viewport { display: grid; grid-template-rows: 70px 1fr 50px; height: 100vh; padding: 10px; box-sizing: border-box; gap: 10px; }
-        
+        /* 📱 Layout Grid */
+        .app-container {
+            display: grid;
+            grid-template-columns: 250px 1fr 320px;
+            grid-template-rows: 60px 1fr 180px;
+            height: 100vh; gap: 10px; padding: 10px; box-sizing: border-box;
+        }
+
         header { 
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); 
-            border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 12px; 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 20px; box-shadow: var(--neon-glow);
+            grid-column: 1 / 4; background: var(--glass); backdrop-filter: blur(15px);
+            border: 1px solid var(--border); border-radius: 12px;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
         }
 
-        .main-engine { display: grid; grid-template-columns: 1fr 380px; gap: 15px; overflow: hidden; }
+        /* 🛠️ Sidebar Tabs */
+        .sidebar { grid-row: 2 / 4; background: var(--glass); border-radius: 12px; border: 1px solid var(--border); padding: 15px; }
+        .nav-item { 
+            padding: 12px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; 
+            transition: 0.3s; border: 1px solid transparent; text-align: center;
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(0, 242, 255, 0.1); border-color: var(--cyan); color: var(--cyan); }
 
-        /* 🛠️ منطقة المحرر (لحل مشكلة "المربعات الطويلة") */
-        .editor-container { 
-            background: var(--glass); border-radius: 15px; 
-            border: 1px solid rgba(255,255,255,0.05); 
-            display: flex; flex-direction: column; overflow: hidden; 
+        /* 💻 Editor Center */
+        .editor-section { position: relative; background: #000; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+        .CodeMirror { height: 100%; font-size: 16px; background: transparent !important; }
+
+        /* 🖼️ Stage (Side-by-Side) */
+        .stage-section { background: white; border-radius: 12px; border: 3px solid var(--cyan); position: relative; overflow: hidden; }
+        #turtle-canvas { width: 100%; height: 100%; }
+
+        /* 🛑 RUN BUTTON (As requested in image) */
+        .run-btn-container { position: absolute; bottom: 20px; right: 20px; z-index: 100; }
+        .btn-red-run {
+            width: 65px; height: 65px; background: #ee1c25; border-radius: 50%;
+            border: 4px solid #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(238, 28, 37, 0.6); transition: 0.2s;
+        }
+        .btn-red-run:active { transform: scale(0.9); }
+        .btn-red-run i { color: white; font-size: 28px; margin-left: 5px; }
+
+        /* 🔴 Console (Success/Error logic) */
+        .console { 
+            grid-column: 2 / 3; background: #000; border-radius: 12px; 
+            border: 1px solid #333; padding: 15px; font-family: 'Consolas', monospace; 
+            font-size: 13px; overflow-y: auto; color: #0f8;
+        }
+        .console.error { border-color: var(--pink); color: var(--pink); box-shadow: inset 0 0 10px rgba(255,0,127,0.2); }
+
+        /* 👤 Profile Pop (localStorage) */
+        #profile-panel { 
+            display: none; position: fixed; top: 70px; right: 20px; width: 280px;
+            background: rgba(10,10,20,0.98); backdrop-filter: blur(20px);
+            border: 1px solid var(--cyan); border-radius: 15px; padding: 20px; z-index: 1000;
         }
 
-        .CodeMirror { height: 100%; font-size: 14px; background: rgba(0,0,0,0.5) !important; }
-
-        /* 🖼️ الـ Stage المرتب جنباً إلى جنب */
-        .stage-container { display: grid; grid-template-rows: 1fr 150px 60px; gap: 10px; }
-        .stage { 
-            background: #fff; border-radius: 15px; border: 3px solid var(--cyan); 
-            position: relative; overflow: hidden; box-shadow: 0 0 25px rgba(0, 242, 255, 0.2); 
+        /* 🤖 Floating AI */
+        #ai-bubble {
+            position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px;
+            background: var(--cyan); border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; box-shadow: 0 0 20px var(--cyan);
+            animation: float 3s ease-in-out infinite; z-index: 2000;
         }
-        #sprite { position: absolute; width: 60px; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.5s ease; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* 🛑 زر الـ RUN الجديد (مثل الصورة) */
-        .btn-run-circle { 
-            width: 50px; height: 50px; background: #ee1c25; 
-            border-radius: 50%; border: none; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; 
-            color: white; font-size: 20px; transition: 0.3s;
-            box-shadow: 0 0 15px rgba(238, 28, 37, 0.5);
-        }
-        .btn-run-circle:hover { transform: scale(1.1); box-shadow: 0 0 25px #ee1c25; }
-
-        /* 👤 البروفايل ونسخ الرابط */
-        .header-icons { display: flex; align-items: center; gap: 15px; }
-        .icon-btn { background: none; border: none; color: var(--cyan); cursor: pointer; font-size: 18px; transition: 0.3s; }
-        .icon-btn:hover { color: white; text-shadow: var(--neon-glow); }
-
-        #console { background: #000; color: var(--pink); border-radius: 10px; border: 1px solid var(--pink); padding: 10px; font-family: monospace; font-size: 12px; overflow-y: auto; }
+        .neon-text { font-family: 'Orbitron', sans-serif; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
     </style>
 </head>
 <body>
 
-<div id="stars-container"></div>
+<canvas id="space-canvas"></canvas>
 
-<div class="viewport">
+<div class="app-container">
     <header>
-        <div class="neon-font" style="font-size: 20px; color: var(--cyan);">MD-STUDIO <span style="font-size:10px; color:white;">EMPIRE v20.0</span></div>
-        <div class="header-icons">
-            <div style="background:rgba(0,0,0,0.5); padding:5px 10px; border-radius:8px; border:1px solid #333; font-size:12px;">
-                🔑 Secure: <span id="strong-pass" style="color:var(--cyan)">********</span>
-            </div>
-            <button class="icon-btn" onclick="copyProjectLink()" title="Copy Project Link"><i class="fas fa-copy"></i></button>
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Multidisciplinary" style="width:40px; border-radius:50%; border:2px solid var(--cyan); cursor:pointer;">
+        <div class="neon-text" style="font-size: 22px;">MD EMPIRE <span style="font-size: 10px; color: white;">v20.0</span></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <button onclick="genSecurePass()" class="nav-item" style="font-size:12px; padding:5px 10px;">🔑 Pass Gen</button>
+            <button onclick="copyShareLink()" class="nav-item" style="font-size:12px; padding:5px 10px;"><i class="fas fa-share"></i> Share</button>
+            <img id="user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Multidisciplinary" onclick="toggleProfile()" style="width:40px; border-radius:50%; border:2px solid var(--cyan); cursor:pointer;">
         </div>
     </header>
 
-    <div class="main-engine">
-        <div class="editor-container">
-            <div style="padding:10px; background:rgba(0,0,0,0.3); display:flex; gap:15px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <span class="neon-font" style="font-size:12px; color:var(--cyan);">SCRATCH LAB</span>
-            </div>
-            <textarea id="code-editor"></textarea>
-        </div>
+    <div class="sidebar">
+        <div class="nav-item active" onclick="switchTab('python')"><i class="fab fa-python"></i><br>Python Hub</div>
+        <div class="nav-item" onclick="switchTab('scratch')"><i class="fas fa-puzzle-piece"></i><br>Scratch Lab</div>
+        <div class="nav-item" onclick="switchTab('web')"><i class="fas fa-globe"></i><br>Web Run</div>
+    </div>
 
-        <div class="stage-container">
-            <div class="stage">
-                <img id="sprite" src="https://openclipart.org/image/800px/217242">
-            </div>
-            <div id="console">[SYSTEM]: Welcome, Multidisciplinary Developer. Empire Online.</div>
-            
-            <div style="display:flex; justify-content:center; align-items:center;">
-                <button class="btn-run-circle" onclick="runProject()"><i class="fas fa-play"></i></button>
-            </div>
+    <div class="editor-section">
+        <textarea id="real-editor"></textarea>
+        <div id="blockly-ui" style="display:none; height:100%;"></div>
+    </div>
+
+    <div class="stage-section" id="stage">
+        <div id="turtle-container" style="width:100%; height:100%;"></div>
+        <iframe id="web-preview" style="display:none; width:100%; height:100%; border:none; background:white;"></iframe>
+        <div class="run-btn-container">
+            <button class="btn-red-run" onclick="executeEngine()"><i class="fas fa-play"></i></button>
         </div>
     </div>
-    
-    <footer style="background:var(--glass); border-top:1px solid rgba(255,255,255,0.05); border-radius:10px; display:flex; align-items:center; padding:0 20px; font-size:11px; color:#888;">
-        System v20.0 Online | Connected to MD-AI Assistant
-    </footer>
+
+    <div class="console" id="console-out">
+        [SYSTEM]: Welcome, Multidisciplinary Developer. Engine Ready...
+    </div>
+
+    <div class="sidebar" style="grid-column: 3; grid-row: 2/4;">
+        <h3 class="neon-text" style="font-size:14px; text-align:center;">MD-AI CHAT</h3>
+        <div id="chat-box" style="height:calc(100% - 100px); overflow-y:auto; font-size:12px; padding:5px; color:#ccc;"></div>
+        <input type="text" id="ai-input" placeholder="Ask AI anything..." style="width:100%; background:#111; border:1px solid #333; color:white; padding:8px; border-radius:5px;">
+    </div>
+</div>
+
+<div id="profile-panel">
+    <h3 class="neon-text">My Profile</h3>
+    <input type="text" id="user-name-in" placeholder="Your Name" style="width:100%; margin-bottom:10px;">
+    <textarea id="user-bio-in" placeholder="Bio..." style="width:100%; height:60px;"></textarea>
+    <button onclick="saveProfile()" style="width:100%; background:var(--cyan); color:black; font-weight:bold; border:none; padding:10px; border-radius:5px; margin-top:10px;">SAVE EMPIRE DATA</button>
+</div>
+
+<div id="ai-bubble" onclick="aiGreet()">
+    <i class="fas fa-robot" style="font-size:28px; color:black;"></i>
 </div>
 
 <script>
-    // 🌌 توليد النجوم
-    const starsContainer = document.getElementById('stars-container');
-    for(let i=0; i<100; i++) {
-        let star = document.createElement('div'); star.className = 'star';
-        let size = Math.random() * 2.5 + 'px'; star.style.width = size; star.style.height = size;
-        star.style.left = Math.random() * 100 + 'vw'; star.style.top = Math.random() * 100 + 'vh';
-        star.style.animationDuration = (Math.random() * 4 + 2) + 's'; starsContainer.appendChild(star);
+    // 🌌 1. Space Particles Background
+    const canvas = document.getElementById('space-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    let stars = Array(150).fill().map(() => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2 }));
+    function drawStars() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "white";
+        stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill(); s.y -= 0.5; if(s.y < 0) s.y = canvas.height; });
+        requestAnimationFrame(drawStars);
     }
+    drawStars();
 
-    // 🛠️ تفعيل CodeMirror (لحل مشكلة "المربعات العشوائية")
-    const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
-        mode: 'xml', theme: 'default', lineNumbers: true, htmlMode: true
+    // 🐍 2. Python (Pyodide) Engine
+    let pyodide;
+    async function initPy() { 
+        pyodide = await loadPyodide(); 
+        document.getElementById('console-out').innerHTML += "<br>[PYTHON]: Runtime Loaded.";
+    }
+    initPy();
+
+    // 📝 3. Editor (CodeMirror)
+    const editor = CodeMirror.fromTextArea(document.getElementById('real-editor'), {
+        lineNumbers: true, mode: 'python', theme: 'abbott', indentUnit: 4
     });
-    editor.setValue('\n<h1 style="color:blue">Hello MD!</h1>\n<style>\n body { text-align: center; background: white; }\n</style>');
 
-    // 🚀 تنفيذ المشروع (التحريك الحقيقي)
-    function runProject() {
-        const sprite = document.getElementById('sprite');
-        sprite.style.transform = 'translate(calc(-50% + 50px), -50%)'; // تحريك بسيط للتجربة
-        
-        const con = document.getElementById('console');
-        con.innerHTML += `<br><span style="color:#0f8">[SUCCESS]: Sprite moved 50px ✅</span>`;
-        con.scrollTop = con.scrollHeight;
+    // 👤 4. Profile Logic (LocalStorage)
+    function saveProfile() {
+        localStorage.setItem('md-name', document.getElementById('user-name-in').value);
+        localStorage.setItem('md-bio', document.getElementById('user-bio-in').value);
+        alert("Data Saved to Empire!");
     }
 
-    // 🔗 نسخ الرابط (الميزة الجديدة)
-    function copyProjectLink() {
-        const code = btoa(editor.getValue());
-        const link = window.location.origin + "?share=" + code;
-        navigator.clipboard.writeText(link).then(() => {
-            alert("Project link copied to clipboard! 🔗");
-        });
+    // 🤖 5. AI Greet (Voice)
+    function aiGreet() {
+        const name = localStorage.getItem('md-name') || "Multidisciplinary Developer";
+        const msg = new SpeechSynthesisUtterance(`Welcome back to your empire, ${name}. I am ready to build.`);
+        window.speechSynthesis.speak(msg);
+    }
+
+    // 🛑 6. EXECUTE ENGINE (The Logic)
+    async function executeEngine() {
+        const code = editor.getValue();
+        const consoleOut = document.getElementById('console-out');
+        consoleOut.classList.remove('error');
+        consoleOut.innerHTML = "[SYSTEM]: Running...";
+
+        try {
+            // Python Mode
+            if(editor.getOption('mode') === 'python') {
+                await pyodide.runPythonAsync(code);
+                consoleOut.innerHTML = "[SUCCESS]: Python code executed perfectly.";
+            } 
+            // Web Mode
+            else {
+                const blob = new Blob([code], {type: 'text/html'});
+                document.getElementById('web-preview').src = URL.createObjectURL(blob);
+                consoleOut.innerHTML = "[SUCCESS]: Web Render Complete.";
+            }
+        } catch (err) {
+            consoleOut.classList.add('error');
+            consoleOut.innerHTML = `[ERROR]: ${err.message} <br><button onclick="fixWithAI()" style="background:white; color:red; border:none; padding:5px; cursor:pointer;">FIX WITH AI</button>`;
+        }
+    }
+
+    // 🧩 7. Scratch Lab (Blockly)
+    function switchTab(type) {
+        document.getElementById('blockly-ui').style.display = type === 'scratch' ? 'block' : 'none';
+        document.querySelector('.CodeMirror').style.display = type === 'scratch' ? 'none' : 'block';
+        document.getElementById('web-preview').style.display = type === 'web' ? 'block' : 'none';
+        editor.setOption('mode', type === 'web' ? 'xml' : 'python');
+    }
+
+    // 🔑 8. Password Gen
+    function genSecurePass() {
+        const pass = Math.random().toString(36).slice(-10) + "!" + Math.floor(Math.random()*100);
+        document.getElementById('console-out').innerHTML = `[SECURITY]: New Strong Password: ${pass}`;
+    }
+
+    function toggleProfile() { 
+        const p = document.getElementById('profile-panel');
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
     }
 </script>
-
 </body>
 </html>
