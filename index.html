@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>MD STUDIO | REGA EMPIRE</title>
+    <title>MD STUDIO | SUPREME EDITION</title>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
     <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
@@ -11,16 +11,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff007f; --dark: #020205; --red: #ff3333; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; touch-action: manipulation; }
+        :root { --cyan: #00f2ff; --pink: #ff007f; --dark: #020205; --red: #ff3333; --green: #00ff88; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; }
 
-        /* 🔐 شاشة الدخول */
+        /* 🔐 شاشة الدخول الاحترافية */
         #login-screen { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: black; gap: 40px; }
-        .matrix-box { width: 400px; height: 400px; background: #000; border: 1px solid #111; border-radius: 15px; padding: 20px; color: #0f8; font-family: 'Source Code Pro'; font-size: 12px; overflow: hidden; }
+        .matrix-box { width: 420px; height: 400px; background: #000; border: 1px solid #1a1a1a; border-radius: 15px; padding: 20px; color: #0f8; font-family: 'Source Code Pro'; font-size: 13px; overflow-y: hidden; box-shadow: inset 0 0 20px #000; }
         .login-card { width: 350px; background: rgba(15,15,25,0.9); padding: 40px; border-radius: 20px; border: 1px solid #222; backdrop-filter: blur(10px); }
         .input-style { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 5px; outline: none; box-sizing: border-box; }
-        .btn-log { width: 100%; padding: 15px; background: #1a1a1a; color: #444; border: none; border-radius: 5px; cursor: not-allowed; transition: 0.4s; font-weight: bold; }
-        .btn-log.active { background: #00ff88; color: black; cursor: pointer; box-shadow: 0 0 15px #00ff88; }
+        
+        /* زرار الدخول اللي هينور أخضر عند 6 خانات */
+        .btn-log { width: 100%; padding: 15px; background: #1a1a1a; color: #444; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; cursor: not-allowed; }
+        .btn-log.active { background: var(--green) !important; color: black !important; cursor: pointer !important; box-shadow: 0 0 25px var(--green) !important; }
 
         /* 📱 الهيكل الرئيسي */
         #main-app { display: none; grid-template-columns: 240px 1fr; height: 100vh; }
@@ -28,26 +30,18 @@
         .nav-btn { padding: 12px; border: 1px solid #222; border-radius: 8px; cursor: pointer; color: #888; font-size: 11px; text-align: center; }
         .nav-btn.active, .nav-btn:hover { background: var(--cyan); color: black; box-shadow: 0 0 10px var(--cyan); }
 
-        /* 🧩 سكراتش الكامل */
+        /* 🧩 سكراتش بالكامل */
         #scratch-area { height: 100%; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; }
         #blocklyDiv { flex: 1; border: 1px solid #333; border-radius: 10px; }
 
         /* 👤 الملف الشخصي (رقم 6) */
         .profile-view { padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        .avatar-box { width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--cyan); cursor: pointer; overflow: hidden; position: relative; }
-        .avatar-box img { width: 100%; height: 100%; object-fit: cover; }
-        .danger-btns { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-red { background: var(--red); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .avatar-box { width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--cyan); cursor: pointer; overflow: hidden; }
+        .btn-red { background: var(--red); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 10px; }
 
         /* 🤖 البوت الأزرق (رقم 5) */
         #ai-trigger { position: fixed; bottom: 30px; left: 30px; width: 65px; height: 65px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 9999; box-shadow: 0 0 20px var(--cyan); color: black; font-size: 28px; }
         #ai-chat { position: fixed; bottom: 110px; left: 30px; width: 330px; height: 420px; background: #0a0a0a; border: 2px solid var(--cyan); border-radius: 15px; display: none; flex-direction: column; z-index: 9999; }
-        
-        /* 🎨 قسم الإبداع الموحد */
-        .creative-theatre { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
-        .stage { background: black; border: 1px solid #222; border-radius: 15px; height: 400px; position: relative; overflow: hidden; }
-        #ascii-layer { position: absolute; inset: 0; font-size: 4px; color: #0f8; opacity: 0.4; pointer-events: none; margin: 0; }
-        #lyrics-neon { height: 60px; display: flex; align-items: center; justify-content: center; color: var(--pink); font-size: 20px; text-shadow: 0 0 10px var(--pink); border-top: 1px solid #222; }
     </style>
 </head>
 <body>
@@ -57,73 +51,55 @@
     <div class="login-card">
         <h2 style="color:var(--cyan); text-align:center;">Join MD Studio</h2>
         <input type="text" id="reg-name" class="input-style" placeholder="Developer Name">
-        <input type="password" id="reg-pass" class="input-style" placeholder="Password (6 Chars: A1b2...)">
-        <button id="entry-btn" onclick="handleAuth()" class="btn-log">INITIALIZE ENGINE</button>
+        <input type="password" id="reg-pass" class="input-style" placeholder="6 Chars (Letters + Numbers)">
+        <button id="entry-btn" onclick="registerUser()" class="btn-log">INITIALIZE ENGINE</button>
     </div>
 </div>
 
 <div id="main-app">
     <div class="sidebar">
         <h3 style="color:var(--cyan); text-align:center; font-size:14px;">MD STUDIO</h3>
-        <div class="nav-btn active" onclick="switchTab('scratch')">SCRATCH ENGINE</div>
-        <div class="nav-btn" onclick="switchTab('creative')">CREATIVE SUITE</div>
-        <div class="nav-btn" onclick="switchTab('debug')">CODE DEBUGGER</div>
-        <div class="nav-btn" onclick="switchTab('profile')" style="margin-top:auto;"><i class="fas fa-user-shield"></i> SETTINGS</div>
+        <div class="nav-btn active" onclick="tab('scratch')">SCRATCH ENGINE</div>
+        <div class="nav-btn" onclick="tab('creative')">CREATIVE SUITE</div>
+        <div class="nav-btn" onclick="tab('debug')">CODE DEBUGGER</div>
+        <div class="nav-btn" onclick="tab('profile')" style="margin-top:auto;"><i class="fas fa-cog"></i> SETTINGS</div>
     </div>
 
-    <div class="main-content" style="overflow-y:auto; height:100vh;">
-        <div id="scratch" class="tab-item">
+    <div class="main-content">
+        <div id="scratch" class="tab-content">
             <div id="scratch-area"><div id="blocklyDiv"></div></div>
         </div>
 
-        <div id="creative" class="tab-item" style="display:none;">
-            <div class="creative-theatre">
+        <div id="creative" class="tab-content" style="display:none; padding:20px;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                 <div>
-                    <div style="position:relative;">
-                        <button onclick="addTab('creative-code')" style="position:absolute; right:5px; top:5px; font-size:10px; background:#333; color:var(--cyan); border:none; cursor:pointer;">TAB</button>
-                        <textarea id="creative-code" class="input-style" style="height:250px; font-family:monospace; font-size:11px;" placeholder="// import sketchpy&#10;engine.draw('IMAGE_URL')&#10;lyrics(['Gift For You'])"></textarea>
-                    </div>
-                    <button class="nav-btn" style="width:100%; margin-top:10px; background:var(--pink); color:white;" onclick="runCreative()">RUN MASTERPIECE</button>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button class="nav-btn" style="flex:1;" onclick="copyGiftLink()"><i class="fas fa-gift"></i> Gift Link</button>
-                        <button class="nav-btn" style="flex:1;" onclick="saveArt()"><i class="fas fa-save"></i> Save Art</button>
-                    </div>
+                    <textarea id="gift-code" class="input-style" style="height:200px;" placeholder="engine.draw('URL')"></textarea>
+                    <button class="nav-btn" style="width:100%; margin-top:10px;" onclick="runGift()">RUN & GIFT</button>
+                    <button class="nav-btn" style="width:100%; margin-top:5px;" onclick="copyLink()">COPY GIFT LINK</button>
                 </div>
-                <div class="stage">
-                    <canvas id="mainCanvas" style="width:100%; height:100%;"></canvas>
-                    <pre id="ascii-layer"></pre>
-                    <div id="drawing-pen" style="position:absolute; font-size:25px; display:none; z-index:10;">🖋️</div>
-                    <div id="lyrics-neon">Awaiting Script...</div>
+                <div style="background:black; border:1px solid #333; height:400px; position:relative;">
+                    <canvas id="giftCanvas" style="width:100%; height:100%;"></canvas>
+                    <div id="pen" style="position:absolute; font-size:25px; display:none;">🖋️</div>
                 </div>
             </div>
         </div>
 
-        <div id="debug" class="tab-item" style="display:none; padding:30px;">
-            <h2>CODE DEBUGGER</h2>
-            <textarea id="buggy-code" class="input-style" style="height:150px;" placeholder="Paste buggy code..."></textarea>
-            <button class="nav-btn" onclick="fixMyCode()">FIX CODE</button>
-            <div style="background:#000; padding:20px; border:1px solid var(--cyan); border-radius:10px; margin-top:20px; position:relative;">
-                <button onclick="copyToClipboard('fixed-output')" style="position:absolute; right:10px; top:10px; background:var(--cyan); border:none; padding:5px; font-size:10px; border-radius:3px; cursor:pointer;">COPY</button>
-                <pre id="fixed-output" style="color:#0f8; white-space:pre-wrap;"></pre>
-            </div>
+        <div id="debug" class="tab-content" style="display:none; padding:20px;">
+            <textarea id="bug-in" class="input-style" style="height:150px;"></textarea>
+            <button class="nav-btn" onclick="fix()">FIX & COPY</button>
+            <pre id="fixed-out" style="color:#0f8; padding:20px; background:#000;"></pre>
         </div>
 
-        <div id="profile" class="tab-item" style="display:none;">
+        <div id="profile" class="tab-content" style="display:none; padding:40px;">
             <div class="profile-view">
-                <div class="avatar-box" onclick="document.getElementById('img-input').click()">
-                    <img src="https://via.placeholder.com/130" id="user-avatar">
-                    <input type="file" id="img-input" hidden onchange="updateAvatar(this)">
+                <div class="avatar-box" onclick="document.getElementById('f').click()">
+                    <img id="p-img" src="https://via.placeholder.com/130" style="width:100%;">
+                    <input type="file" id="f" hidden onchange="up(this)">
                 </div>
-                <div style="width:320px;">
-                    <label>Developer Name:</label>
-                    <input type="text" id="edit-name" class="input-style">
-                    <label>Access Password:</label>
-                    <input type="text" id="edit-pass" class="input-style">
-                </div>
-                <div class="danger-btns">
-                    <button class="btn-red" onclick="logout()">LOG OUT</button>
-                    <button class="btn-red" onclick="deleteAcc()">DELETE ACCOUNT</button>
-                </div>
+                <input type="text" id="p-name" class="input-style">
+                <input type="text" id="p-pass" class="input-style">
+                <button class="btn-red" onclick="logout()">LOG OUT</button>
+                <button class="btn-red" onclick="del()">DELETE ACCOUNT</button>
             </div>
         </div>
     </div>
@@ -131,63 +107,64 @@
 
 <div id="ai-trigger" onclick="toggleAI()"><i class="fas fa-robot"></i></div>
 <div id="ai-chat">
-    <div style="background:var(--cyan); color:black; padding:15px; font-weight:bold;">MD-AI ASSISTANT</div>
-    <div id="ai-msgs" style="flex:1; padding:15px; overflow-y:auto; font-size:12px; color:#0f8;">Hi Rega! I'm your AI partner...</div>
-    <div style="display:flex; border-top:1px solid #222;">
-        <input type="text" id="ai-input" style="flex:1; background:transparent; border:none; color:white; padding:15px;" placeholder="Ask anything...">
-        <button onclick="sendToAI()" style="background:var(--cyan); border:none; padding:15px; cursor:pointer;">GO</button>
+    <div style="background:var(--cyan); color:black; padding:10px;">MD-AI</div>
+    <div id="ai-msgs" style="flex:1; padding:10px; overflow-y:auto; color:#0f8;">Hi Rega! Ask me anything.</div>
+    <div style="display:flex;">
+        <input type="text" id="ai-in" style="flex:1; background:#111; border:none; color:white; padding:10px;">
+        <button onclick="sendAI()" style="background:var(--cyan); border:none; padding:10px;">GO</button>
     </div>
 </div>
 
 <script>
-    // 1. نظام الدخول والذاكرة
-    window.onload = () => {
-        const user = JSON.parse(localStorage.getItem('md_user_data'));
-        if(user) startApp(user.name, true);
-        runMatrix();
-    };
-
-    function handleAuth() {
-        if(!document.getElementById('entry-btn').classList.contains('active')) return;
-        const data = { name: document.getElementById('reg-name').value, pass: document.getElementById('reg-pass').value };
-        localStorage.setItem('md_user_data', JSON.stringify(data));
-        startApp(data.name, false);
-    }
-
-    function startApp(name, isOld) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'grid';
-        document.getElementById('edit-name').value = name;
-        document.getElementById('edit-pass').value = JSON.parse(localStorage.getItem('md_user_data')).pass;
-        const msg = (isOld ? "Welcome Back, " : "Welcome, ") + name;
-        alert(msg);
-        const synth = window.speechSynthesis;
-        synth.speak(new SpeechSynthesisUtterance(msg));
-    }
-
-    // 2. المربع الأسود (أكواد حية)
+    // 1. المربع الأسود (أكواد بتكتب نفسها زي يومي)
     function runMatrix() {
         const box = document.getElementById('matrix-display');
-        const codes = ["> LOADING CORE...", "> INITIALIZING BLOCKLY...", "> CONNECTING AI_BOT...", "> READY_TO_CODE", "> STATUS: SUPREME"];
+        const lines = ["> BOOTING...", "> LOADING REGA_OS...", "> SYSTEM: SUPREME", "> ACCESSING_CORE...", "> READY"];
         let i = 0;
         setInterval(() => {
-            box.innerHTML += `<div>${codes[i % codes.length]}</div>`;
-            i++; if(box.scrollHeight > 400) box.innerHTML = "";
-        }, 900);
+            let d = document.createElement('div');
+            d.innerText = lines[i % lines.length];
+            box.appendChild(d);
+            i++; if(box.childNodes.length > 15) box.removeChild(box.firstChild);
+        }, 1000);
     }
 
-    // 3. التحقق من الباسورد (6 خانات)
+    // 2. شرط الـ 6 خانات "بالظبط" واللون الأخضر
     document.getElementById('reg-pass').addEventListener('input', function() {
         const v = this.value;
         const btn = document.getElementById('entry-btn');
-        if(v.length === 6 && /[a-z]/i.test(v) && /[0-9]/.test(v)) btn.classList.add('active');
-        else btn.classList.remove('active');
+        const ok = (v.length === 6 && /[a-z]/i.test(v) && /[0-9]/.test(v));
+        if(ok) btn.classList.add('active'); else btn.classList.remove('active');
     });
 
-    // 4. سكراتش الكامل
-    const toolbox = {
-        "kind": "categoryToolbox",
-        "contents": [
-            {"kind": "category", "name": "Motion", "colour": "210", "contents": [{"kind": "block", "type": "controls_repeat_ext"}]},
-            {"kind": "category", "name": "Sound", "colour": "260", "contents": [{"kind": "block", "type": "text"}]},
-            {"kind": "category", "name":
+    function registerUser() {
+        if(!document.getElementById('entry-btn').classList.contains('active')) return;
+        const d = { name: document.getElementById('reg-name').value, pass: document.getElementById('reg-pass').value };
+        localStorage.setItem('md_data', JSON.stringify(d));
+        location.reload();
+    }
+
+    window.onload = () => {
+        runMatrix();
+        const u = JSON.parse(localStorage.getItem('md_data'));
+        if(u) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'grid';
+            document.getElementById('p-name').value = u.name;
+            document.getElementById('p-pass').value = u.pass;
+        }
+    };
+
+    // 3. سكراتش
+    Blockly.inject('blocklyDiv', {toolbox: {kind: "categoryToolbox", contents: [{kind: "category", name: "Motion", contents: [{kind: "block", type: "controls_repeat_ext"}]}]}, theme: Blockly.Themes.Dark});
+
+    // 4. وظائف عامة
+    function tab(id) { document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; }
+    function toggleAI() { let c=document.getElementById('ai-chat'); c.style.display=c.style.display==='flex'?'none':'flex'; }
+    function sendAI() { document.getElementById('ai-msgs').innerHTML += `<div>You: ${document.getElementById('ai-in').value}</div>`; document.getElementById('ai-in').value=""; }
+    function logout() { localStorage.removeItem('md_data'); location.reload(); }
+    function del() { localStorage.clear(); location.reload(); }
+    function up(i) { if(i.files[0]) { let r=new FileReader(); r.onload=e=>document.getElementById('p-img').src=e.target.result; r.readAsDataURL(i.files[0]); } }
+</script>
+</body>
+</html>
