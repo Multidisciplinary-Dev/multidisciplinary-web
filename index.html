@@ -3,236 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD Studio | Your AI Empire</title>
+    <title>MD STUDIO | EMPIRE v20.0</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/python/python.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        :root { 
-            --cyan: #00f2ff; --pink: #ff007f; --dark: #05050a; 
-            --glass: rgba(255, 255, 255, 0.05); --border: rgba(0, 210, 255, 0.3);
-        }
+        :root { --cyan: #00f2ff; --pink: #ff007f; --dark: #020205; --glass: rgba(255, 255, 255, 0.05); }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Rajdhani', sans-serif; overflow: hidden; }
+        .neon-font { font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px var(--cyan); }
+
+        /* 🌌 خلفية الأكواد المتحركة لشاشة الدخول */
+        #code-bg { position: fixed; inset: 0; z-index: 1; opacity: 0.1; pointer-events: none; font-family: 'Source Code Pro', monospace; color: var(--cyan); line-height: 1.5; overflow: hidden; }
+
+        /* 🔐 شاشة الدخول (The Intro) */
+        #auth-screen { position: fixed; inset: 0; background: black; z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .auth-container { display: flex; align-items: center; gap: 40px; background: var(--glass); padding: 50px; border-radius: 30px; border: 1px solid var(--cyan); box-shadow: 0 0 50px rgba(0, 242, 255, 0.1); position: relative; z-index: 10; }
+        .side-console { width: 250px; height: 200px; background: rgba(0,0,0,0.5); border-left: 3px solid var(--cyan); padding: 15px; font-family: 'Source Code Pro'; font-size: 11px; color: #0f8; overflow: hidden; }
+        .auth-input { width: 100%; padding: 12px; margin: 10px 0; background: rgba(0,0,0,0.7); border: 1px solid #333; color: var(--cyan); border-radius: 10px; font-family: 'Orbitron'; outline: none; }
         
-        body, html { 
-            margin: 0; padding: 0; height: 100%; background: var(--dark); 
-            color: white; font-family: 'Rajdhani', sans-serif; overflow: hidden; 
-        }
+        /* 📱 اللوحة الرئيسية (The Empire Dashboard) */
+        .main-app { display: none; grid-template-columns: 240px 1fr; grid-template-rows: 70px 1fr; height: 100vh; padding: 10px; gap: 10px; box-sizing: border-box; }
+        header { grid-column: 1 / 3; background: var(--glass); border-radius: 15px; border: 1px solid rgba(0,242,255,0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
 
-        /* 🌌 Space Particles Background */
-        #space-canvas { position: fixed; top: 0; left: 0; z-index: -1; background: radial-gradient(circle, #101025, #000); }
+        /* 📂 Sidebar Menu */
+        .sidebar { background: var(--glass); border-radius: 15px; border: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .nav-btn { background: transparent; border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; cursor: pointer; text-align: left; transition: 0.3s; font-family: 'Orbitron'; font-size: 12px; }
+        .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: black; box-shadow: 0 0 15px var(--cyan); border-color: var(--cyan); }
 
-        /* 📱 Layout Grid */
-        .app-container {
-            display: grid;
-            grid-template-columns: 250px 1fr 320px;
-            grid-template-rows: 60px 1fr 180px;
-            height: 100vh; gap: 10px; padding: 10px; box-sizing: border-box;
-        }
+        /* 🖼️ Content Area */
+        .content-box { background: var(--glass); border-radius: 15px; border: 1px solid #222; overflow: hidden; position: relative; }
+        .tab-content { display: none; height: 100%; width: 100%; }
+        .tab-content.active { display: block; }
 
-        header { 
-            grid-column: 1 / 4; background: var(--glass); backdrop-filter: blur(15px);
-            border: 1px solid var(--border); border-radius: 12px;
-            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
-        }
+        /* 🤖 AI CHAT Section */
+        .chat-wrap { display: flex; flex-direction: column; height: 100%; padding: 20px; box-sizing: border-box; }
+        #chat-logs { flex: 1; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #222; border-left: 4px solid var(--cyan); }
+        .chat-msg { margin-bottom: 10px; font-size: 14px; line-height: 1.4; }
 
-        /* 🛠️ Sidebar Tabs */
-        .sidebar { grid-row: 2 / 4; background: var(--glass); border-radius: 12px; border: 1px solid var(--border); padding: 15px; }
-        .nav-item { 
-            padding: 12px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; 
-            transition: 0.3s; border: 1px solid transparent; text-align: center;
-        }
-        .nav-item:hover, .nav-item.active { background: rgba(0, 242, 255, 0.1); border-color: var(--cyan); color: var(--cyan); }
+        /* 🧩 Scratch Section */
+        .scratch-split { display: grid; grid-template-columns: 1fr 380px; height: 100%; gap: 10px; padding: 10px; box-sizing: border-box; }
+        #blocklyArea { background: rgba(0,0,0,0.2); border-radius: 15px; overflow: hidden; }
+        .stage-view { background: white; border-radius: 20px; border: 5px solid var(--cyan); position: relative; overflow: hidden; height: 400px; box-shadow: 0 0 30px rgba(0,242,255,0.2); }
+        #sprite { position: absolute; width: 70px; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: 0.3s; }
 
-        /* 💻 Editor Center */
-        .editor-section { position: relative; background: #000; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
-        .CodeMirror { height: 100%; font-size: 16px; background: transparent !important; }
+        /* 🛑 Red Run Button (Like image) */
+        .btn-run-main { width: 70px; height: 70px; background: #ee1c25; border-radius: 50%; border: 4px solid white; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 0 25px #ee1c25; margin: 15px auto; transition: 0.2s; }
+        .btn-run-main:active { transform: scale(0.9); }
 
-        /* 🖼️ Stage (Side-by-Side) */
-        .stage-section { background: white; border-radius: 12px; border: 3px solid var(--cyan); position: relative; overflow: hidden; }
-        #turtle-canvas { width: 100%; height: 100%; }
-
-        /* 🛑 RUN BUTTON (As requested in image) */
-        .run-btn-container { position: absolute; bottom: 20px; right: 20px; z-index: 100; }
-        .btn-red-run {
-            width: 65px; height: 65px; background: #ee1c25; border-radius: 50%;
-            border: 4px solid #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px rgba(238, 28, 37, 0.6); transition: 0.2s;
-        }
-        .btn-red-run:active { transform: scale(0.9); }
-        .btn-red-run i { color: white; font-size: 28px; margin-left: 5px; }
-
-        /* 🔴 Console (Success/Error logic) */
-        .console { 
-            grid-column: 2 / 3; background: #000; border-radius: 12px; 
-            border: 1px solid #333; padding: 15px; font-family: 'Consolas', monospace; 
-            font-size: 13px; overflow-y: auto; color: #0f8;
-        }
-        .console.error { border-color: var(--pink); color: var(--pink); box-shadow: inset 0 0 10px rgba(255,0,127,0.2); }
-
-        /* 👤 Profile Pop (localStorage) */
-        #profile-panel { 
-            display: none; position: fixed; top: 70px; right: 20px; width: 280px;
-            background: rgba(10,10,20,0.98); backdrop-filter: blur(20px);
-            border: 1px solid var(--cyan); border-radius: 15px; padding: 20px; z-index: 1000;
-        }
-
-        /* 🤖 Floating AI */
-        #ai-bubble {
-            position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px;
-            background: var(--cyan); border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; cursor: pointer; box-shadow: 0 0 20px var(--cyan);
-            animation: float 3s ease-in-out infinite; z-index: 2000;
-        }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-
-        .neon-text { font-family: 'Orbitron', sans-serif; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
+        /* 👤 Profile Pop */
+        #profile-pop { display: none; position: fixed; top: 85px; right: 25px; width: 280px; background: rgba(5,5,15,0.98); border: 1px solid var(--cyan); border-radius: 20px; padding: 25px; z-index: 1000; text-align: center; backdrop-filter: blur(15px); box-shadow: 0 0 40px black; }
+        
+        /* Star Background for App */
+        #app-stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
     </style>
 </head>
 <body>
 
-<canvas id="space-canvas"></canvas>
+<div id="code-bg"></div>
+<canvas id="app-stars"></canvas>
 
-<div class="app-container">
+<div id="auth-screen">
+    <div class="auth-container">
+        <div class="side-console" id="boot-log">
+            <span style="color:var(--pink)">// SYSTEM_READY</span><br>
+            > Accessing MD_Empire...<br>
+            > Milestone: 4/12/2025 OK<br>
+            > Initializing AI...<br>
+        </div>
+        <div class="auth-card" style="width: 300px; text-align: center;">
+            <h2 class="neon-font" style="font-size: 18px; color:white;">ACCESS PROTOCOL</h2>
+            <input type="text" id="user-name" class="auth-input" placeholder="DEVELOPER_NAME">
+            <input type="password" id="user-pass" class="auth-input" placeholder="SECURITY_KEY">
+            <button onclick="bootSystem()" class="auth-input" style="background:var(--cyan); color:black; font-weight:bold; cursor:pointer;">START ENGINE</button>
+        </div>
+    </div>
+</div>
+
+<div id="profile-pop">
+    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rega" style="width:80px; border-radius:50%; border:2px solid var(--cyan); margin-bottom: 15px;">
+    <h3 class="neon-font" id="p-name" style="margin: 0;">Rega</h3>
+    <p style="font-size:12px; color:var(--cyan); margin: 5px 0;">Multidisciplinary Developer</p>
+    <div style="text-align: left; font-size: 11px; color: #888; margin-top: 15px;">
+        <p><i class="fas fa-calendar"></i> Since: 4/12/2025</p>
+        <p><i class="fas fa-shield"></i> Level: Alpha Creator</p>
+    </div>
+    <button onclick="toggleProfile()" style="width:100%; background:var(--pink); border:none; color:white; padding:10px; border-radius:10px; cursor:pointer; margin-top:15px; font-family:'Orbitron'; font-size:10px;">SECURE LOGOUT</button>
+</div>
+
+<div class="main-app" id="app">
     <header>
-        <div class="neon-text" style="font-size: 22px;">MD EMPIRE <span style="font-size: 10px; color: white;">v20.0</span></div>
-        <div style="display:flex; align-items:center; gap:15px;">
-            <button onclick="genSecurePass()" class="nav-item" style="font-size:12px; padding:5px 10px;">🔑 Pass Gen</button>
-            <button onclick="copyShareLink()" class="nav-item" style="font-size:12px; padding:5px 10px;"><i class="fas fa-share"></i> Share</button>
-            <img id="user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Multidisciplinary" onclick="toggleProfile()" style="width:40px; border-radius:50%; border:2px solid var(--cyan); cursor:pointer;">
+        <div class="neon-font" style="font-size: 22px;">MD-STUDIO <span style="font-size:10px; color:white;">v20.0</span></div>
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div style="background:rgba(0,0,0,0.5); padding:8px 15px; border-radius:8px; border:1px solid #333; font-size:12px;">
+                🔑 Secure: <span id="strong-pass" style="color:var(--cyan)">******</span>
+                <i class="fas fa-sync" style="margin-left:10px; cursor:pointer;" onclick="genPass()"></i>
+            </div>
+            <i class="fas fa-share-alt" onclick="alert('Link Copied! 🔗')" style="color:var(--cyan); cursor:pointer;"></i>
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rega" style="width:45px; border-radius:50%; border:2px solid var(--cyan); cursor:pointer;" onclick="toggleProfile()">
         </div>
     </header>
 
     <div class="sidebar">
-        <div class="nav-item active" onclick="switchTab('python')"><i class="fab fa-python"></i><br>Python Hub</div>
-        <div class="nav-item" onclick="switchTab('scratch')"><i class="fas fa-puzzle-piece"></i><br>Scratch Lab</div>
-        <div class="nav-item" onclick="switchTab('web')"><i class="fas fa-globe"></i><br>Web Run</div>
+        <button class="nav-btn active" onclick="switchTab('ai')"><i class="fas fa-robot"></i> MD-AI ASSISTANT</button>
+        <button class="nav-btn" onclick="switchTab('scratch')"><i class="fas fa-puzzle-piece"></i> SCRATCH LAB</button>
+        <button class="nav-btn" onclick="switchTab('settings')"><i class="fas fa-cog"></i> SYSTEM SETTINGS</button>
+        <div style="margin-top:auto; font-size:10px; color:#444; text-align:center;">Connected: 4/12/2025</div>
     </div>
 
-    <div class="editor-section">
-        <textarea id="real-editor"></textarea>
-        <div id="blockly-ui" style="display:none; height:100%;"></div>
-    </div>
+    <div class="content-box">
+        <div id="ai" class="tab-content active">
+            <div class="chat-wrap">
+                <h3 class="neon-font" style="font-size:14px; margin-bottom:20px;">AI INTERFACE_ONLINE</h3>
+                <div id="chat-logs">
+                    <div class="chat-msg" style="color:var(--cyan)">[MD-AI]: Welcome, Developer. Systems are at 100% efficiency. How shall we build today?</div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="ai-in" class="auth-input" style="margin:0;" placeholder="Command AI...">
+                    <button onclick="aiChat()" class="nav-btn" style="padding:0 30px;">SEND</button>
+                </div>
+            </div>
+        </div>
 
-    <div class="stage-section" id="stage">
-        <div id="turtle-container" style="width:100%; height:100%;"></div>
-        <iframe id="web-preview" style="display:none; width:100%; height:100%; border:none; background:white;"></iframe>
-        <div class="run-btn-container">
-            <button class="btn-red-run" onclick="executeEngine()"><i class="fas fa-play"></i></button>
+        <div id="scratch" class="tab-content">
+            <div class="scratch-split">
+                <div id="blocklyArea"></div>
+                <div style="display:flex; flex-direction:column;">
+                    <div class="stage-view"><img id="sprite" src="https://openclipart.org/image/800px/217242"></div>
+                    <div id="console-log" style="background:black; color:#0f8; font-family:monospace; font-size:11px; padding:10px; height:100px; margin-top:10px; border-radius:10px; border:1px solid #222; overflow-y:auto;">[SYS]: Execution Log Ready.</div>
+                    <button class="btn-run-main" onclick="runScratch()"><i class="fas fa-play" style="font-size:28px;"></i></button>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="console" id="console-out">
-        [SYSTEM]: Welcome, Multidisciplinary Developer. Engine Ready...
-    </div>
-
-    <div class="sidebar" style="grid-column: 3; grid-row: 2/4;">
-        <h3 class="neon-text" style="font-size:14px; text-align:center;">MD-AI CHAT</h3>
-        <div id="chat-box" style="height:calc(100% - 100px); overflow-y:auto; font-size:12px; padding:5px; color:#ccc;"></div>
-        <input type="text" id="ai-input" placeholder="Ask AI anything..." style="width:100%; background:#111; border:1px solid #333; color:white; padding:8px; border-radius:5px;">
-    </div>
-</div>
-
-<div id="profile-panel">
-    <h3 class="neon-text">My Profile</h3>
-    <input type="text" id="user-name-in" placeholder="Your Name" style="width:100%; margin-bottom:10px;">
-    <textarea id="user-bio-in" placeholder="Bio..." style="width:100%; height:60px;"></textarea>
-    <button onclick="saveProfile()" style="width:100%; background:var(--cyan); color:black; font-weight:bold; border:none; padding:10px; border-radius:5px; margin-top:10px;">SAVE EMPIRE DATA</button>
-</div>
-
-<div id="ai-bubble" onclick="aiGreet()">
-    <i class="fas fa-robot" style="font-size:28px; color:black;"></i>
 </div>
 
 <script>
-    // 🌌 1. Space Particles Background
-    const canvas = document.getElementById('space-canvas');
+    // 🌌 خلفية الأكواد العشوائية
+    const snippets = ["system.reboot();", "const MD = new Empire();", "if(Rega) { build(); }", "decrypting_files...", "AI.connect();", "milestone: 4/12/2025"];
+    setInterval(() => {
+        const line = document.createElement('div');
+        line.innerText = snippets[Math.floor(Math.random() * snippets.length)];
+        line.style.paddingLeft = Math.random() * 40 + 'px';
+        document.getElementById('code-bg').appendChild(line);
+        if(document.getElementById('code-bg').childNodes.length > 40) document.getElementById('code-bg').removeChild(document.getElementById('code-bg').firstChild);
+    }, 200);
+
+    // 🌟 خلفية النجوم للتطبيق
+    const canvas = document.getElementById('app-stars');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    let stars = Array(150).fill().map(() => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2 }));
+    let stars = Array(100).fill().map(() => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*2 }));
     function drawStars() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = "white";
-        stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill(); s.y -= 0.5; if(s.y < 0) s.y = canvas.height; });
+        ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "white";
+        stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); s.y -= 0.3; if(s.y<0) s.y=canvas.height; });
         requestAnimationFrame(drawStars);
     }
     drawStars();
 
-    // 🐍 2. Python (Pyodide) Engine
-    let pyodide;
-    async function initPy() { 
-        pyodide = await loadPyodide(); 
-        document.getElementById('console-out').innerHTML += "<br>[PYTHON]: Runtime Loaded.";
-    }
-    initPy();
+    // 🧩 سكراتش (Blockly)
+    Blockly.Blocks['move_10'] = { init: function() { this.appendDummyInput().appendField("Move 10 Steps ➡️"); this.setPreviousStatement(true); this.setNextStatement(true); this.setColour(160); } };
+    const workspace = Blockly.inject('blocklyArea', {toolbox: {kind: 'flyoutToolbox', contents: [{kind: 'block', type: 'move_10'}, {kind: 'block', type: 'controls_repeat_ext'}]}, theme: Blockly.Themes.Dark});
 
-    // 📝 3. Editor (CodeMirror)
-    const editor = CodeMirror.fromTextArea(document.getElementById('real-editor'), {
-        lineNumbers: true, mode: 'python', theme: 'abbott', indentUnit: 4
-    });
-
-    // 👤 4. Profile Logic (LocalStorage)
-    function saveProfile() {
-        localStorage.setItem('md-name', document.getElementById('user-name-in').value);
-        localStorage.setItem('md-bio', document.getElementById('user-bio-in').value);
-        alert("Data Saved to Empire!");
-    }
-
-    // 🤖 5. AI Greet (Voice)
-    function aiGreet() {
-        const name = localStorage.getItem('md-name') || "Multidisciplinary Developer";
-        const msg = new SpeechSynthesisUtterance(`Welcome back to your empire, ${name}. I am ready to build.`);
-        window.speechSynthesis.speak(msg);
-    }
-
-    // 🛑 6. EXECUTE ENGINE (The Logic)
-    async function executeEngine() {
-        const code = editor.getValue();
-        const consoleOut = document.getElementById('console-out');
-        consoleOut.classList.remove('error');
-        consoleOut.innerHTML = "[SYSTEM]: Running...";
-
-        try {
-            // Python Mode
-            if(editor.getOption('mode') === 'python') {
-                await pyodide.runPythonAsync(code);
-                consoleOut.innerHTML = "[SUCCESS]: Python code executed perfectly.";
-            } 
-            // Web Mode
-            else {
-                const blob = new Blob([code], {type: 'text/html'});
-                document.getElementById('web-preview').src = URL.createObjectURL(blob);
-                consoleOut.innerHTML = "[SUCCESS]: Web Render Complete.";
-            }
-        } catch (err) {
-            consoleOut.classList.add('error');
-            consoleOut.innerHTML = `[ERROR]: ${err.message} <br><button onclick="fixWithAI()" style="background:white; color:red; border:none; padding:5px; cursor:pointer;">FIX WITH AI</button>`;
+    // 🔐 تسجيل الدخول
+    function bootSystem() {
+        const name = document.getElementById('user-name').value;
+        if(name) {
+            localStorage.setItem('md_user', name);
+            document.getElementById('auth-screen').style.transition = '1s';
+            document.getElementById('auth-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'grid';
+                document.getElementById('p-name').innerText = name;
+                
+                // 🔊 ترحيب صوتي باسمك
+                const msg = new SpeechSynthesisUtterance("Welcome back to MD Empire, " + name);
+                window.speechSynthesis.speak(msg);
+                genPass();
+            }, 1000);
         }
     }
 
-    // 🧩 7. Scratch Lab (Blockly)
-    function switchTab(type) {
-        document.getElementById('blockly-ui').style.display = type === 'scratch' ? 'block' : 'none';
-        document.querySelector('.CodeMirror').style.display = type === 'scratch' ? 'none' : 'block';
-        document.getElementById('web-preview').style.display = type === 'web' ? 'block' : 'none';
-        editor.setOption('mode', type === 'web' ? 'xml' : 'python');
+    // 📂 التبديل بين الأقسام
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(id === 'scratch') setTimeout(() => Blockly.svgResize(workspace), 50);
     }
 
-    // 🔑 8. Password Gen
-    function genSecurePass() {
-        const pass = Math.random().toString(36).slice(-10) + "!" + Math.floor(Math.random()*100);
-        document.getElementById('console-out').innerHTML = `[SECURITY]: New Strong Password: ${pass}`;
+    // 🤖 دردشة AI
+    function aiChat() {
+        const input = document.getElementById('ai-in');
+        const logs = document.getElementById('chat-logs');
+        if(input.value) {
+            logs.innerHTML += `<div class="chat-msg"><b>You:</b> ${input.value}</div>`;
+            setTimeout(() => {
+                logs.innerHTML += `<div class="chat-msg" style="color:var(--cyan)"><b>MD-AI:</b> Analyzed. I'm ready to assist with your next code module.</div>`;
+                logs.scrollTop = logs.scrollHeight;
+            }, 500);
+            input.value = "";
+        }
+    }
+
+    function runScratch() {
+        const s = document.getElementById('sprite');
+        const log = document.getElementById('console-log');
+        s.style.left = (parseInt(s.style.left) || 50) + 5 + "%";
+        log.innerHTML += `<br>> Sprite moved at ${new Date().toLocaleTimeString()} ✅`;
+        log.scrollTop = log.scrollHeight;
     }
 
     function toggleProfile() { 
-        const p = document.getElementById('profile-panel');
+        const p = document.getElementById('profile-pop');
         p.style.display = p.style.display === 'block' ? 'none' : 'block';
     }
+
+    function genPass() { document.getElementById('strong-pass').innerText = Math.random().toString(36).slice(-8).toUpperCase(); }
 </script>
+
 </body>
 </html>
