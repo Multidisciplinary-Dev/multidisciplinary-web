@@ -1,213 +1,144 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD STUDIO | ULTIMATE EDITION</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>MD STUDIO | SUPREME EMPIRE</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root { --cyan: #00f2ff; --pink: #ff007f; --dark: #020205; --glass: rgba(255, 255, 255, 0.05); }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; touch-action: manipulation; }
 
-        /* 🌌 خلفية الفضاء */
-        #space { position: fixed; inset: 0; z-index: 1; background: radial-gradient(circle at bottom, #050510, #000); }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; }
-        #rain { position: fixed; inset: 0; z-index: 2; opacity: 0.1; color: var(--cyan); pointer-events: none; font-family: monospace; }
-
-        /* 🔐 شاشة الدخول */
-        #login-screen { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: black; }
-        .login-card { display: flex; align-items: center; gap: 30px; background: var(--glass); padding: 40px; border-radius: 25px; border: 1px solid var(--cyan); backdrop-filter: blur(15px); }
-        .console-box { width: 200px; height: 180px; background: rgba(0,0,0,0.7); border-left: 3px solid var(--cyan); padding: 10px; font-family: 'Source Code Pro'; font-size: 10px; color: #0f8; overflow: hidden; }
-        .input-style { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 8px; font-family: 'Orbitron'; outline: none; box-sizing: border-box; }
-        #err-msg { color: var(--pink); font-size: 10px; display: none; }
-        .btn-log { width: 100%; padding: 12px; background: #222; color: #555; border: none; border-radius: 8px; font-weight: bold; cursor: not-allowed; transition: 0.3s; }
+        /* شاشة الدخول الاحترافية */
+        #login-screen { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: black; gap: 20px; }
+        .matrix-box { width: 350px; height: 400px; background: #000; border: 1px solid #111; border-radius: 15px; padding: 15px; overflow: hidden; font-family: 'Source Code Pro'; color: #0f8; font-size: 11px; }
+        .login-card { width: 320px; background: var(--glass); padding: 30px; border-radius: 20px; border: 1px solid #222; text-align: center; backdrop-filter: blur(10px); }
+        
+        .input-style { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #333; color: var(--cyan); border-radius: 5px; font-size: 16px; outline: none; box-sizing: border-box; }
+        .btn-log { width: 100%; padding: 15px; background: #222; color: #555; border: none; border-radius: 5px; font-weight: bold; cursor: not-allowed; transition: 0.4s; }
         .btn-log.ready { background: #00ff88; color: black; cursor: pointer; box-shadow: 0 0 20px #00ff88; }
 
-        /* 📱 الواجهة الرئيسية */
-        #main-app { display: none; grid-template-columns: 250px 1fr; height: 100vh; position: relative; z-index: 10; }
-        .sidebar { background: rgba(0,0,0,0.9); border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .nav-btn { padding: 15px; border-radius: 10px; border: 1px solid #333; cursor: pointer; text-align: left; font-size: 12px; transition: 0.3s; }
-        .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: black; box-shadow: 0 0 15px var(--cyan); border-color: var(--cyan); }
+        /* الواجهة الرئيسية */
+        #main-app { display: none; grid-template-columns: 240px 1fr; height: 100vh; position: relative; z-index: 10; }
+        .sidebar { background: rgba(0,0,0,0.9); border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-btn { padding: 12px; border-radius: 8px; border: 1px solid #333; color: #ccc; cursor: pointer; font-size: 11px; transition: 0.3s; }
+        .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: black; }
 
-        /* الأقسام */
-        .section { display: none; padding: 30px; height: 100%; box-sizing: border-box; overflow-y: auto; }
-        .section.active { display: block; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* المربع الذكي مع زرار المسافة */
+        .editor-container { position: relative; margin-top: 15px; }
+        .smart-editor { width: 100%; min-height: 60px; background: #000; border: 2px solid var(--pink); border-radius: 10px; padding: 15px; color: #0f8; font-family: 'Source Code Pro'; resize: both; overflow: auto; box-sizing: border-box; }
+        .space-btn { position: absolute; top: 5px; right: 5px; background: #222; color: var(--cyan); border: 1px solid var(--cyan); padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; }
 
-        /* ⌨️ المحرر الذكي (المربع اللي طلبتيه) */
-        .smart-editor { 
-            width: 300px; /* بيبدأ مربع صغير */
-            min-height: 80px; 
-            background: #000; 
-            border: 2px solid var(--pink); 
-            border-radius: 12px; 
-            padding: 15px; 
-            font-family: 'Source Code Pro'; 
-            color: #0f8; 
-            overflow: hidden; 
-            resize: both; /* خيار التوسيع باللمس/الشد */
-            display: inline-block;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        /* سكراتش */
-        .engine-grid { display: grid; grid-template-columns: 1fr 380px; gap: 15px; height: 450px; }
-        #blocklyDiv { border: 1px solid #333; border-radius: 15px; }
-        .stage { background: white; border-radius: 20px; border: 5px solid var(--cyan); position: relative; overflow: hidden; height: 100%; }
-        .run-btn-red { width: 70px; height: 70px; background: #ee1c25; border-radius: 50%; border: 4px solid white; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 10px auto; box-shadow: 0 0 15px #ee1c25; }
-
+        /* بوت الـ AI */
+        #ai-bot { position: fixed; bottom: 20px; left: 20px; width: 60px; height: 60px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 25px; cursor: pointer; z-index: 1000; box-shadow: 0 0 15px var(--cyan); color: black; }
     </style>
 </head>
 <body>
 
-<div id="space"></div>
-<div id="rain"></div>
-
 <div id="login-screen">
+    <div class="matrix-box" id="matrix-code"></div>
     <div class="login-card">
-        <div class="console-box" id="log-stream">
-            <span style="color:var(--pink)">// SYSTEM_LOCK_v3</span><br>
-            > awaiting_identity...<br>
-        </div>
-        <div style="width: 280px; text-align: center;">
-            <h2 style="font-size: 16px;">MD EMPIRE LOGIN</h2>
-            <input type="text" id="u-name" class="input-style" placeholder="ENTER NAME">
-            <input type="password" id="u-pass" class="input-style" placeholder="6-CHAR KEY (A1b2...)">
-            <div id="err-msg">Must be 6 (Letters + Numbers)</div>
-            <button id="entry-btn" onclick="startApp()" class="btn-log">ACTIVATE EMPIRE</button>
-        </div>
+        <h2 style="color:var(--cyan); font-size: 18px;">JOIN MD STUDIO</h2>
+        <input type="text" id="u-name" class="input-style" placeholder="Your Name">
+        <input type="password" id="u-pass" class="input-style" placeholder="Password (6 Chars)">
+        <p id="hint" style="color:var(--pink); font-size: 10px; display:none;">6 Mixed Chars Required!</p>
+        <button id="entry-btn" onclick="login()" class="btn-log">LAUNCH ENGINE</button>
     </div>
 </div>
 
 <div id="main-app">
     <div class="sidebar">
-        <h2 style="color:var(--cyan); margin-bottom: 30px;">MD STUDIO</h2>
-        <div class="nav-btn active" onclick="navigate('ai')"><i class="fas fa-robot"></i> AI ASSISTANT</div>
-        <div class="nav-btn" onclick="navigate('engine')"><i class="fas fa-gamepad"></i> GAME BUILDER</div>
-        <div class="nav-btn" onclick="navigate('tools')"><i class="fas fa-tools"></i> DEV TOOLS</div>
-        <div class="nav-btn" onclick="navigate('profile')"><i class="fas fa-user-shield"></i> PROFILE</div>
+        <h2 style="color:var(--cyan); font-size: 14px;">MD STUDIO</h2>
+        <div class="nav-btn active">GAME BUILDER</div>
+        <div class="nav-btn">AI LAB</div>
+        <div class="nav-btn" style="margin-top:auto; background:var(--pink); color:white;" onclick="logout()">LOGOUT</div>
     </div>
-
-    <div class="content">
-        <div id="ai" class="section active">
-            <h2 style="color:var(--cyan)">MD-AI</h2>
-            <div id="chat" style="height:60%; background:rgba(0,0,0,0.4); border-radius:15px; padding:20px; border-left:3px solid var(--cyan); overflow-y:auto;">
-                <div style="color:var(--cyan)">[SYSTEM]: Interface Online.</div>
-            </div>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <input type="text" id="ai-in" class="input-style" placeholder="Ask AI...">
-                <button onclick="aiTalk()" class="nav-btn" style="padding:0 30px;">SEND</button>
-            </div>
-        </div>
-
-        <div id="engine" class="section">
-            <h2 style="color:var(--cyan)">GAME BUILDER</h2>
-            <div class="engine-grid">
-                <div id="blocklyDiv"></div>
-                <div class="stage">
-                    <img id="cat" src="https://scratch.mit.edu/static/assets/009dc4fa606f5279930f40d6ca8e506d.svg" style="position:absolute; width:80px; top:40%; left:40%;">
-                    <div style="position:absolute; bottom:10px; width:100%; text-align:center;">
-                        <button class="run-btn-red" onclick="moveCat()"><i class="fas fa-play"></i></button>
-                    </div>
-                </div>
-            </div>
-            
-            <p style="margin-top:20px; font-size:12px; color:var(--pink);">SMART LOGIC EDITOR (Resize by handle or just type):</p>
-            <div class="smart-editor" id="editor-box" contenteditable="true" oninput="autoExpand(this)">
-                // Type code here...
-            </div>
-        </div>
-
-        <div id="tools" class="section">
-            <h2 style="color:var(--cyan)">SECURE TOOLS</h2>
-            <div style="background:var(--glass); padding:20px; border-radius:15px; border:1px solid #333;">
-                <h3>Pass Generator</h3>
-                <div id="p-res" style="color:var(--cyan); margin-bottom:10px;">********</div>
-                <button class="nav-btn" onclick="genP()">GENERATE KEY</button>
-            </div>
-        </div>
-
-        <div id="profile" class="section">
-            <div style="max-width:500px; margin:auto; background:var(--glass); padding:30px; border-radius:20px; border:1px solid var(--cyan); text-align:center;">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rega" style="width:120px; border:3px solid var(--cyan); border-radius:50%; margin-bottom:15px;">
-                <h2 id="d-name">Developer</h2>
-                <input type="text" id="edit-n" class="input-style" placeholder="Update Name">
-                <button class="nav-btn" style="width:100%;" onclick="alert('Empire Synchronized!')">SAVE DATA</button>
+    
+    <div style="padding: 25px;">
+        <h1 id="welcome-msg" style="color:var(--cyan); text-shadow: 0 0 10px var(--cyan);"></h1>
+        
+        <div class="editor-container">
+            <div class="space-btn" onclick="addSpace('main-editor')">TAB SPACE</div>
+            <div class="smart-editor" id="main-editor" contenteditable="true" oninput="autoExpand(this)">
+                // Write your empire code here...
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    // 🌌 الفضاء
-    for(let i=0; i<100; i++) {
-        let s = document.createElement('div'); s.className='star';
-        s.style.width=s.style.height=Math.random()*2+'px';
-        s.style.left=Math.random()*100+'vw'; s.style.top=Math.random()*100+'vh';
-        document.getElementById('space').appendChild(s);
-    }
-    setInterval(() => {
-        let r = document.createElement('div'); r.innerText = "REGA_MD_EMPIRE";
-        r.style.position='fixed'; r.style.left=Math.random()*100+'vw'; r.style.top='-20px';
-        r.style.transition='4s linear'; document.getElementById('rain').appendChild(r);
-        setTimeout(()=>r.style.top='110vh',10); setTimeout(()=>r.remove(),4000);
-    }, 600);
+<div id="ai-bot"><i class="fas fa-robot"></i></div>
 
-    // 🔐 الدخول (الباسورد 6 ميكس)
-    const passInput = document.getElementById('u-pass');
-    const entryBtn = document.getElementById('entry-btn');
-    passInput.addEventListener('input', () => {
-        const v = passInput.value;
+<script>
+    // 1. نظام الذاكرة والترحيب
+    window.onload = function() {
+        const savedName = localStorage.getItem('md_user');
+        if(savedName) {
+            showApp(savedName, true);
+        }
+        startMatrix();
+    };
+
+    function login() {
+        if(!document.getElementById('entry-btn').classList.contains('ready')) return;
+        const name = document.getElementById('u-name').value;
+        localStorage.setItem('md_user', name);
+        showApp(name, false);
+    }
+
+    function showApp(name, isOld) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'grid';
+        
+        const msg = isOld ? `WELCOME BACK, ${name.toUpperCase()}!` : `WELCOME, ${name.toUpperCase()}!`;
+        document.getElementById('welcome-msg').innerText = msg;
+        
+        // ترحيب صوتي
+        const synth = window.speechSynthesis;
+        synth.speak(new SpeechSynthesisUtterance(msg));
+    }
+
+    // 2. التحقق من الباسورد (6 خانات ميكس)
+    document.getElementById('u-pass').addEventListener('input', function() {
+        const v = this.value;
+        const btn = document.getElementById('entry-btn');
         const valid = v.length === 6 && /[a-zA-Z]/.test(v) && /[0-9]/.test(v);
-        if(v.length > 0 && !valid) { document.getElementById('err-msg').style.display='block'; entryBtn.classList.remove('ready'); }
-        else if(valid) { document.getElementById('err-msg').style.display='none'; entryBtn.classList.add('ready'); }
+        
+        if(v.length > 0 && !valid) {
+            document.getElementById('hint').style.display = 'block';
+            btn.classList.remove('ready');
+        } else if(valid) {
+            document.getElementById('hint').style.display = 'none';
+            btn.classList.add('ready');
+        }
     });
 
-    function startApp() {
-        if(!entryBtn.classList.contains('ready')) return;
-        const name = document.getElementById('u-name').value || "Rega";
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('main-app').style.display='grid';
-        document.getElementById('d-name').innerText = name;
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance("Welcome, " + name));
+    // 3. علامة المساحة للأكواد
+    function addSpace(id) {
+        const editor = document.getElementById(id);
+        editor.focus();
+        document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
     }
 
-    // 📱 التنقل بالتاتش
-    function navigate(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
-        if(id === 'engine') setTimeout(() => Blockly.svgResize(workspace), 50);
-    }
-
-    // ⌨️ المربع اللي بيكبر لوحده
+    // 4. المربع الذكي
     function autoExpand(el) {
         el.style.height = 'auto';
         el.style.height = el.scrollHeight + 'px';
     }
 
-    // Tools & Game
-    function genP() {
-        const chars = "ABC123abc!@#"; let p = "";
-        for(let i=0; i<12; i++) p += chars[Math.floor(Math.random()*chars.length)];
-        document.getElementById('p-res').innerText = p;
+    // تأثير الماتريكس (الأكواد العشوائية)
+    function startMatrix() {
+        const codes = ["import md_empire", "system.status = 'Ready'", "turtle.draw_neon()", "ai.connect()", "fixing_bug_04...", "sketchpy.render()"];
+        const box = document.getElementById('matrix-code');
+        setInterval(() => {
+            const line = codes[Math.floor(Math.random()*codes.length)];
+            box.innerHTML += `<div>> ${line}</div>`;
+            if(box.children.length > 15) box.removeChild(box.firstChild);
+        }, 600);
     }
-    const workspace = Blockly.inject('blocklyDiv', {toolbox: {kind: 'flyoutToolbox', contents: [{kind: 'block', type: 'controls_repeat_ext'}]}, theme: Blockly.Themes.Dark});
-    function moveCat() { let c = document.getElementById('cat'); c.style.left = (parseInt(c.style.left)||40)+5+"%"; }
-    function aiTalk() { 
-        let i = document.getElementById('ai-in');
-        if(i.value) { 
-            document.getElementById('chat').innerHTML += `<div><b>You:</b> ${i.value}</div>`;
-            setTimeout(()=> document.getElementById('chat').innerHTML += `<div style="color:var(--cyan)"><b>AI:</b> Working on it...</div>`, 500);
-            i.value = "";
-        }
-    }
+
+    function logout() { localStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
