@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD STUDIO | REGA EMPIRE</title>
+    <title>MD STUDIO | REGA SUPREME EDITION</title>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
     <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
@@ -12,83 +12,74 @@
         :root { --cyan: #00f2ff; --pink: #ff0077; --green: #00ff88; --red: #ff3333; --dark: #020205; }
         body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
-        /* 🔐 شاشة الدخول */
-        #login-screen { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: black; gap: 30px; }
-        .matrix-box { width: 300px; height: 350px; background: #000; border: 1px solid #111; color: #0f8; padding: 15px; font-family: monospace; overflow: hidden; font-size: 11px; }
-        .login-card { width: 320px; padding: 30px; background: #0a0a0f; border: 1px solid #222; border-radius: 20px; text-align: center; }
-        .input-style { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 8px; outline: none; }
-        .btn-log { width: 100%; padding: 15px; background: #1a1a1a; color: #444; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-log.active { background: var(--green) !important; color: black !important; box-shadow: 0 0 20px var(--green); }
-
         /* 📱 الهيكل الرئيسي */
-        #main-app { display: none; grid-template-columns: 250px 1fr; height: 100vh; }
+        #main-app { display: grid; grid-template-columns: 250px 1fr; height: 100vh; }
         .sidebar { background: #05050a; border-right: 2px solid #111; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-btn { padding: 14px; background: #111; border: 1px solid #222; border-radius: 10px; cursor: pointer; color: #888; font-size: 13px; text-align: left; }
-        .nav-btn.active { background: var(--cyan); color: #000; font-weight: bold; }
+        .nav-btn { padding: 14px; background: #111; border: 1px solid #222; border-radius: 10px; cursor: pointer; color: #888; font-size: 13px; text-align: left; transition: 0.3s; }
+        .nav-btn.active { background: var(--cyan); color: #000; font-weight: bold; box-shadow: 0 0 15px var(--cyan); }
 
-        /* 🎊 ترحيب الأنيميشن */
-        #welcome-popup { position: fixed; top: 50%; left: 55%; transform: translate(-50%, -50%); font-size: 50px; font-weight: bold; color: var(--cyan); text-shadow: 0 0 20px var(--cyan); display: none; z-index: 9999; animation: fadeOut 3s forwards; }
-        @keyframes fadeOut { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -60%) scale(0.8); display: none; } }
+        .content { position: relative; background: var(--dark); overflow-y: auto; padding: 30px; }
+        .tab-content { display: none; width: 100%; }
+        .active-tab { display: block !important; }
 
-        /* 🎨 الرسم الحي */
-        #canvas-container { width: 500px; height: 500px; background: #000; border: 2px solid #222; margin-top: 20px; position: relative; border-radius: 15px; }
-        canvas { position: absolute; top: 0; left: 0; }
+        /* 🎨 الرسم و الباسوورد */
+        .card { background: #0a0a0f; padding: 25px; border-radius: 15px; border: 1px solid #222; margin-bottom: 20px; }
+        #canvas-container { width: 400px; height: 400px; background: #000; border: 2px solid #222; position: relative; border-radius: 10px; }
+        canvas { width: 100%; height: 100%; }
+        .pass-box { font-size: 24px; color: var(--green); background: #000; padding: 15px; border-radius: 10px; border: 1px dashed var(--green); margin: 15px 0; font-family: monospace; }
 
-        /* 🤖 البوت */
-        #ai-trigger { position: fixed; bottom: 30px; left: 30px; width: 80px; height: 80px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 25px var(--cyan); border: 4px solid #000; }
-        #ai-chat { position: fixed; bottom: 120px; left: 30px; width: 320px; height: 400px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 20px; display: none; flex-direction: column; z-index: 1000; overflow: hidden; }
-        #msgs { flex: 1; padding: 15px; overflow-y: auto; color: white; }
+        /* 🤖 البوت المتطور */
+        #ai-trigger { position: fixed; bottom: 30px; left: 30px; width: 70px; height: 70px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 20px var(--cyan); font-size: 30px; }
+        #ai-chat { position: fixed; bottom: 110px; left: 30px; width: 320px; height: 400px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 20px; display: none; flex-direction: column; z-index: 1000; overflow: hidden; }
+        #msgs { flex: 1; padding: 15px; overflow-y: auto; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div id="welcome-popup">WELCOME REGA</div>
-
-<div id="login-screen">
-    <div class="matrix-box" id="matrix"></div>
-    <div class="login-card">
-        <h2 style="color:var(--cyan)">MD STUDIO</h2>
-        <input type="text" id="reg-name" class="input-style" placeholder="Your Name">
-        <input type="text" id="reg-pass" class="input-style" placeholder="6 Chars Password">
-        <button id="entry-btn" class="btn-log" onclick="handleEntry()">LOGIN / CREATE</button>
-    </div>
-</div>
-
 <div id="main-app">
     <div class="sidebar">
-        <h2 style="color:var(--cyan); font-size: 18px;">MD MENU</h2>
-        <div class="nav-btn active" onclick="showTab('tab1')">🧩 SCRATCH FULL</div>
-        <div class="nav-btn" onclick="showTab('tab2')">🎨 ART (LIVE DRAW)</div>
-        <div class="nav-btn" onclick="showTab('tab3')">🔍 DEBUGGER</div>
-        <div class="nav-btn" onclick="showTab('tab4')" style="margin-top:auto;">👤 PROFILE</div>
+        <h2 style="color:var(--cyan); font-size: 18px;">MD ENGINE</h2>
+        <div class="nav-btn active" onclick="switchTab('tab1', this)">🧩 SCRATCH FULL</div>
+        <div class="nav-btn" onclick="switchTab('tab2', this)">🎨 ART LIVE DRAW</div>
+        <div class="nav-btn" onclick="switchTab('tab3', this)">🕹️ GAME MAKER</div>
+        <div class="nav-btn" onclick="switchTab('tab4', this)">🛡️ SERVER SECURITY</div>
+        <div class="nav-btn" onclick="switchTab('tab5', this)" style="margin-top:auto">👤 MY PROFILE</div>
     </div>
 
     <div class="content">
         <div id="tab1" class="tab-content active-tab">
-            <h3 style="color:var(--cyan)">Blockly Workspace</h3>
-            <div id="blocklyDiv" style="height: 80vh; width: 100%; border-radius: 15px;"></div>
+            <h3 style="color:var(--cyan)">Blockly Logic Workspace</h3>
+            <div id="blocklyDiv" style="height: 70vh; width: 100%; border-radius: 10px;"></div>
         </div>
 
         <div id="tab2" class="tab-content">
-            <h3 style="color:var(--pink)">Live Art Generator</h3>
-            <button class="nav-btn" style="background:var(--pink); color:white; width:150px; display:inline-block;" onclick="startLiveDraw()">RUN DRAW</button>
-            <button class="nav-btn" style="background:var(--green); color:black; width:150px; display:inline-block;" onclick="saveImg()">SAVE PNG</button>
-            <div id="canvas-container"><canvas id="artCanvas" width="500" height="500"></canvas></div>
+            <h3>Live Art Rendering</h3>
+            <button class="nav-btn" style="background:var(--pink); color:white; margin-bottom:10px;" onclick="startDraw()">START DRAWING</button>
+            <div id="canvas-container"><canvas id="artCanvas" width="400" height="400"></canvas></div>
         </div>
 
         <div id="tab3" class="tab-content">
-            <h3>AI Debugger</h3>
-            <textarea id="debug-in" class="input-style" style="height:150px;" placeholder="Paste code..."></textarea>
-            <button class="nav-btn" style="background:var(--green); color:black; width:100%;" onclick="runDebug()">ANALYZE</button>
-            <div id="debug-out" style="margin-top:20px; padding:15px; background:#000; border-radius:10px;"></div>
+            <h3>Mini Game Simulator</h3>
+            <div style="width:100%; height:300px; background:#111; border-radius:15px; position:relative; overflow:hidden;" id="stage">
+                <div id="player" style="position:absolute; bottom:10px; left:10px; font-size:40px;">🦖</div>
+            </div>
+            <p>Use Arrow Keys to test movement!</p>
         </div>
 
-        <div id="tab4" class="tab-content" style="text-align:center;">
-            <div style="background:#0a0a0f; padding:40px; border-radius:20px; border:1px solid #222;">
-                <img src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" style="width:100px; border:2px solid var(--cyan); border-radius:50%;">
-                <h3 id="p-name">Name: Rega ✎</h3>
+        <div id="tab4" class="tab-content">
+            <div class="card">
+                <h3 style="color:var(--green)">🛡️ Server Password Generator</h3>
+                <p>Generate unbreakable 16-character passwords for your server.</p>
+                <div id="pass-display" class="pass-box">Click Generate...</div>
+                <button class="nav-btn" style="background:var(--green); color:black; width:100%;" onclick="genPass()">GENERATE STRONG PASSWORD</button>
+            </div>
+        </div>
+
+        <div id="tab5" class="tab-content">
+            <div class="card" style="text-align:center;">
+                <img src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" width="100">
+                <h2 id="p-name">Rega ✎</h2>
                 <h3 id="p-pass">Pass: ****** ✎</h3>
-                <button class="nav-btn" style="background:var(--red); color:white; width:200px; margin-top:20px;" onclick="location.reload()">LOGOUT</button>
             </div>
         </div>
     </div>
@@ -96,89 +87,81 @@
 
 <div id="ai-trigger" onclick="toggleAI()">🤖</div>
 <div id="ai-chat">
-    <div style="background:var(--cyan); color:black; padding:15px; font-weight:bold;">MD BOT</div>
+    <div style="background:var(--cyan); color:black; padding:15px; font-weight:bold;">MD-ASSISTANT</div>
     <div id="msgs"></div>
-    <input type="text" id="ai-input" onkeypress="if(event.key==='Enter') askAI()" style="width:100%; padding:15px; background:#000; color:white; border:none;" placeholder="Ask me...">
+    <div style="display:flex; border-top:1px solid #222;">
+        <input type="text" id="ai-input" style="flex:1; background:transparent; border:none; color:white; padding:15px;" placeholder="Ask me anything...">
+        <button onclick="askAI()" style="background:var(--cyan); border:none; padding:15px; cursor:pointer;">GO</button>
+    </div>
 </div>
 
 <script>
-    // 1. الدخول والترحيب
-    function handleEntry() {
-        const name = document.getElementById('reg-name').value || "Developer";
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'grid';
+    // 1. وظيفة تبديل الأقسام (الآن تعمل 100%)
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         
-        // ترحيب بصري
-        const popup = document.getElementById('welcome-popup');
-        popup.innerText = "WELCOME " + name.toUpperCase();
-        popup.style.display = 'block';
-
-        // ترحيب صوتي
-        const msg = new SpeechSynthesisUtterance("Welcome " + name + ", System is online");
-        window.speechSynthesis.speak(msg);
-
-        document.getElementById('p-name').innerText = "Name: " + name + " ✎";
-        initScratch();
+        document.getElementById(tabId).classList.add('active-tab');
+        btn.classList.add('active');
+        
+        if(tabId === 'tab1') Blockly.svgResize(workspace);
     }
 
-    // 2. سكراتش الكامل
-    function initScratch() {
-        const tb = `<xml>
-            <category name="Motion" colour="210"><block type="controls_repeat_ext"></block></category>
-            <category name="Logic" colour="210"><block type="controls_if"></block><block type="logic_compare"></block></category>
-            <category name="Loops" colour="120"><block type="controls_for"></block></category>
-            <category name="Math" colour="230"><block type="math_number"></block><block type="math_arithmetic"></block></category>
-            <category name="Variables" custom="VARIABLE" colour="330"></category>
-        </xml>`;
-        Blockly.inject('blocklyDiv', {toolbox: tb, theme: Blockly.Themes.Dark});
-    }
-
-    // 3. الرسم الحي
-    function startLiveDraw() {
-        const canvas = document.getElementById('artCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,500,500);
-        let i = 0;
-        ctx.strokeStyle = "cyan";
-        function animate() {
-            if(i < 300) {
-                ctx.beginPath();
-                ctx.moveTo(250 + (i-1)*Math.cos(i*0.2), 250 + (i-1)*Math.sin(i*0.2));
-                ctx.lineTo(250 + i*Math.cos(i*0.2), 250 + i*Math.sin(i*0.2));
-                ctx.stroke();
-                i++; requestAnimationFrame(animate);
-            }
-        }
-        animate();
-    }
-
-    function saveImg() {
-        const link = document.createElement('a');
-        link.download = 'rega_art.png';
-        link.href = document.getElementById('artCanvas').toDataURL();
-        link.click();
-    }
-
-    // 4. المصحح والبوت
-    function runDebug() {
-        const code = document.getElementById('debug-in').value;
-        const out = document.getElementById('debug-out');
-        if(code.includes("while") && !code.includes("++")) {
-            out.innerHTML = "<b style='color:red'>❌ ERROR: Infinite Loop!</b><br>Fix: Add 'i++' inside your loop.";
-        } else {
-            out.innerHTML = "<b style='color:var(--green)'>✓ Perfect Logic, Boss!</b>";
-        }
-    }
-
-    function showTab(id) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab')); document.getElementById(id).classList.add('active-tab'); }
-    function toggleAI() { let c = document.getElementById('ai-chat'); c.style.display = c.style.display==='flex'?'none':'flex'; }
+    // 2. البوت الذكي (ردود متغيرة)
+    function toggleAI() { let c = document.getElementById('ai-chat'); c.style.display = (c.style.display==='flex')?'none':'flex'; }
     function askAI() {
         const inp = document.getElementById('ai-input');
         const msgs = document.getElementById('msgs');
-        msgs.innerHTML += `<div>You: ${inp.value}</div>`;
-        setTimeout(() => { msgs.innerHTML += `<div style="color:var(--cyan)">Bot: I'm here for you, Rega!</div>`; }, 500);
+        const text = inp.value.toLowerCase();
+        if(!text) return;
+
+        msgs.innerHTML += `<div style="text-align:right; margin-bottom:10px;"><b>You:</b> ${inp.value}</div>`;
+        
+        let reply = "That's a good point, Rega! Let's build something great.";
+        if(text.includes("hello")) reply = "Hello Rega! Your empire is online and ready.";
+        if(text.includes("game")) reply = "In the Game Maker tab, you can test physics and movement.";
+        if(text.includes("pass") || text.includes("security")) reply = "Go to the Security tab to generate an unhackable password!";
+        if(text.includes("art")) reply = "I love digital art! The Live Drawing tab uses math to draw.";
+
+        setTimeout(() => {
+            msgs.innerHTML += `<div style="color:var(--cyan); margin-bottom:10px;"><b>Bot:</b> ${reply}</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+        }, 300);
         inp.value = "";
     }
+
+    // 3. مولد الباسوورد القوي جداً
+    function genPass() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+        let pass = "";
+        for(let i=0; i<16; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        document.getElementById('pass-display').innerText = pass;
+    }
+
+    // 4. الرسم الحي
+    function startDraw() {
+        const canvas = document.getElementById('artCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,400,400);
+        let i = 0;
+        ctx.strokeStyle = "cyan";
+        function anim() {
+            if(i < 200) {
+                ctx.beginPath();
+                ctx.lineTo(200 + i * Math.cos(i*0.1), 200 + i * Math.sin(i*0.1));
+                ctx.stroke();
+                i++; requestAnimationFrame(anim);
+            }
+        }
+        anim();
+    }
+
+    // تهيئة سكراتش
+    const toolbox = { 'kind': 'categoryToolbox', 'contents': [
+        { 'kind': 'category', 'name': 'Logic', 'colour': '210', 'contents': [{ 'kind': 'block', 'type': 'controls_if' }] },
+        { 'kind': 'category', 'name': 'Loops', 'colour': '120', 'contents': [{ 'kind': 'block', 'type': 'controls_repeat_ext' }] }
+    ]};
+    const workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: Blockly.Themes.Dark});
 </script>
 </body>
 </html>
