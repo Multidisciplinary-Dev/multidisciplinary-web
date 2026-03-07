@@ -2,124 +2,135 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MD Studio | Project Cloud v9</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/dracula.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/xml/xml.min.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MD Studio | Ultimate Space</title>
     <style>
-        :root { --accent: #00d2ff; --pink: #ff0080; --dark: #050510; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        :root { --accent: #00d2ff; --err: #ff4d4d; --dark: #000; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* Layout */
-        #main-app { display: flex; flex-direction: column; height: 100vh; }
-        .main-layout { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 200px; background: #0a0a15; border-right: 1px solid #222; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-link { padding: 10px; cursor: pointer; border-radius: 8px; background: #111; font-size: 13px; border: 1px solid #333; }
-        .nav-link.active { background: var(--accent); color: #000; font-weight: bold; }
+        /* 🌌 خلفية الفضاء والماتريكس */
+        canvas { position: fixed; inset: 0; z-index: -1; }
 
-        /* Workspace */
-        .view { flex: 1; display: none; padding: 20px; }
-        .view.active { display: block; }
+        /* 🔐 شاشة الدخول */
+        #auth-screen { height: 100vh; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); }
+        .login-card { background: rgba(10, 10, 25, 0.95); padding: 40px; border: 2px solid var(--accent); border-radius: 20px; width: 320px; text-align: center; box-shadow: 0 0 20px var(--accent); }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #333; color: var(--accent); border-radius: 8px; box-sizing: border-box; outline: none; }
         
-        /* Project Manager Panel */
-        .project-panel { width: 200px; background: #000; border-left: 1px solid #222; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
-        .prj-item { padding: 8px; background: #111; border-radius: 5px; cursor: pointer; font-size: 12px; border: 1px solid #222; overflow: hidden; text-overflow: ellipsis; }
-        .prj-item:hover { border-color: var(--accent); }
+        /* 🔴 الرسالة الحمراء تحت الباسورد فوراً */
+        .error-hint { color: var(--err); font-size: 12px; text-align: left; min-height: 18px; font-weight: bold; margin-bottom: 10px; }
 
-        .btn-save { background: var(--pink); color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        /* 📱 الواجهة الرئيسية */
+        #main-app { display: none; height: 100vh; flex-direction: column; }
+        .sidebar { width: 220px; background: rgba(0,0,0,0.9); border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .nav-item { padding: 12px; cursor: pointer; border: 1px solid #333; border-radius: 10px; text-align: center; transition: 0.3s; }
+        .nav-item.active, .nav-item:hover { background: var(--accent); color: #000; font-weight: bold; }
+
+        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* 🎮 محرك التاتش */
+        #game-area { height: 400px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 15px; position: relative; overflow: hidden; touch-action: none; }
+        .item { position: absolute; font-size: 50px; cursor: move; touch-action: none; user-select: none; }
     </style>
 </head>
 <body>
 
+<canvas id="spaceCanvas"></canvas>
+
+<div id="auth-screen">
+    <div class="login-card">
+        <h2 style="color:var(--accent)">MD STUDIO</h2>
+        <input type="text" placeholder="Username">
+        <input type="password" id="passInput" placeholder="Password (6 Chars)" oninput="validatePass()">
+        <div id="errMsg" class="error-hint"></div>
+        <button id="loginBtn" onclick="openApp()" disabled style="width:100%; padding:15px; background:#222; border:none; color:#555; border-radius:10px; cursor:not-allowed; font-weight:bold;">LAUNCH</button>
+    </div>
+</div>
+
 <div id="main-app">
-    <nav style="height:50px; background:#000; border-bottom:1px solid var(--accent); display:flex; align-items:center; padding:0 20px; justify-content:space-between;">
-        <span style="color:var(--accent); font-weight:bold;">MD STUDIO CLOUD</span>
-        <span id="user-display">Developer</span>
-    </nav>
-
-    <div class="main-layout">
+    <nav style="padding:15px; border-bottom:2px solid var(--accent); background:#000; font-weight:bold; color:var(--accent);">MD STUDIO | EMPIRE</nav>
+    <div style="display:flex; flex:1;">
         <div class="sidebar">
-            <div class="nav-link active" onclick="showTab('v-web')">🌐 Web Workspace</div>
-            <div class="nav-link" onclick="showTab('v-game')">🎮 Game Studio</div>
-            <button onclick="location.reload()" style="margin-top:auto;">Logout</button>
+            <div class="nav-item active" onclick="showPage('game-page', this)">🎮 Engine</div>
+            <div class="nav-item" onclick="showPage('profile-page', this)">👤 Profile</div>
+            <button onclick="location.reload()" style="margin-top:auto; background:#ff0080; border:none; padding:10px; color:white; border-radius:5px;">Logout</button>
         </div>
-
-        <div id="v-web" class="view active" style="display:flex; gap:10px; padding:0;">
-            <div style="flex:1; display:flex; flex-direction:column; padding:15px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <h3>Code Editor</h3>
-                    <input type="text" id="project-name" placeholder="Project Name..." style="background:#111; color:white; border:1px solid #444; padding:5px; border-radius:5px;">
-                    <button class="btn-save" onclick="saveProject()">💾 SAVE PROJECT</button>
+        <div class="content">
+            <div id="game-page" class="page active">
+                <h2>Game Engine (Touch Support)</h2>
+                <button onclick="spawn('🚀')">Add Ship</button> <button onclick="spawn('👾')">Add Enemy</button>
+                <div id="game-area" style="margin-top:20px;"></div>
+            </div>
+            <div id="profile-page" class="page">
+                <div style="text-align:center; border:1px solid var(--accent); padding:40px; border-radius:20px; background:#0a0a0a;">
+                    <div style="width:100px; height:100px; background:var(--accent); border-radius:50%; margin:auto; margin-bottom:20px;"></div>
+                    <h1>Multidisciplinary Developer</h1>
+                    <p style="color:var(--accent)">System Administrator</p>
                 </div>
-                <textarea id="editor"></textarea>
-            </div>
-            
-            <div class="project-panel">
-                <h4 style="font-size:12px; color:var(--accent);">MY PROJECTS</h4>
-                <div id="projects-list"></div>
             </div>
         </div>
-
-        <div id="v-game" class="view">
-            <h3>Touch Game Engine</h3>
-            <p>Your game progress is saved locally.</p>
-            </div>
     </div>
 </div>
 
 <script>
-    // Initialize Editor
-    const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
-        mode: "xml",
-        theme: "dracula",
-        lineNumbers: true
-    });
+    // 🌌 خلفية الفضاء
+    const canvas = document.getElementById('spaceCanvas');
+    const ctx = canvas.getContext('2d');
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.onresize = resize; resize();
 
-    let currentUserId = "dev_user"; // User identification
-
-    // 💾 وظيفة حفظ المشروع
-    function saveProject() {
-        const name = document.getElementById('project-name').value;
-        const code = editor.getValue();
-        
-        if (!name) { alert("Please enter a project name!"); return; }
-
-        // الحصول على المشاريع القديمة أو إنشاء قائمة جديدة
-        let projects = JSON.parse(localStorage.getItem('md_projects_' + currentUserId)) || {};
-        projects[name] = { code: code, date: new Date().toLocaleString() };
-        
-        localStorage.setItem('md_projects_' + currentUserId, JSON.stringify(projects));
-        alert("Project '" + name + "' saved successfully!");
-        loadProjectsList();
-    }
-
-    // 📂 تحميل قائمة المشاريع
-    function loadProjectsList() {
-        const listDiv = document.getElementById('projects-list');
-        const projects = JSON.parse(localStorage.getItem('md_projects_' + currentUserId)) || {};
-        listDiv.innerHTML = "";
-
-        for (let name in projects) {
-            const item = document.createElement('div');
-            item.className = "prj-item";
-            item.innerHTML = `<strong>${name}</strong><br><small style="color:#666">${projects[name].date}</small>`;
-            item.onclick = () => {
-                editor.setValue(projects[name].code);
-                document.getElementById('project-name').value = name;
-            };
-            listDiv.appendChild(item);
+    function drawSpace() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#00d2ff"; ctx.font = "15px monospace";
+        for(let i=0; i<20; i++) {
+            ctx.fillText(Math.random() > 0.5 ? "1" : "0", Math.random()*canvas.width, Math.random()*canvas.height);
         }
+    } setInterval(drawSpace, 50);
+
+    // 🔐 فحص الباسورد (الرسالة الحمراء)
+    function validatePass() {
+        const p = document.getElementById('passInput').value;
+        const m = document.getElementById('errMsg');
+        const b = document.getElementById('loginBtn');
+        const hasChar = /[a-zA-Z]/.test(p);
+        const hasSym = /[!@#$%^&*]/.test(p);
+
+        if(p.length === 0) m.innerText = "";
+        else if(p.length < 6) m.innerText = "❌ Too Short! (Must be 6)";
+        else if(p.length > 6) m.innerText = "❌ Too Long! (Must be 6)";
+        else if(!hasChar || !hasSym) m.innerText = "❌ Need Letters & Symbols";
+        else {
+            m.innerHTML = "<span style='color:#00ff88'>✅ Ready!</span>";
+            b.disabled = false; b.style.background = "#00d2ff"; b.style.color = "#000"; b.style.cursor = "pointer";
+            return;
+        }
+        b.disabled = true; b.style.background = "#222"; b.style.color = "#555"; b.style.cursor = "not-allowed";
     }
 
-    function showTab(id) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    function openApp() { document.getElementById('auth-screen').style.display='none'; document.getElementById('main-app').style.display='flex'; }
+    
+    function showPage(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active');
+        el.classList.add('active');
     }
 
-    // Load projects on start
-    window.onload = loadProjectsList;
+    // 🎮 سحب العناصر (تاتش وماوس)
+    function spawn(emoji) {
+        const d = document.createElement('div'); d.className = 'item'; d.innerText = emoji;
+        d.style.left = '50px'; d.style.top = '50px';
+        const move = (e) => {
+            e.preventDefault(); const pt = e.touches ? e.touches[0] : e;
+            const r = document.getElementById('game-area').getBoundingClientRect();
+            d.style.left = (pt.clientX - r.left - 25) + 'px';
+            d.style.top = (pt.clientY - r.top - 25) + 'px';
+        };
+        d.onmousedown = d.ontouchstart = () => { window.onmousemove = window.ontouchmove = move; };
+        window.onmouseup = window.ontouchend = () => { window.onmousemove = window.ontouchmove = null; };
+        document.getElementById('game-area').appendChild(d);
+    }
 </script>
 </body>
 </html>
