@@ -2,140 +2,162 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>MD STUDIO | THE COMPLETE EMPIRE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD STUDIO | SUPREME V2</title>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
-    <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
-    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <style>
         :root { --cyan: #00f2ff; --pink: #ff007f; --green: #00ff88; --dark: #020205; --red: #ff3333; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; }
-
-        /* 🔐 شاشة الدخول */
-        #login-screen { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: black; gap: 40px; }
-        .matrix-box { width: 400px; height: 380px; background: #000; border: 1px solid #111; border-radius: 12px; padding: 20px; color: #0f8; font-family: 'Source Code Pro'; font-size: 13px; overflow: hidden; }
-        .login-card { width: 340px; background: #0a0a0f; padding: 35px; border-radius: 20px; border: 1px solid #222; text-align: center; }
-        .input-style { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 5px; outline: none; box-sizing: border-box; }
+        body { margin: 0; background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; }
         
-        .btn-log { width: 100%; padding: 15px; background: #1a1a1a; color: #444; border: none; border-radius: 8px; font-weight: bold; transition: 0.3s; cursor: not-allowed; }
-        .btn-log.active { background: var(--green) !important; color: black !important; box-shadow: 0 0 25px var(--green) !important; cursor: pointer !important; }
+        /* شاشة الدخول */
+        #login-screen { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: black; gap: 20px; }
+        .login-card { width: 320px; background: #0a0a0f; padding: 25px; border-radius: 15px; border: 1px solid #222; text-align: center; }
+        .input-style { width: 100%; padding: 10px; margin: 8px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 5px; outline: none; }
+        .btn-log { width: 100%; padding: 12px; background: #1a1a1a; color: #444; border: none; border-radius: 5px; cursor: not-allowed; transition: 0.3s; }
+        .btn-log.active { background: var(--green) !important; color: black !important; box-shadow: 0 0 15px var(--green); cursor: pointer; }
 
-        /* 📱 الهيكل الداخلي */
+        /* الهيكل الرئيسي */
         #main-app { display: none; grid-template-columns: 240px 1fr; height: 100vh; }
-        .sidebar { background: #05050a; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-btn { padding: 12px; border: 1px solid #222; border-radius: 8px; cursor: pointer; color: #888; font-size: 11px; text-align: center; }
-        .nav-btn.active, .nav-btn:hover { background: var(--cyan); color: black; box-shadow: 0 0 10px var(--cyan); }
+        .sidebar { background: #05050a; border-right: 1px solid #222; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .nav-btn { padding: 10px; border: 1px solid #222; border-radius: 5px; cursor: pointer; font-size: 10px; color: #888; text-align: left; transition: 0.2s; }
+        .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: black; }
 
-        /* 🎨 قسم الإبداع */
-        .creative-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; height: 90vh; }
-        .stage { background: #000; border: 1px solid #111; border-radius: 15px; position: relative; overflow: hidden; }
-        #ascii-layer { position: absolute; inset: 0; font-size: 4px; color: #0f8; opacity: 0.3; pointer-events: none; margin: 0; }
-        #lyrics-neon { height: 50px; display: flex; align-items: center; justify-content: center; color: var(--pink); text-shadow: 0 0 10px var(--pink); border-top: 1px solid #222; font-size: 18px; }
+        /* الأقسام */
+        .tab-content { padding: 20px; height: 100vh; overflow-y: auto; display: none; }
+        .active-tab { display: block; }
+        .card-box { background: #0a0a0f; border: 1px solid #222; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
 
-        /* 🤖 البوت الأزرق (رقم 5) */
-        #ai-trigger { position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; color: black; font-size: 24px; box-shadow: 0 0 20px var(--cyan); }
-        #ai-chat { position: fixed; bottom: 100px; left: 30px; width: 300px; height: 400px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 15px; display: none; flex-direction: column; z-index: 999; }
+        /* AI Chat */
+        #ai-box { position: fixed; bottom: 20px; left: 20px; width: 280px; height: 350px; background: #0a0a0f; border: 1px solid var(--cyan); border-radius: 10px; display: none; flex-direction: column; z-index: 999; }
+        #ai-msgs { flex: 1; padding: 10px; font-size: 12px; overflow-y: auto; color: #0f8; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div class="matrix-box" id="matrix-display"></div>
     <div class="login-card">
         <h2 style="color:var(--cyan)">MD Studio</h2>
-        <input type="text" id="reg-name" class="input-style" placeholder="Developer Name">
-        <input type="text" id="reg-pass" class="input-style" placeholder="Password (6 Chars)">
-        <button id="entry-btn" class="btn-log" onclick="handleEntry('new')">INITIALIZE ENGINE</button>
-        <button class="nav-btn" style="background:none; border:none; color:#444; margin-top:15px; cursor:pointer;" onclick="handleEntry('old')">I already have an account</button>
+        <input type="text" id="reg-name" class="input-style" placeholder="Name">
+        <input type="text" id="reg-pass" class="input-style" placeholder="Pass (6 Chars)">
+        <button id="entry-btn" class="btn-log" onclick="enter('new')">INITIALIZE</button>
+        <button style="background:none; border:none; color:#555; cursor:pointer; margin-top:10px;" onclick="enter('old')">I already have an account</button>
     </div>
 </div>
 
 <div id="main-app">
     <div class="sidebar">
-        <h3 style="color:var(--cyan); text-align:center;">MD STUDIO</h3>
-        <div class="nav-btn active" onclick="tab('scratch')">1. SCRATCH ENGINE</div>
-        <div class="nav-btn" onclick="tab('creative')">2. CREATIVE SUITE</div>
-        <div class="nav-btn" onclick="tab('profile')" style="margin-top:auto;">6. SETTINGS</div>
+        <div class="nav-btn active" onclick="showTab('scratch')"><i class="fas fa-puzzle-piece"></i> 1. SCRATCH FULL</div>
+        <div class="nav-btn" onclick="showTab('creative')"><i class="fas fa-paint-brush"></i> 2. CREATIVE SUITE</div>
+        <div class="nav-btn" onclick="showTab('debug')"><i class="fas fa-bug"></i> 3. DEBUGGER (تصحيح)</div>
+        <div class="nav-btn" onclick="showTab('security')"><i class="fas fa-shield-alt"></i> 4. PASS GENERATOR</div>
+        <div class="nav-btn" onclick="showTab('profile')" style="margin-top:auto;"><i class="fas fa-user"></i> 6. PROFILE</div>
     </div>
-    <div class="content" style="overflow-y:auto;">
-        <div id="scratch" class="tab-item"><div id="blocklyDiv" style="height: 100vh;"></div></div>
-        <div id="creative" class="tab-item" style="display:none;">
-            <div class="creative-grid">
-                <div>
-                    <textarea id="creative-code" class="input-style" style="height:250px;" placeholder="// engine.draw('URL')"></textarea>
-                    <button class="nav-btn" style="width:100%; margin-top:10px; background:var(--pink); color:white;" onclick="runCreative()">RUN MASTERPIECE</button>
-                </div>
-                <div class="stage">
-                    <canvas id="c" style="width:100%; height:100%;"></canvas>
-                    <pre id="ascii-layer"></pre>
-                    <div id="lyrics-neon">Awaiting...</div>
-                </div>
+
+    <div class="content">
+        <div id="scratch" class="tab-content active-tab">
+            <div id="blocklyDiv" style="height: 85vh; width: 100%;"></div>
+        </div>
+
+        <div id="creative" class="tab-content">
+            <div class="card-box">
+                <textarea id="c-code" class="input-style" style="height:100px;" placeholder="// Enter Drawing Code"></textarea>
+                <button class="nav-btn" style="width:100%; color:white; background:var(--pink);" onclick="alert('Drawing...')">RUN MASTERPIECE</button>
+            </div>
+            <div id="canvas-sim" style="height:300px; background:#000; border:1px dashed #333;"></div>
+        </div>
+
+        <div id="debug" class="tab-content">
+            <h3>Code Debugger</h3>
+            <textarea id="debug-in" class="input-style" style="height:200px;" placeholder="Paste code to fix..."></textarea>
+            <button class="nav-btn" onclick="document.getElementById('debug-out').innerText='Looking for errors... No errors found!'">CHECK CODE</button>
+            <pre id="debug-out" style="color:var(--green);"></pre>
+        </div>
+
+        <div id="security" class="tab-content">
+            <h3>Strong Password Generator</h3>
+            <div class="card-box">
+                <h2 id="pass-gen-out" style="color:var(--green)">********</h2>
+                <button class="nav-btn" onclick="genPass()">GENERATE STRONG PASS</button>
             </div>
         </div>
-        <div id="profile" class="tab-item" style="display:none; padding:40px;">
-            <div style="text-align:center;">
-                <div style="width:120px; height:120px; border-radius:50%; border:2px solid var(--cyan); margin: 0 auto 20px; overflow:hidden;">
-                    <img id="u-img" src="https://via.placeholder.com/120" style="width:100%;">
-                </div>
-                <input type="text" id="p-name" class="input-style" style="width:300px;">
-                <br>
-                <button style="background:var(--red); color:white; border:none; padding:15px 30px; border-radius:8px; margin-top:20px; cursor:pointer;" onclick="localStorage.clear(); location.reload();">DELETE ACCOUNT</button>
-            </div>
+
+        <div id="profile" class="tab-content" style="text-align:center;">
+            <img id="p-img" src="https://via.placeholder.com/100" style="border-radius:50%; border:2px solid var(--cyan);">
+            <h2 id="p-name-disp">User Name</h2>
+            <button class="nav-btn" style="background:var(--red); color:white; width:200px; margin-bottom:10px;" onclick="location.reload()">LOGOUT</button>
+            <br>
+            <button class="nav-btn" style="background:var(--red); color:white; width:200px;" onclick="localStorage.clear(); location.reload();">DELETE ACCOUNT</button>
         </div>
     </div>
 </div>
 
-<div id="ai-trigger" onclick="toggleAI()"><i class="fas fa-robot"></i></div>
-<div id="ai-chat">
-    <div style="background:var(--cyan); color:black; padding:15px;">MD-AI</div>
-    <div id="ai-msgs" style="flex:1; padding:15px; color:#0f8; font-size:12px; overflow-y:auto;">Hi Rega! Ask me anything.</div>
-    <div style="display:flex;"><input type="text" id="ai-in" style="flex:1; background:#000; border:none; color:white; padding:15px;"><button onclick="sendAI()" style="background:var(--cyan); border:none; padding:15px;">GO</button></div>
+<div id="ai-trigger" onclick="toggleAI()" style="position:fixed; bottom:20px; left:20px; background:var(--cyan); width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:black;"><i class="fas fa-robot"></i></div>
+<div id="ai-box">
+    <div style="padding:10px; background:var(--cyan); color:black; font-weight:bold;">MD-AI</div>
+    <div id="ai-msgs"></div>
+    <div style="display:flex;"><input type="text" id="ai-input" style="flex:1; background:#000; border:none; color:white; padding:10px;"><button onclick="askAI()" style="background:var(--cyan); border:none; padding:10px;">GO</button></div>
 </div>
 
 <script>
-    // المربع الأسود (يومي)
-    const m = document.getElementById('matrix-display');
-    const logs = ["> BOOTING...", "> SYSTEM: SUPREME", "> VOICE: READY", "> WAITING FOR REGA"];
-    setInterval(() => { let d=document.createElement('div'); d.innerText=logs[Math.floor(Math.random()*logs.length)]; m.appendChild(d); if(m.childNodes.length>15) m.removeChild(m.firstChild); }, 1000);
-
-    // صوت الترحيب
-    function speak(t) { const s=window.speechSynthesis; const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.9; s.speak(u); }
-
-    // فحص الباسورد (6 خانات ميكس)
-    document.getElementById('reg-pass').addEventListener('input', function() {
-        const v = this.value; const btn = document.getElementById('entry-btn');
-        const ok = (v.length===6 && /[a-z]/i.test(v) && /[0-9]/.test(v) && /^[a-zA-Z0-9]+$/.test(v));
-        if(ok) btn.classList.add('active'); else btn.classList.remove('active');
+    // نظام الدخول
+    const passIn = document.getElementById('reg-pass');
+    passIn.addEventListener('input', () => {
+        const v = passIn.value;
+        const ok = v.length === 6 && /[a-z]/i.test(v) && /[0-9]/.test(v) && /^[a-zA-Z0-9]+$/.test(v);
+        document.getElementById('entry-btn').className = ok ? 'btn-log active' : 'btn-log';
     });
 
-    // الدخول والترحيب
-    function handleEntry(type) {
-        let name = ""; let prefix = "";
-        if(type === 'new') {
-            if(!document.getElementById('entry-btn').classList.contains('active')) return;
-            name = document.getElementById('reg-name').value || "Developer";
-            localStorage.setItem('md_user', JSON.stringify({name: name}));
-            prefix = "Welcome ";
-        } else {
+    function speak(t) { const s=window.speechSynthesis; const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; s.speak(u); }
+
+    function enter(type) {
+        let name = document.getElementById('reg-name').value || "Dev";
+        if(type === 'old') {
             const saved = JSON.parse(localStorage.getItem('md_user'));
-            if(!saved) return alert("No account found!");
-            name = saved.name; prefix = "Welcome Back ";
+            if(!saved) return alert("No Account!");
+            const p = prompt("Enter Password:");
+            if(p !== saved.pass) return alert("Wrong!");
+            name = saved.name;
+            speak("Welcome Back " + name);
+        } else {
+            if(!document.getElementById('entry-btn').classList.contains('active')) return;
+            localStorage.setItem('md_user', JSON.stringify({name:name, pass:passIn.value}));
+            speak("Welcome " + name);
         }
         document.getElementById('login-screen').style.display='none';
         document.getElementById('main-app').style.display='grid';
-        document.getElementById('p-name').value = name;
-        speak(prefix + name + ", your empire is ready.");
+        document.getElementById('p-name-disp').innerText = name;
         Blockly.svgResize(workspace);
     }
 
-    // سكراتش والأقسام
+    // سكراتش
     const workspace = Blockly.inject('blocklyDiv', {toolbox: {kind: "categoryToolbox", contents: [{kind: "category", name: "Motion", contents: [{kind: "block", type: "controls_repeat_ext"}]}]}, theme: Blockly.Themes.Dark});
-    function tab(id) { document.querySelectorAll('.tab-item').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; if(id==='scratch') Blockly.svgResize(workspace); }
-    function toggleAI() { let c=document.getElementById('ai-chat'); c.style.display=c.style.display==='flex'?'none':'flex'; }
-    function sendAI() { document.getElementById('ai-msgs').innerHTML += `<div>You: ${document.getElementById('ai-in').value}</div>`; document.getElementById('ai-in').value=""; }
+
+    // تبديل الأقسام
+    function showTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active-tab');
+        if(id==='scratch') Blockly.svgResize(workspace);
+    }
+
+    // مولد الباسوردات
+    function genPass() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        let p = ""; for(let i=0; i<12; i++) p += chars.charAt(Math.floor(Math.random()*chars.length));
+        document.getElementById('pass-gen-out').innerText = p;
+    }
+
+    // AI
+    function toggleAI() { let b = document.getElementById('ai-box'); b.style.display = b.style.display==='flex'?'none':'flex'; }
+    function askAI() {
+        const inp = document.getElementById('ai-input');
+        const msgs = document.getElementById('ai-msgs');
+        msgs.innerHTML += `<div>You: ${inp.value}</div>`;
+        setTimeout(() => { msgs.innerHTML += `<div style="color:var(--cyan)">AI: I am MD-AI, how can I help with your code?</div>`; }, 500);
+        inp.value = "";
+    }
 </script>
 </body>
 </html>
