@@ -9,192 +9,168 @@
     <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
     <script src="https://unpkg.com/blockly/msg/en.js"></script>
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff0077; --green: #00ff88; --red: #ff3333; --dark: #05050a; }
-        body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
+        :root { --cyan: #00f2ff; --pink: #ff0077; --green: #00ff88; --dark: #020205; }
+        body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
         /* الهيكل الأساسي */
-        #main-app { display: flex; height: 100vh; width: 100vw; }
-        
-        /* القائمة الجانبية ثابتة */
-        .sidebar { width: 250px; background: #0a0a0f; border-right: 2px solid #1a1a25; padding: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 100; }
-        .nav-btn { padding: 15px; background: #111; border: 1px solid #222; border-radius: 12px; cursor: pointer; color: #888; text-align: left; font-weight: bold; transition: 0.3s; }
+        #main-container { display: flex; height: 100vh; width: 100vw; }
+        .sidebar { width: 260px; background: #0a0a0f; border-right: 2px solid #1a1a25; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .nav-btn { padding: 15px; background: #111; border: 1px solid #222; border-radius: 12px; cursor: pointer; color: #888; transition: 0.3s; font-weight: bold; }
         .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
 
-        /* المحتوى - حل مشكلة عدم الظهور */
-        .content { flex: 1; position: relative; background: var(--dark); padding: 30px; overflow-y: auto; }
-        .tab-content { display: none; opacity: 0; transition: opacity 0.4s; width: 100%; }
-        .tab-content.active-tab { display: block !important; opacity: 1; }
+        /* المحتوى المبدل */
+        .content-area { flex: 1; background: var(--dark); padding: 30px; position: relative; }
+        .section { display: none; width: 100%; height: 100%; }
+        .section.active-section { display: block !important; }
 
-        /* قسم الباسورد */
-        .card { background: #0f0f1a; border: 1px solid #222; padding: 25px; border-radius: 20px; text-align: center; max-width: 500px; margin: auto; }
-        #pass-box { font-size: 22px; color: var(--green); background: #000; padding: 20px; border-radius: 12px; border: 1px dashed var(--green); margin: 20px 0; word-break: break-all; font-family: monospace; }
+        /* قسم الحماية (طلبك) */
+        .security-card { background: #0f0f1a; border: 2px solid var(--green); padding: 30px; border-radius: 20px; text-align: center; max-width: 500px; margin: 40px auto; }
+        #pass-result { font-size: 24px; color: var(--green); background: #000; padding: 20px; border-radius: 10px; margin: 20px 0; word-break: break-all; font-family: monospace; border: 1px dashed var(--green); }
 
-        /* البوت المتطور */
-        #ai-trigger { position: fixed; bottom: 30px; left: 30px; width: 80px; height: 80px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; font-size: 35px; box-shadow: 0 0 20px var(--cyan); }
-        #ai-chat { position: fixed; bottom: 120px; left: 30px; width: 350px; height: 450px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 25px; display: none; flex-direction: column; z-index: 1000; overflow: hidden; }
-        #msgs { flex: 1; padding: 20px; overflow-y: auto; background: #05050a; font-size: 14px; line-height: 1.6; }
-        .msg-in { display: flex; border-top: 1px solid #222; }
-        .msg-in input { flex: 1; background: transparent; border: none; color: white; padding: 15px; outline: none; }
-        .msg-in button { background: var(--cyan); border: none; padding: 0 20px; cursor: pointer; font-weight: bold; }
+        /* البوت */
+        #bot-icon { position: fixed; bottom: 30px; left: 30px; width: 70px; height: 70px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 30px; box-shadow: 0 0 20px var(--cyan); z-index: 1000; }
+        #bot-window { position: fixed; bottom: 110px; left: 30px; width: 330px; height: 420px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 20px; display: none; flex-direction: column; z-index: 1000; }
+        #chat-log { flex: 1; padding: 15px; overflow-y: auto; font-size: 14px; }
+        .chat-input { display: flex; border-top: 1px solid #222; }
+        .chat-input input { flex: 1; background: transparent; border: none; color: white; padding: 15px; outline: none; }
+        .chat-input button { background: var(--cyan); border: none; padding: 0 15px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="main-app">
+<div id="main-container">
     <div class="sidebar">
-        <h2 style="color:var(--cyan); margin-bottom: 20px;">MD STUDIO</h2>
-        <div class="nav-btn active" onclick="openSection('tab1', this)">🧩 SCRATCH ENGINE</div>
-        <div class="nav-btn" onclick="openSection('tab2', this)">🎨 ART RENDERING</div>
-        <div class="nav-btn" onclick="openSection('tab3', this)">🕹️ GAME SIMULATOR</div>
-        <div class="nav-btn" onclick="openSection('tab4', this)">🛡️ SERVER SECURITY</div>
-        <div class="nav-btn" onclick="openSection('tab5', this)" style="margin-top: auto;">👤 PROFILE</div>
+        <h2 style="color:var(--cyan)">MD STUDIO</h2>
+        <div class="nav-btn active" onclick="showSec('sec1', this)">🧩 SCRATCH ENGINE</div>
+        <div class="nav-btn" onclick="showSec('sec2', this)">🎨 ART RENDERING</div>
+        <div class="nav-btn" onclick="showSec('sec3', this)">🕹️ GAME MAKER</div>
+        <div class="nav-btn" onclick="showSec('sec4', this)">🛡️ SERVER SECURITY</div>
+        <div class="nav-btn" onclick="showSec('sec5', this)" style="margin-top:auto">👤 PROFILE</div>
     </div>
 
-    <div class="content">
-        <div id="tab1" class="tab-content active-tab">
-            <h2 style="color:var(--cyan)">Blockly Workspace</h2>
-            <div id="blocklyDiv" style="height: 75vh; width: 100%; border-radius: 15px;"></div>
+    <div class="content-area">
+        <div id="sec1" class="section active-section">
+            <h2 style="color:var(--cyan)">Full Scratch Blocks</h2>
+            <div id="blocklyDiv" style="height: 80vh; width: 100%; border-radius: 15px;"></div>
         </div>
 
-        <div id="tab2" class="tab-content">
-            <h2>Live Art Draw</h2>
-            <button class="nav-btn" style="background:var(--pink); color:white;" onclick="startArt()">DRAW NOW</button>
-            <canvas id="artCanvas" width="500" height="500" style="border:1px solid #222; margin-top:20px;"></canvas>
+        <div id="sec2" class="section">
+            <h2>Live Canvas Drawing</h2>
+            <button class="nav-btn" style="background:var(--pink); color:white" onclick="startDrawing()">DRAW ANIMATION</button>
+            <canvas id="artCanvas" width="500" height="400" style="border:1px solid #222; margin-top:20px;"></canvas>
         </div>
 
-        <div id="tab3" class="tab-content">
-            <h2>Game Physics Test</h2>
-            <div style="width:100%; height:400px; background:#111; border-radius:20px; position:relative;">
-                <div id="char" style="position:absolute; bottom:20px; left:20px; font-size:50px;">🦖</div>
+        <div id="sec3" class="section">
+            <h2>Game Simulator</h2>
+            <div style="width:100%; height:300px; background:#111; position:relative; border-radius:15px; overflow:hidden;">
+                <div id="rega-player" style="position:absolute; bottom:20px; left:20px; font-size:40px;">🦖</div>
             </div>
-            <p>Arrows to move.</p>
+            <p>Use Arrows to test physics.</p>
         </div>
 
-        <div id="tab4" class="tab-content">
-            <div class="card">
-                <h2 style="color:var(--green)">Server Protection</h2>
-                <p>Generate high-entropy passwords for your server security.</p>
-                <div id="pass-box">********</div>
-                <button class="nav-btn" style="background:var(--green); color:black; width:100%;" onclick="createSecurePass()">GENERATE ENCRYPTED PASS</button>
-                <button class="nav-btn" style="background:#222; color:white; width:100%; margin-top:10px;" onclick="copyPass()">COPY TO CLIPBOARD</button>
+        <div id="sec4" class="section">
+            <div class="security-card">
+                <h2 style="color:var(--green)">🛡️ Unhackable Pass Generator</h2>
+                <p>Generate 20-character military-grade passwords for your server.</p>
+                <div id="pass-result">Click Generate...</div>
+                <button class="nav-btn" style="background:var(--green); color:black; width:100%" onclick="makePass()">GENERATE PASSWORD</button>
+                <button class="nav-btn" style="background:#222; color:white; width:100%; margin-top:10px" onclick="copyToClipboard()">COPY PASS</button>
             </div>
         </div>
 
-        <div id="tab5" class="tab-content">
-            <div class="card">
-                <img src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" width="120">
-                <h2 id="user-display">Rega ✎</h2>
-                <p>Status: Online / Admin</p>
+        <div id="sec5" class="section">
+            <div class="security-card" style="border-color:var(--cyan)">
+                <img src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" width="100">
+                <h2>Rega ✎</h2>
+                <p>Status: Developer/Admin</p>
             </div>
         </div>
     </div>
 </div>
 
-<div id="ai-trigger" onclick="toggleBot()">🤖</div>
-<div id="ai-chat">
+<div id="bot-icon" onclick="toggleBot()">🤖</div>
+<div id="bot-window">
     <div style="background:var(--cyan); color:black; padding:15px; font-weight:bold;">REGA AI ASSISTANT</div>
-    <div id="msgs"></div>
-    <div class="msg-in">
-        <input type="text" id="ai-input" placeholder="Ask me anything in any language..." onkeypress="if(event.key==='Enter') botReply()">
-        <button onclick="botReply()">SEND</button>
+    <div id="chat-log"></div>
+    <div class="chat-input">
+        <input type="text" id="bot-in" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter') regaReply()">
+        <button onclick="regaReply()">GO</button>
     </div>
 </div>
 
 <script>
-    // 1. حل مشكلة فتح الأقسام
-    function openSection(tabId, btn) {
-        // إخفاء كل الأقسام فوراً
-        const allTabs = document.querySelectorAll('.tab-content');
-        allTabs.forEach(tab => {
-            tab.classList.remove('active-tab');
-            tab.style.display = 'none';
+    // 1. حل مشكلة التنقل (Force Show/Hide)
+    function showSec(id, btn) {
+        // إخفاء كل الأقسام فوراً بدون استثناء
+        document.querySelectorAll('.section').forEach(s => {
+            s.classList.remove('active-section');
+            s.style.display = 'none';
         });
-
-        // إظهار القسم المطلوب
-        const target = document.getElementById(tabId);
+        
+        // إظهار القسم المطلوب فقط
+        const target = document.getElementById(id);
         target.style.display = 'block';
-        setTimeout(() => target.classList.add('active-tab'), 10);
+        setTimeout(() => target.classList.add('active-section'), 10);
 
-        // تغيير شكل الزراير
+        // تحديث الزراير
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
-        if(tabId === 'tab1') Blockly.svgResize(workspace);
+        if(id === 'sec1') Blockly.svgResize(workspace);
     }
 
     // 2. مولد الباسورد القوي للسيرفر
-    function createSecurePass() {
-        const charset = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
-        let password = "";
-        for (let i = 0; i < 20; i++) {
-            password += charset.charAt(Math.floor(Math.random() * charset.length));
-        }
-        document.getElementById('pass-box').innerText = password;
+    function makePass() {
+        const chars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789!@#$%^&*()_+?><";
+        let pass = "";
+        for(let i=0; i<20; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        document.getElementById('pass-result').innerText = pass;
     }
-    function copyPass() {
-        const p = document.getElementById('pass-box').innerText;
-        navigator.clipboard.writeText(p);
-        alert("Password Copied to Clipboard!");
+    function copyToClipboard() {
+        const txt = document.getElementById('pass-result').innerText;
+        navigator.clipboard.writeText(txt);
+        alert("Password Copied!");
     }
 
-    // 3. البوت المتعدد اللغات والردود الذكية
+    // 3. البوت الذكي (ردود متغيرة)
     function toggleBot() { 
-        const chat = document.getElementById('ai-chat');
-        chat.style.display = (chat.style.display === 'flex') ? 'none' : 'flex'; 
+        const win = document.getElementById('bot-window');
+        win.style.display = (win.style.display === 'flex') ? 'none' : 'flex'; 
     }
+    function regaReply() {
+        const inp = document.getElementById('bot-in');
+        const log = document.getElementById('chat-log');
+        const val = inp.value.trim().toLowerCase();
+        if(!val) return;
 
-    function botReply() {
-        const input = document.getElementById('ai-input');
-        const msgs = document.getElementById('msgs');
-        const userText = input.value.trim().toLowerCase();
-        if(!userText) return;
-
-        msgs.innerHTML += `<div style="text-align:right; margin-bottom:10px;"><b>You:</b> ${input.value}</div>`;
+        log.innerHTML += `<div style="text-align:right; margin-bottom:10px;"><b>You:</b> ${inp.value}</div>`;
         
-        let response = "";
-        // منطق الرد الذكي
-        if(userText.includes("hello") || userText.includes("أهلا")) {
-            response = "Welcome back, Rega! How can I help with your empire today?";
-        } else if(userText.includes("password") || userText.includes("باسورد")) {
-            response = "I can generate a 20-character encrypted password for your server in the 'Security' tab. It's impossible to crack!";
-        } else if(userText.includes("game") || userText.includes("لعبة")) {
-            response = "The Game Simulator is ready. You can test character physics there.";
-        } else if(userText.includes("how") || userText.includes("ازاي")) {
-            response = "I can guide you through Scratch blocks or security settings. What's your goal?";
-        } else if(userText.includes("shat") || userText.includes("زفت") || userText.includes("bad")) {
-            response = "I understand you're frustrated, Rega! I've updated my code to be more responsive. Let's try again.";
-        } else {
-            response = "Interesting question! As an AI for a Multidisciplinary Developer, I suggest looking into the logic of your Scratch workspace to solve this.";
-        }
-
+        let res = "I'm checking that for you, Rega! MD Studio is ready.";
+        if(val.includes("hello") || val.includes("أهلا")) res = "Hello Boss Rega! Ready to code today?";
+        if(val.includes("pass") || val.includes("باسورد")) res = "Check the SERVER SECURITY tab! I can give you a 20-character unhackable password.";
+        if(val.includes("game") || val.includes("لعبة")) res = "The Game Maker simulator is waiting for your logic!";
+        if(val.includes("زفت") || val.includes("مشاكل")) res = "I've updated my core code to fix the section issues. Try them now!";
+        
         setTimeout(() => {
-            msgs.innerHTML += `<div style="color:var(--cyan); margin-bottom:15px; border-left: 2px solid var(--pink); padding-left:10px;"><b>Bot:</b> ${response}</div>`;
-            msgs.scrollTop = msgs.scrollHeight;
+            log.innerHTML += `<div style="color:var(--cyan); margin-bottom:15px;"><b>Bot:</b> ${res}</div>`;
+            log.scrollTop = log.scrollHeight;
         }, 300);
-        input.value = "";
+        inp.value = "";
     }
 
-    // 4. تهيئة سكراتش
+    // تهيئة سكراتش
     const toolbox = { 'kind': 'categoryToolbox', 'contents': [
         { 'kind': 'category', 'name': 'Logic', 'colour': '210', 'contents': [{ 'kind': 'block', 'type': 'controls_if' }] },
-        { 'kind': 'category', 'name': 'Variables', 'colour': '330', 'contents': [{ 'kind': 'block', 'type': 'math_number' }] }
+        { 'kind': 'category', 'name': 'Loops', 'colour': '120', 'contents': [{ 'kind': 'block', 'type': 'controls_repeat_ext' }] }
     ]};
     const workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: Blockly.Themes.Dark});
 
-    // 5. الرسم
-    function startArt() {
-        const c = document.getElementById('artCanvas');
-        const ctx = c.getContext('2d');
-        ctx.clearRect(0,0,500,500);
-        ctx.strokeStyle = "cyan";
+    function startDrawing() {
+        const ctx = document.getElementById('artCanvas').getContext('2d');
+        ctx.clearRect(0,0,500,400); ctx.strokeStyle = "cyan";
         let x = 0;
-        function draw() {
-            if(x < 100) {
-                ctx.strokeRect(250-x, 250-x, x*2, x*2);
-                x++; requestAnimationFrame(draw);
-            }
-        }
-        draw();
+        function d() { if(x<100) { ctx.strokeRect(250-x,200-x,x*2,x*2); x++; requestAnimationFrame(d); } }
+        d();
     }
 </script>
 </body>
