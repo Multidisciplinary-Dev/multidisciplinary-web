@@ -1,42 +1,38 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD Studio | AI & Game Engine</title>
+    <title>MD Studio | AI Empire</title>
     <style>
         :root { --accent: #00d2ff; --pink: #ff0080; --dark: #050510; }
         body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         canvas#bg { position: fixed; inset: 0; z-index: -1; opacity: 0.4; }
 
-        /* 🔐 Login & Registration */
+        /* 🔐 Auth Gate */
         #auth-gate { height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #101025, #000); }
-        .card { background: rgba(15, 15, 30, 0.95); padding: 30px; border: 2px solid var(--accent); border-radius: 20px; width: 320px; text-align: center; box-shadow: 0 0 30px var(--accent); }
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: var(--accent); border-radius: 8px; box-sizing: border-box; outline: none; }
-
-        /* 📱 Layout */
-        #app { display: none; height: 100vh; flex-direction: column; }
-        header { background: #000; border-bottom: 2px solid var(--accent); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .wrapper { display: flex; flex: 1; overflow: hidden; }
+        .card { background: rgba(15, 15, 30, 0.95); padding: 30px; border: 2px solid var(--accent); border-radius: 20px; width: 330px; text-align: center; box-shadow: 0 0 30px var(--accent); }
+        input { width: 100%; padding: 14px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--accent); border-radius: 10px; box-sizing: border-box; outline: none; font-size: 16px; }
         
-        /* 🚥 Sidebar */
-        .sidebar { width: 220px; background: rgba(0,0,0,0.95); border-right: 1px solid #222; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-link { padding: 12px; cursor: pointer; border-radius: 8px; border: 1px solid #222; font-size: 14px; transition: 0.3s; }
+        /* 🔴 المطلب الأساسي: الرسالة الحمراء */
+        .err-msg { color: #ff4d4d; font-size: 12px; text-align: left; min-height: 18px; font-weight: bold; margin-bottom: 10px; }
+
+        /* 📱 Interface */
+        #app { display: none; height: 100vh; flex-direction: column; }
+        header { background: #000; border-bottom: 2px solid var(--accent); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .wrapper { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 220px; background: rgba(0,0,0,0.9); border-right: 1px solid #222; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-link { padding: 12px; cursor: pointer; border-radius: 8px; border: 1px solid #222; font-size: 14px; }
         .nav-link.active { background: var(--accent); color: #000; font-weight: bold; }
 
-        /* 📺 Content Area */
-        .content { flex: 1; padding: 20px; overflow-y: auto; display: flex; gap: 20px; }
-        .panel { background: rgba(20,20,40,0.8); border-radius: 15px; border: 1px solid #333; padding: 20px; display: flex; flex-direction: column; }
-
-        /* 🤖 AI Chat Bot Box */
-        #ai-bot { width: 300px; border-left: 2px solid var(--accent); background: #000; padding: 15px; display: flex; flex-direction: column; }
-        .chat-logs { flex: 1; overflow-y: auto; font-size: 13px; margin-bottom: 10px; }
-        .bot-msg { color: var(--accent); margin-bottom: 10px; background: #111; padding: 8px; border-radius: 5px; }
-        .user-msg { color: #fff; text-align: right; margin-bottom: 10px; }
-
-        /* 🎮 Stage (Scratch Style) */
-        #stage { flex: 1; background: white; border-radius: 15px; position: relative; overflow: hidden; }
-        canvas#art-canvas { width: 100%; height: 100%; }
+        /* 🤖 AI & Innovation Lab */
+        .content { flex: 1; padding: 20px; display: flex; gap: 20px; }
+        .panel { background: rgba(20,20,40,0.8); border-radius: 15px; border: 1px solid #333; padding: 20px; flex: 1; position: relative; }
+        #ai-chat { width: 300px; background: #000; border-left: 2px solid var(--accent); padding: 15px; display: flex; flex-direction: column; }
+        .chat-logs { flex: 1; overflow-y: auto; margin-bottom: 10px; padding: 5px; }
+        .bot-txt { color: var(--accent); background: #111; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; border-left: 3px solid var(--accent); }
+        
+        #stage { height: 350px; background: white; border-radius: 15px; margin-top: 15px; position: relative; overflow: hidden; }
         .sprite { position: absolute; font-size: 50px; cursor: move; touch-action: none; }
     </style>
 </head>
@@ -46,132 +42,125 @@
 
 <div id="auth-gate">
     <div class="card">
-        <h2 id="auth-title">MD GATEWAY</h2>
-        <input type="text" id="u-name" placeholder="User Name">
-        <input type="password" id="u-pass" placeholder="Password (retaj1)" oninput="vAuth()">
-        <div id="u-err" style="color:red; font-size:12px; font-weight:bold;"></div>
-        <button id="auth-btn" onclick="login()" disabled style="width:100%; padding:12px; background:#222; border:none; border-radius:10px; cursor:not-allowed;">LAUNCH</button>
-        <p onclick="toggleMode()" id="mode-text" style="font-size:11px; cursor:pointer; margin-top:10px; color:#aaa;">New? Create Account</p>
+        <h2 style="color:var(--accent)">MD SYSTEM</h2>
+        <input type="text" id="user-in" placeholder="User Name">
+        <input type="password" id="pass-in" placeholder="6 Chars (Name+Num)" oninput="validate()">
+        <div id="err-log" class="err-msg"></div>
+        <button id="launch-btn" onclick="start()" disabled style="width:100%; padding:15px; background:#222; border:none; color:#555; border-radius:10px; font-weight:bold;">LAUNCH ENGINE</button>
     </div>
 </div>
 
 <div id="app">
     <header>
-        <div style="color:var(--accent); font-weight:bold;">MD STUDIO | AI EMPIRE</div>
-        <div id="user-display"></div>
+        <div style="color:var(--accent); font-weight:bold;">MD STUDIO | AI v15.0</div>
+        <div id="display-name"></div>
     </header>
 
     <div class="wrapper">
         <div class="sidebar">
             <div class="nav-link active">🛠️ Innovation Lab</div>
-            <div class="nav-link">🔧 Code Fixer</div>
-            <div class="nav-link">🔑 Security Tool</div>
-            <div class="nav-link">👤 Profile</div>
-            <button onclick="location.reload()" style="margin-top:auto; background:var(--pink); border:none; color:white; padding:10px; border-radius:8px; cursor:pointer;">Exit System</button>
+            <div class="nav-link">👤 Profile Settings</div>
+            <button onclick="location.reload()" style="margin-top:auto; background:var(--pink); color:white; border:none; padding:10px; border-radius:5px;">Logout</button>
         </div>
 
         <div class="content">
-            <div class="panel" style="flex: 1;">
-                <h3 style="margin-top:0">Innovation Lab (Scratch Engine)</h3>
-                <div style="margin-bottom:10px;">
-                    <button onclick="spawn('🚀')">Add Ship</button>
-                    <button onclick="spawn('👾')">Add Enemy</button>
-                    <button onclick="runCode('heart')" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px;">Draw Heart</button>
+            <div class="panel">
+                <h3 style="margin:0">Innovation Lab</h3>
+                <div style="margin-top:10px;">
+                    <button onclick="spawn('🚀')">Add SpaceShip</button>
+                    <button onclick="drawArt('heart')" style="background:red; color:white; border:none; padding:5px 15px; border-radius:5px;">Draw Heart</button>
                 </div>
-                <div id="stage">
-                    <canvas id="art-canvas"></canvas>
-                </div>
-                <textarea id="code-box" placeholder="Write commands like 'heart' or 'flower'..." style="height:80px; margin-top:10px;"></textarea>
+                <div id="stage"><canvas id="canvas-art" style="width:100%; height:100%"></canvas></div>
             </div>
 
-            <div id="ai-bot">
-                <h4 style="color:var(--accent); margin-top:0;">🤖 MD-AI ASSISTANT</h4>
-                <div class="chat-logs" id="chat-logs">
-                    <div class="bot-msg">Hello Multidisciplinary Developer! How can I help you build today?</div>
+            <div id="ai-chat">
+                <h4 style="color:var(--accent); margin:0 0 10px 0;">🤖 MD-AI ASSISTANT</h4>
+                <div class="chat-logs" id="logs">
+                    <div class="bot-txt">Ready to assist you, Developer!</div>
                 </div>
-                <input type="text" id="ai-input" placeholder="Ask AI anything..." onkeydown="if(event.key==='Enter') askAI()">
-                <button onclick="askAI()" style="background:var(--accent); border:none; padding:8px; border-radius:5px; font-weight:bold; cursor:pointer;">SEND</button>
+                <input type="text" id="ai-msg" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') talk()">
+                <button onclick="talk()" style="background:var(--accent); color:#000; border:none; padding:10px; border-radius:5px; font-weight:bold;">SEND</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    let isLogin = true;
-    let currentUser = "";
+    // 🔐 فحص الباسورد (6 خانات حروف وأرقام بالملي)
+    function validate() {
+        const p = document.getElementById('pass-in').value;
+        const e = document.getElementById('err-log');
+        const b = document.getElementById('launch-btn');
+        const hasChar = /[a-zA-Z]/.test(p);
+        const hasNum = /[0-9]/.test(p);
 
-    // 🔐 Auth
-    function vAuth() {
-        const p = document.getElementById('u-pass').value;
-        const b = document.getElementById('auth-btn');
-        if(p.length === 6 && /[a-z]/i.test(p) && /[0-9]/.test(p)) {
-            b.disabled = false; b.style.background = "var(--accent)"; b.style.cursor="pointer";
-        } else { b.disabled = true; b.style.background = "#222"; }
+        if(p.length === 0) e.innerText = "";
+        else if(p.length !== 6) e.innerText = "❌ Must be EXACTLY 6 characters!";
+        else if(!hasChar || !hasNum) e.innerText = "❌ Must mix Letters & Numbers!";
+        else {
+            e.innerHTML = "<span style='color:#0f8'>✅ Password Perfect!</span>";
+            b.disabled = false; b.style.background = "var(--accent)"; b.style.color = "#000"; b.style.cursor = "pointer";
+            return;
+        }
+        b.disabled = true; b.style.background = "#222"; b.style.color = "#555";
     }
 
-    function toggleMode() {
-        isLogin = !isLogin;
-        document.getElementById('auth-title').innerText = isLogin ? "MD GATEWAY" : "CREATE ACCOUNT";
-    }
-
-    function login() {
-        currentUser = document.getElementById('u-name').value;
+    function start() {
+        const name = document.getElementById('user-in').value || "Developer";
         document.getElementById('auth-gate').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
-        document.getElementById('user-display').innerText = "Logged in as: " + currentUser;
-        speakAI("Welcome back, " + currentUser + ". All systems are online.");
+        document.getElementById('display-name').innerText = "System Admin: " + name;
+        aiSpeak("Access granted. Welcome back, " + name);
     }
 
-    // 🤖 AI Logic (The Talking AI)
-    function askAI() {
-        const inp = document.getElementById('ai-input');
-        const logs = document.getElementById('chat-logs');
-        if(!inp.value) return;
+    // 🤖 AI Speech & Chat
+    function talk() {
+        const input = document.getElementById('ai-msg');
+        const logs = document.getElementById('logs');
+        if(!input.value) return;
 
-        logs.innerHTML += `<div class="user-msg">${inp.value}</div>`;
-        const userQ = inp.value.toLowerCase();
-        inp.value = "";
+        logs.innerHTML += `<div style="text-align:right; margin-bottom:10px;">${input.value}</div>`;
+        const q = input.value.toLowerCase();
+        input.value = "";
 
         setTimeout(() => {
-            let reply = "I'm analyzing that... As your AI, I suggest checking the Innovation Lab for results.";
-            if(userQ.includes("heart")) reply = "I've processed your request. I can draw a heart in the lab for you!";
-            if(userQ.includes("who are you")) reply = "I am MD-AI, built to support your multidisciplinary projects.";
+            let res = "Analyzing... Check the Innovation Lab for results.";
+            if(q.includes("heart")) res = "Processing heart shape... Draw command sent to lab.";
+            if(q.includes("hello")) res = "Hello! I am your MD-AI, ready to code.";
             
-            logs.innerHTML += `<div class="bot-msg">${reply}</div>`;
-            speakAI(reply);
+            logs.innerHTML += `<div class="bot-txt">${res}</div>`;
+            aiSpeak(res);
             logs.scrollTop = logs.scrollHeight;
-        }, 1000);
+        }, 800);
     }
 
-    function speakAI(text) {
-        const msg = new SpeechSynthesisUtterance();
-        msg.text = text;
-        msg.lang = 'en-US'; 
-        window.speechSynthesis.speak(msg);
+    function aiSpeak(txt) {
+        const s = new SpeechSynthesisUtterance(txt);
+        s.lang = 'en-US';
+        window.speechSynthesis.speak(s);
     }
 
-    // 🎮 Innovation Lab Logic
-    function spawn(emoji) {
-        const s = document.createElement('div');
-        s.className = 'sprite'; s.innerText = emoji;
-        s.style.left = "50px"; s.style.top = "50px";
-        const move = (e) => {
+    // 🎮 Lab Logic
+    function spawn(em) {
+        const d = document.createElement('div'); d.className='sprite'; d.innerText=em;
+        d.style.left='50px'; d.style.top='50px';
+        const mv = (e) => {
             e.preventDefault(); const pt = e.touches ? e.touches[0] : e;
             const r = document.getElementById('stage').getBoundingClientRect();
-            s.style.left = (pt.clientX - r.left - 25) + 'px';
-            s.style.top = (pt.clientY - r.top - 25) + 'px';
+            d.style.left = (pt.clientX - r.left - 25) + 'px';
+            d.style.top = (pt.clientY - r.top - 25) + 'px';
         };
-        s.onmousedown = s.ontouchstart = () => { window.onmousemove = window.ontouchmove = move; };
+        d.onmousedown = d.ontouchstart = () => { window.onmousemove = window.ontouchmove = mv; };
         window.onmouseup = window.ontouchend = () => { window.onmousemove = window.ontouchmove = null; };
-        document.getElementById('stage').appendChild(s);
+        document.getElementById('stage').appendChild(d);
     }
 
-    function runCode(cmd) {
-        const canvas = document.getElementById('art-canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        if(cmd === 'heart') {
-            ctx.fillStyle = "red"; ctx.beginPath();
+    function drawArt(type) {
+        const c = document.getElementById('canvas-art');
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0,0,c.width,c.height);
+        if(type === 'heart') {
+            ctx.fillStyle="red"; ctx.beginPath();
             ctx.moveTo(75, 40); ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
             ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5); ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
             ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5); ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
@@ -180,16 +169,16 @@
     }
 
     // 🌌 Matrix BG
-    const mcv = document.getElementById('bg'), mct = mcv.getContext('2d');
-    mcv.width = window.innerWidth; mcv.height = window.innerHeight;
-    const drops = Array(100).fill(1);
-    function drawM() {
-        mct.fillStyle = "rgba(0,0,0,0.1)"; mct.fillRect(0,0,mcv.width,mcv.height);
-        mct.fillStyle = "#00d2ff"; drops.forEach((y, i) => {
-            mct.fillText(Math.random() > 0.5 ? "1" : "0", i*20, y*20);
-            if(y*20 > mcv.height) drops[i]=0; drops[i]++;
+    const cv = document.getElementById('bg'), ct = cv.getContext('2d');
+    cv.width = window.innerWidth; cv.height = window.innerHeight;
+    const dr = Array(100).fill(1);
+    function draw() {
+        ct.fillStyle = "rgba(0,0,0,0.1)"; ct.fillRect(0,0,cv.width,cv.height);
+        ct.fillStyle = "#00d2ff"; dr.forEach((y, i) => {
+            ct.fillText(Math.random() > 0.5 ? "1" : "0", i*20, y*20);
+            if(y*20 > cv.height) dr[i]=0; dr[i]++;
         });
-    } setInterval(drawM, 50);
+    } setInterval(draw, 50);
 </script>
 </body>
 </html>
