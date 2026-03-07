@@ -3,142 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>MD STUDIO | SUPREME EMPIRE</title>
+    <title>MD STUDIO | PROFESSIONAL EDITION</title>
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff007f; --dark: #020205; --glass: rgba(255, 255, 255, 0.05); }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; touch-action: manipulation; }
+        :root { --cyan: #00f2ff; --pink: #ff007f; --dark: #020205; --red: #ff4b2b; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; }
 
-        /* شاشة الدخول الاحترافية */
-        #login-screen { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: black; gap: 20px; }
-        .matrix-box { width: 350px; height: 400px; background: #000; border: 1px solid #111; border-radius: 15px; padding: 15px; overflow: hidden; font-family: 'Source Code Pro'; color: #0f8; font-size: 11px; }
-        .login-card { width: 320px; background: var(--glass); padding: 30px; border-radius: 20px; border: 1px solid #222; text-align: center; backdrop-filter: blur(10px); }
-        
-        .input-style { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #333; color: var(--cyan); border-radius: 5px; font-size: 16px; outline: none; box-sizing: border-box; }
-        .btn-log { width: 100%; padding: 15px; background: #222; color: #555; border: none; border-radius: 5px; font-weight: bold; cursor: not-allowed; transition: 0.4s; }
-        .btn-log.ready { background: #00ff88; color: black; cursor: pointer; box-shadow: 0 0 20px #00ff88; }
+        /* 🔐 شاشة الدخول المحدثة */
+        #login-screen { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: black; gap: 40px; }
+        .matrix-box { width: 450px; height: 450px; background: #000; border: 1px solid #222; border-radius: 15px; padding: 20px; color: #0f8; font-family: 'Source Code Pro'; font-size: 12px; overflow: hidden; }
+        .login-card { width: 380px; background: rgba(15,15,25,0.9); padding: 40px; border-radius: 20px; border: 1px solid #333; }
+        .input-style { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #333; color: white; border-radius: 5px; outline: none; }
+        .btn-entry { width: 100%; padding: 15px; background: #222; color: #555; border: none; border-radius: 5px; cursor: not-allowed; transition: 0.5s; font-weight: bold; }
+        .btn-entry.active { background: #00ff88; color: black; cursor: pointer; box-shadow: 0 0 20px #00ff88; }
 
-        /* الواجهة الرئيسية */
-        #main-app { display: none; grid-template-columns: 240px 1fr; height: 100vh; position: relative; z-index: 10; }
-        .sidebar { background: rgba(0,0,0,0.9); border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-btn { padding: 12px; border-radius: 8px; border: 1px solid #333; color: #ccc; cursor: pointer; font-size: 11px; transition: 0.3s; }
+        /* 📱 الهيكل الرئيسي */
+        #main-app { display: none; grid-template-columns: 260px 1fr; height: 100vh; }
+        .sidebar { background: #05050a; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-btn { padding: 12px; border: 1px solid #222; color: #aaa; cursor: pointer; border-radius: 8px; font-size: 11px; }
         .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: black; }
 
-        /* المربع الذكي مع زرار المسافة */
-        .editor-container { position: relative; margin-top: 15px; }
-        .smart-editor { width: 100%; min-height: 60px; background: #000; border: 2px solid var(--pink); border-radius: 10px; padding: 15px; color: #0f8; font-family: 'Source Code Pro'; resize: both; overflow: auto; box-sizing: border-box; }
-        .space-btn { position: absolute; top: 5px; right: 5px; background: #222; color: var(--cyan); border: 1px solid var(--cyan); padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; }
+        /* 🧩 مساحة سكراتش الكاملة */
+        #scratch-section { height: 100%; display: grid; grid-template-columns: 1fr 400px; gap: 10px; padding: 10px; box-sizing: border-box; }
+        #blocklyDiv { height: 85vh; width: 100%; border-radius: 10px; border: 1px solid #333; }
 
-        /* بوت الـ AI */
-        #ai-bot { position: fixed; bottom: 20px; left: 20px; width: 60px; height: 60px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 25px; cursor: pointer; z-index: 1000; box-shadow: 0 0 15px var(--cyan); color: black; }
+        /* ⚙️ الملف الشخصي (رقم 6) */
+        .profile-panel { background: #0a0a0f; padding: 30px; border-radius: 15px; border: 1px solid var(--cyan); width: 80%; margin: auto; }
+        .avatar-box { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--cyan); cursor: pointer; margin-bottom: 20px; overflow: hidden; }
+        .btn-danger { background: var(--red); color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; margin: 10px; font-weight: bold; }
+
+        /* 🤖 البوت الأزرق (رقم 5) */
+        #ai-trigger { position: fixed; bottom: 30px; left: 30px; width: 70px; height: 70px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2000; box-shadow: 0 0 25px var(--cyan); }
+        #chat-window { position: fixed; bottom: 110px; left: 30px; width: 350px; height: 450px; background: #0a0a0a; border: 2px solid var(--cyan); border-radius: 15px; display: none; flex-direction: column; z-index: 2000; }
+        .chat-content { flex: 1; padding: 15px; overflow-y: auto; font-size: 12px; color: #0f8; }
+
+        /* 🧪 قسم التصحيح والنسخ */
+        .fixer-box { background: #111; padding: 20px; border-radius: 10px; margin-top: 10px; border: 1px solid var(--pink); }
+        .copy-btn { background: var(--cyan); color: black; border: none; padding: 5px 10px; border-radius: 4px; font-size: 10px; float: right; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div class="matrix-box" id="matrix-code"></div>
+    <div class="matrix-box" id="matrix-text"></div>
     <div class="login-card">
-        <h2 style="color:var(--cyan); font-size: 18px;">JOIN MD STUDIO</h2>
-        <input type="text" id="u-name" class="input-style" placeholder="Your Name">
-        <input type="password" id="u-pass" class="input-style" placeholder="Password (6 Chars)">
-        <p id="hint" style="color:var(--pink); font-size: 10px; display:none;">6 Mixed Chars Required!</p>
-        <button id="entry-btn" onclick="login()" class="btn-log">LAUNCH ENGINE</button>
+        <h2 style="color:var(--cyan); text-align:center;">MD STUDIO LOGIN</h2>
+        <input type="text" id="u-name" class="input-style" placeholder="Developer Name">
+        <input type="password" id="u-pass" class="input-style" placeholder="6 Chars (Letters + Numbers)">
+        <button id="entry-btn" onclick="initApp()" class="btn-entry">INITIALIZE ENGINE</button>
+        <div id="has-account" style="display:none; text-align:center; margin-top:15px; font-size:12px;">
+            <a href="#" onclick="showLoginOnly()" style="color:var(--cyan);">I have an account</a>
+        </div>
     </div>
 </div>
 
 <div id="main-app">
     <div class="sidebar">
-        <h2 style="color:var(--cyan); font-size: 14px;">MD STUDIO</h2>
-        <div class="nav-btn active">GAME BUILDER</div>
-        <div class="nav-btn">AI LAB</div>
-        <div class="nav-btn" style="margin-top:auto; background:var(--pink); color:white;" onclick="logout()">LOGOUT</div>
+        <div class="nav-btn active" onclick="tab('scratch')">SCRATCH ENGINE</div>
+        <div class="nav-btn" onclick="tab('creative')">SKETCHPY & ASCII</div>
+        <div class="nav-btn" onclick="tab('debug')">CODE DEBUGGER</div>
+        <div class="nav-btn" onclick="tab('profile')" style="margin-top:auto;"><i class="fas fa-user-cog"></i> SETTINGS</div>
     </div>
-    
-    <div style="padding: 25px;">
-        <h1 id="welcome-msg" style="color:var(--cyan); text-shadow: 0 0 10px var(--cyan);"></h1>
-        
-        <div class="editor-container">
-            <div class="space-btn" onclick="addSpace('main-editor')">TAB SPACE</div>
-            <div class="smart-editor" id="main-editor" contenteditable="true" oninput="autoExpand(this)">
-                // Write your empire code here...
+
+    <div class="main-content">
+        <div id="scratch" class="section active">
+            <div id="scratch-section">
+                <div id="blocklyDiv"></div>
+                <div style="background:#fff; border-radius:10px; height:85vh; position:relative;">
+                    <div style="color:#333; padding:10px;">STAGE VIEW</div>
+                    </div>
+            </div>
+        </div>
+
+        <div id="creative" class="section" style="display:none; padding:30px;">
+            <h2 style="color:var(--cyan)">CREATIVE SUITE</h2>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div class="fixer-box">
+                    <h3>Sketchpy & Turtle</h3>
+                    <div id="py-canvas" style="height:200px; background:black;"></div>
+                    <button class="nav-btn" onclick="runPy()">DRAW VECTOR</button>
+                </div>
+                <div class="fixer-box">
+                    <h3>ASCII ART Generator</h3>
+                    <input type="file" onchange="toAscii(this)">
+                    <pre id="ascii-res" style="font-size:4px;"></pre>
+                </div>
+            </div>
+            <div class="fixer-box" style="margin-top:20px;">
+                <h3>Neon Lyrics Sync</h3>
+                <div id="lyrics-neon" style="height:100px; font-size:30px; text-align:center;">LYRICS AREA</div>
+            </div>
+        </div>
+
+        <div id="debug" class="section" style="display:none; padding:30px;">
+            <h2>CODE FIXER PRO</h2>
+            <textarea id="buggy-code" class="input-style" style="height:200px;"></textarea>
+            <button class="nav-btn" onclick="fixCode()">FIX NOW</button>
+            <div class="fixer-box">
+                <button class="copy-btn" onclick="copyCode()">COPY</button>
+                <pre id="fixed-result">Fixed code will appear here...</pre>
+            </div>
+        </div>
+
+        <div id="profile" class="section" style="display:none; padding:30px;">
+            <div class="profile-panel">
+                <div style="display:flex; gap:30px; align-items:center;">
+                    <div class="avatar-box" onclick="alert('Change Photo')">
+                        <img src="https://via.placeholder.com/100" id="user-img" style="width:100%;">
+                    </div>
+                    <div>
+                        <h3>MD Developer Settings</h3>
+                        <p>Customize your engine credentials.</p>
+                    </div>
+                </div>
+                <label>Developer Name:</label>
+                <input type="text" id="edit-name" class="input-style">
+                <label>Access Password:</label>
+                <input type="text" id="edit-pass" class="input-style">
+                <div style="margin-top:20px;">
+                    <button class="btn-danger" onclick="logout()">LOG OUT</button>
+                    <button class="btn-danger" onclick="deleteAccount()">DELETE ACCOUNT</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div id="ai-bot"><i class="fas fa-robot"></i></div>
+<div id="ai-trigger" onclick="toggleChat()"><i class="fas fa-robot" style="font-size:30px;"></i></div>
+<div id="chat-window">
+    <div style="padding:15px; background:var(--cyan); color:black; font-weight:bold;">MD-AI ASSISTANT</div>
+    <div class="chat-content" id="chat-box">Hi Rega! Ask me anything about code...</div>
+    <div style="display:flex; border-top:1px solid #333;">
+        <input type="text" id="ai-input" style="flex:1; background:transparent; border:none; color:white; padding:10px;" placeholder="Type here...">
+        <button onclick="askAI()" style="background:var(--cyan); border:none; padding:10px;">SEND</button>
+    </div>
+</div>
 
 <script>
-    // 1. نظام الذاكرة والترحيب
+    // --- 1. نظام الدخول والذاكرة ---
     window.onload = function() {
-        const savedName = localStorage.getItem('md_user');
-        if(savedName) {
-            showApp(savedName, true);
+        const user = JSON.parse(localStorage.getItem('md_studio_account'));
+        if(user) {
+            startApp(user.name, true);
         }
-        startMatrix();
+        typeMatrix();
     };
 
-    function login() {
-        if(!document.getElementById('entry-btn').classList.contains('ready')) return;
-        const name = document.getElementById('u-name').value;
-        localStorage.setItem('md_user', name);
-        showApp(name, false);
+    function initApp() {
+        if(!document.getElementById('entry-btn').classList.contains('active')) return;
+        const acc = { name: document.getElementById('u-name').value, pass: document.getElementById('u-pass').value };
+        localStorage.setItem('md_studio_account', JSON.stringify(acc));
+        startApp(acc.name, false);
     }
 
-    function showApp(name, isOld) {
+    function startApp(name, isOld) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'grid';
-        
-        const msg = isOld ? `WELCOME BACK, ${name.toUpperCase()}!` : `WELCOME, ${name.toUpperCase()}!`;
-        document.getElementById('welcome-msg').innerText = msg;
-        
-        // ترحيب صوتي
-        const synth = window.speechSynthesis;
-        synth.speak(new SpeechSynthesisUtterance(msg));
+        const msg = isOld ? "Welcome Back, " : "Welcome, ";
+        alert(msg + name);
+        document.getElementById('edit-name').value = name;
+        document.getElementById('edit-pass').value = JSON.parse(localStorage.getItem('md_studio_account')).pass;
     }
 
-    // 2. التحقق من الباسورد (6 خانات ميكس)
+    // --- 2. المربع الأسود المتحرك (رقم 3) ---
+    function typeMatrix() {
+        const box = document.getElementById('matrix-text');
+        const lines = ["> MD_SYSTEM_V.6 STARTING...", "> LOADING SCRATCH BLOCKS...", "> CONNECTING TO PYODIDE...", "> AI ENGINE READY...", "> ENCRYPTING PASSWORDS...", "> STATUS: 100% OPERATIONAL"];
+        let i = 0;
+        setInterval(() => {
+            box.innerHTML += lines[i % lines.length] + "<br>";
+            i++;
+            if(box.scrollHeight > 450) box.innerHTML = "";
+        }, 1000);
+    }
+
+    // --- 3. التحقق من الباسورد (6 خانات ميكس) ---
     document.getElementById('u-pass').addEventListener('input', function() {
         const v = this.value;
         const btn = document.getElementById('entry-btn');
         const valid = v.length === 6 && /[a-zA-Z]/.test(v) && /[0-9]/.test(v);
-        
-        if(v.length > 0 && !valid) {
-            document.getElementById('hint').style.display = 'block';
-            btn.classList.remove('ready');
-        } else if(valid) {
-            document.getElementById('hint').style.display = 'none';
-            btn.classList.add('ready');
-        }
+        if(valid) btn.classList.add('active'); else btn.classList.remove('active');
     });
 
-    // 3. علامة المساحة للأكواد
-    function addSpace(id) {
-        const editor = document.getElementById(id);
-        editor.focus();
-        document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
+    // --- 4. سكراتش (Blockly) ---
+    const toolbox = {
+        "kind": "categoryToolbox",
+        "contents": [
+            {"kind": "category", "name": "Motion", "colour": "210", "contents": [{"kind": "block", "type": "motion_move"}]},
+            {"kind": "category", "name": "Events", "colour": "20", "contents": [{"kind": "block", "type": "event_whenflagclicked"}]},
+            {"kind": "category", "name": "Control", "colour": "120", "contents": [{"kind": "block", "type": "controls_repeat_ext"}]}
+        ]
+    };
+    const workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: Blockly.Themes.Dark, zoom: {controls: true, wheel: true}});
+
+    // --- 5. الذكاء الاصطناعي (رقم 5) ---
+    function toggleChat() { let c = document.getElementById('chat-window'); c.style.display = c.style.display==='flex'?'none':'flex'; }
+    function askAI() {
+        const input = document.getElementById('ai-input').value;
+        const box = document.getElementById('chat-box');
+        box.innerHTML += `<div style='margin-bottom:10px; color:var(--cyan)'>You: ${input}</div>`;
+        setTimeout(() => {
+            box.innerHTML += `<div style='margin-bottom:10px;'>AI: I am analyzing '${input}'. For MD Studio, I recommend using Scratch-Python hybrid.</div>`;
+            box.scrollTop = box.scrollHeight;
+        }, 1000);
+        document.getElementById('ai-input').value = "";
     }
 
-    // 4. المربع الذكي
-    function autoExpand(el) {
-        el.style.height = 'auto';
-        el.style.height = el.scrollHeight + 'px';
+    // --- 6. التنقل والوظائف الأخرى ---
+    function tab(id) {
+        document.querySelectorAll('.section').forEach(s => s.style.display='none');
+        document.getElementById(id).style.display = (id==='scratch'?'grid':'block');
+        Blockly.svgResize(workspace);
     }
-
-    // تأثير الماتريكس (الأكواد العشوائية)
-    function startMatrix() {
-        const codes = ["import md_empire", "system.status = 'Ready'", "turtle.draw_neon()", "ai.connect()", "fixing_bug_04...", "sketchpy.render()"];
-        const box = document.getElementById('matrix-code');
-        setInterval(() => {
-            const line = codes[Math.floor(Math.random()*codes.length)];
-            box.innerHTML += `<div>> ${line}</div>`;
-            if(box.children.length > 15) box.removeChild(box.firstChild);
-        }, 600);
+    function logout() { localStorage.removeItem('md_studio_account'); location.reload(); }
+    function deleteAccount() { if(confirm("Are you sure?")) { localStorage.clear(); location.reload(); } }
+    function fixCode() { 
+        document.getElementById('fixed-result').innerText = "// Code Fixed!\n" + document.getElementById('buggy-code').value; 
     }
-
-    function logout() { localStorage.clear(); location.reload(); }
+    function copyCode() { navigator.clipboard.writeText(document.getElementById('fixed-result').innerText); alert("Copied!"); }
 </script>
+
 </body>
 </html>
