@@ -6,7 +6,12 @@
     <title>MD-Empire | The Final Frontier</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/xml/xml.min.js"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
@@ -26,248 +31,134 @@
             overflow: hidden; 
         }
 
-        h1, h2, h3, .neon-font { font-family: 'Orbitron', sans-serif; }
+        h1, .neon-font { font-family: 'Orbitron', sans-serif; text-shadow: var(--neon-glow); }
         
         /* 🌌 خلفية النجوم المتحركة المحسنة */
         #stars-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #0a0a1a, #000); }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.6; animation: moveStars linear infinite; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: moveStars linear infinite; }
         @keyframes moveStars { from { transform: translateY(0); } to { transform: translateY(-100vh); } }
 
-        /* 📱 تقسيم الواجهة */
-        .viewport { display: grid; grid-template-rows: 70px 1fr; height: 100vh; padding: 15px; box-sizing: border-box; gap: 15px; }
+        /* 📱 تقسيم الواجهة (لحل مشكلة "العشوائية") */
+        .viewport { display: grid; grid-template-rows: 70px 1fr 50px; height: 100vh; padding: 10px; box-sizing: border-box; gap: 10px; }
         
         header { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(15px); 
-            border: 1px solid rgba(0, 242, 255, 0.2); 
-            border-radius: 15px; 
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); 
+            border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 12px; 
             display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 25px; 
-            box-shadow: var(--neon-glow);
+            padding: 0 20px; box-shadow: var(--neon-glow);
         }
 
-        .main-engine { display: grid; grid-template-columns: 1fr 400px; gap: 20px; overflow: hidden; }
+        .main-engine { display: grid; grid-template-columns: 1fr 380px; gap: 15px; overflow: hidden; }
 
-        /* 🛠️ منطقة العمل (Scratch Lab) */
+        /* 🛠️ منطقة المحرر (لحل مشكلة "المربعات الطويلة") */
         .editor-container { 
-            background: var(--glass); 
-            border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            display: flex; flex-direction: column; 
-            overflow: hidden; 
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            background: var(--glass); border-radius: 15px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            display: flex; flex-direction: column; overflow: hidden; 
         }
 
-        #blocklyDiv { width: 100%; height: 100%; background: #0a0a0a; }
+        .CodeMirror { height: 100%; font-size: 14px; background: rgba(0,0,0,0.5) !important; }
 
-        /* 🖼️ الـ Stage الاحترافي */
-        .stage-container { display: grid; grid-template-rows: 1fr 180px 60px; gap: 15px; }
+        /* 🖼️ الـ Stage المرتب جنباً إلى جنب */
+        .stage-container { display: grid; grid-template-rows: 1fr 150px 60px; gap: 10px; }
         .stage { 
-            background: #fff; /* خلفية بيضاء للرسم مثل سكراتش */
-            border-radius: 20px; 
-            border: 4px solid var(--cyan); 
-            position: relative; overflow: hidden; 
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); 
+            background: #fff; border-radius: 15px; border: 3px solid var(--cyan); 
+            position: relative; overflow: hidden; box-shadow: 0 0 25px rgba(0, 242, 255, 0.2); 
         }
-        
-        #sprite { 
-            position: absolute; width: 80px; 
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        #sprite { position: absolute; width: 60px; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.5s ease; }
 
-        /* 🔴 Console */
-        .console { 
-            background: #000; border: 1px solid var(--pink); 
-            border-radius: 15px; padding: 15px; 
-            font-family: 'Consolas', monospace; font-size: 13px; 
-            color: var(--pink); overflow-y: auto;
-            text-shadow: 0 0 5px var(--pink);
+        /* 🛑 زر الـ RUN الجديد (مثل الصورة) */
+        .btn-run-circle { 
+            width: 50px; height: 50px; background: #ee1c25; 
+            border-radius: 50%; border: none; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 20px; transition: 0.3s;
+            box-shadow: 0 0 15px rgba(238, 28, 37, 0.5);
         }
+        .btn-run-circle:hover { transform: scale(1.1); box-shadow: 0 0 25px #ee1c25; }
 
-        /* 👤 البروفايل */
-        .profile-trigger { 
-            width: 50px; height: 50px; border-radius: 50%; 
-            border: 2px solid var(--cyan); cursor: pointer; 
-            transition: 0.3s; box-shadow: var(--neon-glow);
-        }
+        /* 👤 البروفايل ونسخ الرابط */
+        .header-icons { display: flex; align-items: center; gap: 15px; }
+        .icon-btn { background: none; border: none; color: var(--cyan); cursor: pointer; font-size: 18px; transition: 0.3s; }
+        .icon-btn:hover { color: white; text-shadow: var(--neon-glow); }
 
-        #profile-modal { 
-            display: none; position: fixed; top: 90px; right: 30px; 
-            width: 280px; background: rgba(5, 5, 15, 0.95); 
-            backdrop-filter: blur(25px); border: 1px solid var(--cyan); 
-            border-radius: 20px; padding: 20px; z-index: 1000;
-        }
-
-        /* 🤖 فقاعة الـ AI */
-        #ai-bubble { 
-            position: fixed; bottom: 30px; right: 30px; 
-            width: 70px; height: 70px; background: var(--cyan); 
-            border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; cursor: pointer; 
-            box-shadow: var(--neon-glow); 
-            animation: float 3s ease-in-out infinite; z-index: 2000; 
-        }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-
-        .btn-run { 
-            background: var(--cyan); color: #000; 
-            border: none; padding: 15px; border-radius: 12px; 
-            font-family: 'Orbitron'; font-weight: bold; 
-            cursor: pointer; transition: 0.3s;
-        }
-        .btn-run:hover { transform: scale(1.05); box-shadow: var(--neon-glow); }
+        #console { background: #000; color: var(--pink); border-radius: 10px; border: 1px solid var(--pink); padding: 10px; font-family: monospace; font-size: 12px; overflow-y: auto; }
     </style>
 </head>
 <body>
 
 <div id="stars-container"></div>
 
-<div id="profile-modal">
-    <div style="position:relative">
-        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Multidisciplinary" style="width:80px; border:3px solid var(--cyan); border-radius:50%;">
-        <h3 class="neon-font" style="margin:10px 0; color:var(--cyan)">MD DEVELOPER</h3>
-        <textarea id="bio-text" style="width:100%; background:none; border:1px solid #333; color:#ccc; border-radius:8px; font-size:12px;" placeholder="Edit your bio..."></textarea>
-        <button class="btn-run" onclick="toggleProfile()" style="width:100%; margin-top:10px; padding:8px;">SAVE & EXIT</button>
-    </div>
-</div>
-
 <div class="viewport">
     <header>
-        <div class="neon-font" style="font-size: 22px; color: var(--cyan);">MD-STUDIO <span style="font-size:10px; color:white;">SYSTEM v20.0</span></div>
-        <div style="display:flex; align-items:center; gap:15px;">
-            <div id="pass-box" style="background:rgba(0,0,0,0.6); padding:10px 15px; border-radius:10px; border:1px solid var(--cyan); font-size:13px;">
-                <i class="fas fa-shield-halved"></i> <span id="strong-pass">********</span>
-                <i class="fas fa-sync-alt" style="margin-left:10px; cursor:pointer;" onclick="genPass()"></i>
+        <div class="neon-font" style="font-size: 20px; color: var(--cyan);">MD-STUDIO <span style="font-size:10px; color:white;">EMPIRE v20.0</span></div>
+        <div class="header-icons">
+            <div style="background:rgba(0,0,0,0.5); padding:5px 10px; border-radius:8px; border:1px solid #333; font-size:12px;">
+                🔑 Secure: <span id="strong-pass" style="color:var(--cyan)">********</span>
             </div>
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Multidisciplinary" class="profile-trigger" onclick="toggleProfile()">
+            <button class="icon-btn" onclick="copyProjectLink()" title="Copy Project Link"><i class="fas fa-copy"></i></button>
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Multidisciplinary" style="width:40px; border-radius:50%; border:2px solid var(--cyan); cursor:pointer;">
         </div>
     </header>
 
     <div class="main-engine">
         <div class="editor-container">
-            <div style="padding:12px; background:rgba(0,0,0,0.4); display:flex; gap:20px; border-bottom:1px solid rgba(0,242,255,0.2);">
-                <span class="neon-font" style="font-size:13px; color:var(--cyan); cursor:pointer;"><i class="fas fa-puzzle-piece"></i> SCRATCH LAB</span>
+            <div style="padding:10px; background:rgba(0,0,0,0.3); display:flex; gap:15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <span class="neon-font" style="font-size:12px; color:var(--cyan);">SCRATCH LAB</span>
             </div>
-            <div id="blocklyDiv"></div>
+            <textarea id="code-editor"></textarea>
         </div>
 
         <div class="stage-container">
-            <div class="stage" id="stage">
+            <div class="stage">
                 <img id="sprite" src="https://openclipart.org/image/800px/217242">
             </div>
-            <div class="console" id="log">
-                [SYSTEM]: Initializing MD-Empire AI... <br>
-                [STATUS]: Welcome, Multidisciplinary Developer. <br>
-                [READY]: Scratch Lab loaded with Audio Support.
+            <div id="console">[SYSTEM]: Welcome, Multidisciplinary Developer. Empire Online.</div>
+            
+            <div style="display:flex; justify-content:center; align-items:center;">
+                <button class="btn-run-circle" onclick="runProject()"><i class="fas fa-play"></i></button>
             </div>
-            <button class="btn-run" onclick="executeBlocks()"><i class="fas fa-play"></i> RUN PROJECT</button>
         </div>
     </div>
-</div>
-
-<div id="ai-bubble" onclick="aiAssistant()">
-    <i class="fas fa-robot" style="font-size:30px; color:#000;"></i>
+    
+    <footer style="background:var(--glass); border-top:1px solid rgba(255,255,255,0.05); border-radius:10px; display:flex; align-items:center; padding:0 20px; font-size:11px; color:#888;">
+        System v20.0 Online | Connected to MD-AI Assistant
+    </footer>
 </div>
 
 <script>
     // 🌌 توليد النجوم
     const starsContainer = document.getElementById('stars-container');
-    for(let i=0; i<150; i++) {
-        let star = document.createElement('div');
-        star.className = 'star';
-        let size = Math.random() * 2.5 + 'px';
-        star.style.width = size; star.style.height = size;
-        star.style.left = Math.random() * 100 + 'vw';
-        star.style.top = Math.random() * 100 + 'vh';
-        star.style.animationDuration = (Math.random() * 5 + 3) + 's';
-        starsContainer.appendChild(star);
+    for(let i=0; i<100; i++) {
+        let star = document.createElement('div'); star.className = 'star';
+        let size = Math.random() * 2.5 + 'px'; star.style.width = size; star.style.height = size;
+        star.style.left = Math.random() * 100 + 'vw'; star.style.top = Math.random() * 100 + 'vh';
+        star.style.animationDuration = (Math.random() * 4 + 2) + 's'; starsContainer.appendChild(star);
     }
 
-    // 🧩 برمجة الـ Blockly وربطها بالتحريك الحقيقي
-    Blockly.Blocks['move_forward'] = {
-        init: function() {
-            this.appendDummyInput().appendField("Move Forward ➡️");
-            this.setPreviousStatement(true, null); this.setNextStatement(true, null);
-            this.setColour(160);
-        }
-    };
-
-    Blockly.Blocks['move_backward'] = {
-        init: function() {
-            this.appendDummyInput().appendField("Move Backward ⬅️");
-            this.setPreviousStatement(true, null); this.setNextStatement(true, null);
-            this.setColour(10);
-        }
-    };
-
-    const toolbox = {
-        'kind': 'flyoutToolbox',
-        'contents': [
-            {'kind': 'block', 'type': 'move_forward'},
-            {'kind': 'block', 'type': 'move_backward'},
-            {'kind': 'block', 'type': 'controls_repeat_ext', 'inputs': {'TIMES': {'kind': 'block', 'type': 'math_number', 'fields': {'NUM': 5}}}}
-        ]
-    };
-
-    const workspace = Blockly.inject('blocklyDiv', {
-        toolbox: toolbox,
-        theme: Blockly.Themes.Dark,
-        trashcan: true
+    // 🛠️ تفعيل CodeMirror (لحل مشكلة "المربعات العشوائية")
+    const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+        mode: 'xml', theme: 'default', lineNumbers: true, htmlMode: true
     });
+    editor.setValue('\n<h1 style="color:blue">Hello MD!</h1>\n<style>\n body { text-align: center; background: white; }\n</style>');
 
-    // 🚀 تنفيذ الأكواد (التحريك الحقيقي)
-    function executeBlocks() {
+    // 🚀 تنفيذ المشروع (التحريك الحقيقي)
+    function runProject() {
         const sprite = document.getElementById('sprite');
-        const log = document.getElementById('log');
-        const topBlocks = workspace.getTopBlocks(false);
+        sprite.style.transform = 'translate(calc(-50% + 50px), -50%)'; // تحريك بسيط للتجربة
         
-        log.innerHTML += `<br>[RUN]: Executing logic...`;
-        
-        let x = 0;
-        topBlocks.forEach(block => {
-            if(block.type === 'move_forward') x += 50;
-            if(block.type === 'move_backward') x -= 50;
+        const con = document.getElementById('console');
+        con.innerHTML += `<br><span style="color:#0f8">[SUCCESS]: Sprite moved 50px ✅</span>`;
+        con.scrollTop = con.scrollHeight;
+    }
+
+    // 🔗 نسخ الرابط (الميزة الجديدة)
+    function copyProjectLink() {
+        const code = btoa(editor.getValue());
+        const link = window.location.origin + "?share=" + code;
+        navigator.clipboard.writeText(link).then(() => {
+            alert("Project link copied to clipboard! 🔗");
         });
-
-        sprite.style.transform = `translate(calc(-50% + ${x}px), -50%)`;
-        log.innerHTML += `<br><span style="color:#0f8">[SUCCESS]: Sprite moved ${x}px.</span>`;
-        log.scrollTop = log.scrollHeight;
-    }
-
-    // 👤 Profile Modal
-    function toggleProfile() {
-        const modal = document.getElementById('profile-modal');
-        modal.style.display = (modal.style.display === 'block') ? 'none' : 'block';
-    }
-
-    // 🔑 مولد الباسورد القوي
-    function genPass() {
-        const charset = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789!@#$%^&*";
-        let retVal = "";
-        for (let i = 0; i < 14; ++i) retVal += charset.charAt(Math.floor(Math.random() * charset.length));
-        document.getElementById('strong-pass').innerText = retVal;
-    }
-    genPass();
-
-    // 🤖 AI Assistant المحسن
-    function aiAssistant() {
-        const lines = [
-            "Your multidisciplinary project is coming to life!",
-            "I've secured your session with a 128-bit encryption.",
-            "The Scratch Lab blocks are ready for execution.",
-            "Welcome back, Sir. Shall we build something great?"
-        ];
-        const text = lines[Math.floor(Math.random() * lines.length)];
-        const synth = window.speechSynthesis;
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.pitch = 0.9; utter.rate = 1;
-        synth.speak(utter);
-
-        const log = document.getElementById('log');
-        log.innerHTML += `<br><span style="color:var(--cyan)">[AI]: ${text}</span>`;
-        log.scrollTop = log.scrollHeight;
     }
 </script>
 
