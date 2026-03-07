@@ -3,129 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD Studio | Space Empire</title>
+    <title>MD Studio | AI & Game Engine</title>
     <style>
-        :root { --accent: #00d2ff; --err: #ff4d4d; --dark: #000; }
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        canvas { position: fixed; inset: 0; z-index: -1; }
+        :root { --accent: #00d2ff; --pink: #ff0080; --dark: #050510; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        canvas#bg { position: fixed; inset: 0; z-index: -1; opacity: 0.4; }
+
+        /* 🔐 Login & Registration */
+        #auth-gate { height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #101025, #000); }
+        .card { background: rgba(15, 15, 30, 0.95); padding: 30px; border: 2px solid var(--accent); border-radius: 20px; width: 320px; text-align: center; box-shadow: 0 0 30px var(--accent); }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: var(--accent); border-radius: 8px; box-sizing: border-box; outline: none; }
+
+        /* 📱 Layout */
+        #app { display: none; height: 100vh; flex-direction: column; }
+        header { background: #000; border-bottom: 2px solid var(--accent); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .wrapper { display: flex; flex: 1; overflow: hidden; }
         
-        /* 🔐 Login Box */
-        #gate { height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .card { background: rgba(10, 10, 25, 0.95); padding: 40px; border: 2px solid var(--accent); border-radius: 20px; width: 330px; text-align: center; box-shadow: 0 0 20px var(--accent); }
-        input { width: 100%; padding: 14px; margin: 10px 0; background: #111; border: 1px solid #333; color: var(--accent); border-radius: 8px; box-sizing: border-box; outline: none; font-size: 16px; }
-        
-        /* 🔴 الرسالة الحمراء تحت المربع فوراً */
-        .err-hint { color: var(--err); font-size: 12px; text-align: left; min-height: 18px; font-weight: bold; margin-bottom: 10px; padding-left: 5px; }
+        /* 🚥 Sidebar */
+        .sidebar { width: 220px; background: rgba(0,0,0,0.95); border-right: 1px solid #222; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-link { padding: 12px; cursor: pointer; border-radius: 8px; border: 1px solid #222; font-size: 14px; transition: 0.3s; }
+        .nav-link.active { background: var(--accent); color: #000; font-weight: bold; }
 
-        /* 📱 الواجهة الرئيسية */
-        #main { display: none; height: 100vh; flex-direction: column; }
-        nav { height: 60px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; padding: 0 20px; background: #000; }
-        .sidebar { width: 200px; background: rgba(0,0,0,0.9); border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .nav-btn { padding: 12px; cursor: pointer; border: 1px solid #333; border-radius: 10px; text-align: center; }
-        .nav-btn.active { background: var(--accent); color: #000; font-weight: bold; }
+        /* 📺 Content Area */
+        .content { flex: 1; padding: 20px; overflow-y: auto; display: flex; gap: 20px; }
+        .panel { background: rgba(20,20,40,0.8); border-radius: 15px; border: 1px solid #333; padding: 20px; display: flex; flex-direction: column; }
 
-        .view { flex: 1; padding: 30px; display: none; overflow-y: auto; }
-        .view.active { display: block; }
+        /* 🤖 AI Chat Bot Box */
+        #ai-bot { width: 300px; border-left: 2px solid var(--accent); background: #000; padding: 15px; display: flex; flex-direction: column; }
+        .chat-logs { flex: 1; overflow-y: auto; font-size: 13px; margin-bottom: 10px; }
+        .bot-msg { color: var(--accent); margin-bottom: 10px; background: #111; padding: 8px; border-radius: 5px; }
+        .user-msg { color: #fff; text-align: right; margin-bottom: 10px; }
 
-        /* 🎮 محرك التاتش */
-        #zone { height: 400px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 15px; position: relative; overflow: hidden; touch-action: none; }
-        .sprite { position: absolute; font-size: 50px; cursor: move; touch-action: none; user-select: none; }
+        /* 🎮 Stage (Scratch Style) */
+        #stage { flex: 1; background: white; border-radius: 15px; position: relative; overflow: hidden; }
+        canvas#art-canvas { width: 100%; height: 100%; }
+        .sprite { position: absolute; font-size: 50px; cursor: move; touch-action: none; }
     </style>
 </head>
 <body>
 
-<canvas id="stars"></canvas>
+<canvas id="bg"></canvas>
 
-<div id="gate">
+<div id="auth-gate">
     <div class="card">
-        <h2 style="color:var(--accent)">MD LOGIN</h2>
-        <input type="text" placeholder="Username">
-        <input type="password" id="pass" placeholder="Name + Number (6 Chars)" oninput="check()">
-        <div id="msg" class="err-hint"></div>
-        <button id="btn" onclick="start()" disabled style="width:100%; padding:15px; background:#222; border:none; color:#555; border-radius:10px; cursor:not-allowed; font-weight:bold;">LAUNCH ENGINE</button>
+        <h2 id="auth-title">MD GATEWAY</h2>
+        <input type="text" id="u-name" placeholder="User Name">
+        <input type="password" id="u-pass" placeholder="Password (retaj1)" oninput="vAuth()">
+        <div id="u-err" style="color:red; font-size:12px; font-weight:bold;"></div>
+        <button id="auth-btn" onclick="login()" disabled style="width:100%; padding:12px; background:#222; border:none; border-radius:10px; cursor:not-allowed;">LAUNCH</button>
+        <p onclick="toggleMode()" id="mode-text" style="font-size:11px; cursor:pointer; margin-top:10px; color:#aaa;">New? Create Account</p>
     </div>
 </div>
 
-<div id="main">
-    <nav><span style="color:var(--accent); font-weight:bold;">MD STUDIO v11.0</span></nav>
-    <div style="display:flex; flex:1;">
+<div id="app">
+    <header>
+        <div style="color:var(--accent); font-weight:bold;">MD STUDIO | AI EMPIRE</div>
+        <div id="user-display"></div>
+    </header>
+
+    <div class="wrapper">
         <div class="sidebar">
-            <div class="nav-btn active" onclick="tab('g-view', this)">🎮 Engine</div>
-            <div class="nav-btn" onclick="tab('p-view', this)">👤 Profile</div>
-            <button onclick="location.reload()" style="margin-top:auto; background:#ff0080; border:none; padding:10px; color:white; border-radius:5px;">Logout</button>
+            <div class="nav-link active">🛠️ Innovation Lab</div>
+            <div class="nav-link">🔧 Code Fixer</div>
+            <div class="nav-link">🔑 Security Tool</div>
+            <div class="nav-link">👤 Profile</div>
+            <button onclick="location.reload()" style="margin-top:auto; background:var(--pink); border:none; color:white; padding:10px; border-radius:8px; cursor:pointer;">Exit System</button>
         </div>
-        <div id="g-view" class="view active">
-            <h2>Game Studio</h2>
-            <button onclick="add('🚀')">Add Ship</button>
-            <div id="zone" style="margin-top:20px;"></div>
-        </div>
-        <div id="p-view" class="view">
-            <div style="text-align:center; border:1px solid var(--accent); padding:40px; border-radius:20px;">
-                <div style="width:100px; height:100px; background:var(--accent); border-radius:50%; margin:auto; margin-bottom:20px;"></div>
-                <h1>Multidisciplinary Developer</h1>
-                <p>Status: Ready</p>
+
+        <div class="content">
+            <div class="panel" style="flex: 1;">
+                <h3 style="margin-top:0">Innovation Lab (Scratch Engine)</h3>
+                <div style="margin-bottom:10px;">
+                    <button onclick="spawn('🚀')">Add Ship</button>
+                    <button onclick="spawn('👾')">Add Enemy</button>
+                    <button onclick="runCode('heart')" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px;">Draw Heart</button>
+                </div>
+                <div id="stage">
+                    <canvas id="art-canvas"></canvas>
+                </div>
+                <textarea id="code-box" placeholder="Write commands like 'heart' or 'flower'..." style="height:80px; margin-top:10px;"></textarea>
+            </div>
+
+            <div id="ai-bot">
+                <h4 style="color:var(--accent); margin-top:0;">🤖 MD-AI ASSISTANT</h4>
+                <div class="chat-logs" id="chat-logs">
+                    <div class="bot-msg">Hello Multidisciplinary Developer! How can I help you build today?</div>
+                </div>
+                <input type="text" id="ai-input" placeholder="Ask AI anything..." onkeydown="if(event.key==='Enter') askAI()">
+                <button onclick="askAI()" style="background:var(--accent); border:none; padding:8px; border-radius:5px; font-weight:bold; cursor:pointer;">SEND</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    const cv = document.getElementById('stars'), ct = cv.getContext('2d');
-    function res() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
-    window.onresize = res; res();
-    const drops = Array(Math.floor(cv.width/20)).fill(1);
-    function draw() {
-        ct.fillStyle = "rgba(0,0,0,0.1)"; ct.fillRect(0,0,cv.width,cv.height);
-        ct.fillStyle = "#00d2ff"; ct.font = "15px monospace";
-        drops.forEach((y, i) => {
-            ct.fillText(Math.random() > 0.5 ? "1" : "0", i*20, y*20);
-            if(y*20 > cv.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
-        });
-    } setInterval(draw, 50);
+    let isLogin = true;
+    let currentUser = "";
 
-    // 🔐 فحص الباسورد (حروف + أرقام)
-    function check() {
-        const p = document.getElementById('pass').value;
-        const m = document.getElementById('msg');
-        const b = document.getElementById('btn');
-        
-        const hasChar = /[a-zA-Z]/.test(p);  // فيه حروف
-        const hasNum = /[0-9]/.test(p);      // فيه أرقام
-
-        if(p.length === 0) { m.innerText = ""; }
-        else if(p.length < 6) { m.innerText = "❌ Too Short! (Must be exactly 6)"; }
-        else if(p.length > 6) { m.innerText = "❌ Too Long! (Must be exactly 6)"; }
-        else if(!hasChar || !hasNum) { m.innerText = "❌ Must include Letters and Numbers"; }
-        else {
-            m.innerHTML = "<span style='color:#0f8'>✅ Perfect! Access Ready</span>";
-            b.disabled = false; b.style.background = "#00d2ff"; b.style.color = "#000"; b.style.cursor = "pointer";
-            return;
-        }
-        b.disabled = true; b.style.background = "#222"; b.style.color = "#555"; b.style.cursor = "not-allowed";
+    // 🔐 Auth
+    function vAuth() {
+        const p = document.getElementById('u-pass').value;
+        const b = document.getElementById('auth-btn');
+        if(p.length === 6 && /[a-z]/i.test(p) && /[0-9]/.test(p)) {
+            b.disabled = false; b.style.background = "var(--accent)"; b.style.cursor="pointer";
+        } else { b.disabled = true; b.style.background = "#222"; }
     }
 
-    function start() { document.getElementById('gate').style.display='none'; document.getElementById('main').style.display='flex'; }
-    function tab(id, el) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        el.classList.add('active');
+    function toggleMode() {
+        isLogin = !isLogin;
+        document.getElementById('auth-title').innerText = isLogin ? "MD GATEWAY" : "CREATE ACCOUNT";
     }
 
-    function add(e) {
-        const d = document.createElement('div'); d.className = 'sprite'; d.innerText = e;
-        d.style.left = '50px'; d.style.top = '50px';
-        const mv = (ev) => {
-            ev.preventDefault(); const pt = ev.touches ? ev.touches[0] : ev;
-            const r = document.getElementById('zone').getBoundingClientRect();
-            d.style.left = (pt.clientX - r.left - 25) + 'px';
-            d.style.top = (pt.clientY - r.top - 25) + 'px';
+    function login() {
+        currentUser = document.getElementById('u-name').value;
+        document.getElementById('auth-gate').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        document.getElementById('user-display').innerText = "Logged in as: " + currentUser;
+        speakAI("Welcome back, " + currentUser + ". All systems are online.");
+    }
+
+    // 🤖 AI Logic (The Talking AI)
+    function askAI() {
+        const inp = document.getElementById('ai-input');
+        const logs = document.getElementById('chat-logs');
+        if(!inp.value) return;
+
+        logs.innerHTML += `<div class="user-msg">${inp.value}</div>`;
+        const userQ = inp.value.toLowerCase();
+        inp.value = "";
+
+        setTimeout(() => {
+            let reply = "I'm analyzing that... As your AI, I suggest checking the Innovation Lab for results.";
+            if(userQ.includes("heart")) reply = "I've processed your request. I can draw a heart in the lab for you!";
+            if(userQ.includes("who are you")) reply = "I am MD-AI, built to support your multidisciplinary projects.";
+            
+            logs.innerHTML += `<div class="bot-msg">${reply}</div>`;
+            speakAI(reply);
+            logs.scrollTop = logs.scrollHeight;
+        }, 1000);
+    }
+
+    function speakAI(text) {
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = text;
+        msg.lang = 'en-US'; 
+        window.speechSynthesis.speak(msg);
+    }
+
+    // 🎮 Innovation Lab Logic
+    function spawn(emoji) {
+        const s = document.createElement('div');
+        s.className = 'sprite'; s.innerText = emoji;
+        s.style.left = "50px"; s.style.top = "50px";
+        const move = (e) => {
+            e.preventDefault(); const pt = e.touches ? e.touches[0] : e;
+            const r = document.getElementById('stage').getBoundingClientRect();
+            s.style.left = (pt.clientX - r.left - 25) + 'px';
+            s.style.top = (pt.clientY - r.top - 25) + 'px';
         };
-        d.onmousedown = d.ontouchstart = () => { window.onmousemove = window.ontouchmove = mv; };
+        s.onmousedown = s.ontouchstart = () => { window.onmousemove = window.ontouchmove = move; };
         window.onmouseup = window.ontouchend = () => { window.onmousemove = window.ontouchmove = null; };
-        document.getElementById('zone').appendChild(d);
+        document.getElementById('stage').appendChild(s);
     }
+
+    function runCode(cmd) {
+        const canvas = document.getElementById('art-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        if(cmd === 'heart') {
+            ctx.fillStyle = "red"; ctx.beginPath();
+            ctx.moveTo(75, 40); ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
+            ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5); ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
+            ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5); ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
+            ctx.bezierCurveTo(85, 25, 75, 37, 75, 40); ctx.fill();
+        }
+    }
+
+    // 🌌 Matrix BG
+    const mcv = document.getElementById('bg'), mct = mcv.getContext('2d');
+    mcv.width = window.innerWidth; mcv.height = window.innerHeight;
+    const drops = Array(100).fill(1);
+    function drawM() {
+        mct.fillStyle = "rgba(0,0,0,0.1)"; mct.fillRect(0,0,mcv.width,mcv.height);
+        mct.fillStyle = "#00d2ff"; drops.forEach((y, i) => {
+            mct.fillText(Math.random() > 0.5 ? "1" : "0", i*20, y*20);
+            if(y*20 > mcv.height) drops[i]=0; drops[i]++;
+        });
+    } setInterval(drawM, 50);
 </script>
 </body>
 </html>
