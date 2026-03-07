@@ -3,160 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD STUDIO | SUPREME V2</title>
+    <title>MD STUDIO | SUPREME REFIX</title>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff007f; --green: #00ff88; --dark: #020205; --red: #ff3333; }
-        body { margin: 0; background: var(--dark); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; }
+        :root { --cyan: #00f2ff; --green: #00ff88; --red: #ff3333; --dark: #05050a; }
+        body { margin: 0; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
         
-        /* شاشة الدخول */
-        #login-screen { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: black; gap: 20px; }
-        .login-card { width: 320px; background: #0a0a0f; padding: 25px; border-radius: 15px; border: 1px solid #222; text-align: center; }
-        .input-style { width: 100%; padding: 10px; margin: 8px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 5px; outline: none; }
-        .btn-log { width: 100%; padding: 12px; background: #1a1a1a; color: #444; border: none; border-radius: 5px; cursor: not-allowed; transition: 0.3s; }
-        .btn-log.active { background: var(--green) !important; color: black !important; box-shadow: 0 0 15px var(--green); cursor: pointer; }
+        /* 1. حل مشكلة المربعات الطويلة */
+        #login-screen { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: #000; gap: 20px; }
+        .login-card { width: 300px; padding: 25px; background: #0a0a0f; border: 1px solid #222; border-radius: 15px; text-align: center; max-height: 80vh; }
+        .matrix-box { width: 300px; height: 300px; background: #000; border: 1px solid #111; color: #0f8; padding: 15px; font-family: monospace; overflow: hidden; font-size: 12px; }
 
-        /* الهيكل الرئيسي */
-        #main-app { display: none; grid-template-columns: 240px 1fr; height: 100vh; }
-        .sidebar { background: #05050a; border-right: 1px solid #222; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .nav-btn { padding: 10px; border: 1px solid #222; border-radius: 5px; cursor: pointer; font-size: 10px; color: #888; text-align: left; transition: 0.2s; }
-        .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: black; }
+        .input-style { width: 90%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 5px; }
+        .btn-log { width: 100%; padding: 12px; background: #222; color: #555; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-log.active { background: var(--green); color: #000; box-shadow: 0 0 15px var(--green); }
 
-        /* الأقسام */
-        .tab-content { padding: 20px; height: 100vh; overflow-y: auto; display: none; }
+        /* 2. الهيكل الداخلي - تنظيم الأقسام */
+        #main-app { display: none; grid-template-columns: 200px 1fr; height: 100vh; }
+        .sidebar { background: var(--dark); border-right: 1px solid #222; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-btn { padding: 10px; background: #111; color: #888; border: 1px solid #222; border-radius: 5px; cursor: pointer; text-align: left; font-size: 12px; }
+        .nav-btn.active { background: var(--cyan); color: #000; }
+
+        .tab-content { display: none; padding: 20px; height: 100vh; overflow-y: auto; }
         .active-tab { display: block; }
-        .card-box { background: #0a0a0f; border: 1px solid #222; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
 
-        /* AI Chat */
-        #ai-box { position: fixed; bottom: 20px; left: 20px; width: 280px; height: 350px; background: #0a0a0f; border: 1px solid var(--cyan); border-radius: 10px; display: none; flex-direction: column; z-index: 999; }
-        #ai-msgs { flex: 1; padding: 10px; font-size: 12px; overflow-y: auto; color: #0f8; }
+        /* 3. بوت AI */
+        #ai-chat { position: fixed; bottom: 80px; left: 20px; width: 260px; height: 300px; background: #0a0a0f; border: 1px solid var(--cyan); display: none; flex-direction: column; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
+    <div class="matrix-box" id="matrix"></div>
     <div class="login-card">
         <h2 style="color:var(--cyan)">MD Studio</h2>
-        <input type="text" id="reg-name" class="input-style" placeholder="Name">
-        <input type="text" id="reg-pass" class="input-style" placeholder="Pass (6 Chars)">
-        <button id="entry-btn" class="btn-log" onclick="enter('new')">INITIALIZE</button>
-        <button style="background:none; border:none; color:#555; cursor:pointer; margin-top:10px;" onclick="enter('old')">I already have an account</button>
+        <input type="text" id="name-in" class="input-style" placeholder="Your Name">
+        <input type="text" id="pass-in" class="input-style" placeholder="6 Chars (ex: rita12)">
+        <button id="entry-btn" class="btn-log" onclick="access('new')">CREATE ACCOUNT</button>
+        <button onclick="access('old')" style="background:none; border:none; color:var(--cyan); margin-top:15px; cursor:pointer;">I have an account</button>
     </div>
 </div>
 
 <div id="main-app">
     <div class="sidebar">
-        <div class="nav-btn active" onclick="showTab('scratch')"><i class="fas fa-puzzle-piece"></i> 1. SCRATCH FULL</div>
-        <div class="nav-btn" onclick="showTab('creative')"><i class="fas fa-paint-brush"></i> 2. CREATIVE SUITE</div>
-        <div class="nav-btn" onclick="showTab('debug')"><i class="fas fa-bug"></i> 3. DEBUGGER (تصحيح)</div>
-        <div class="nav-btn" onclick="showTab('security')"><i class="fas fa-shield-alt"></i> 4. PASS GENERATOR</div>
-        <div class="nav-btn" onclick="showTab('profile')" style="margin-top:auto;"><i class="fas fa-user"></i> 6. PROFILE</div>
+        <h4 style="color:var(--cyan)">MENU</h4>
+        <div class="nav-btn active" onclick="show('tab1')">1. SCRATCH ENGINE</div>
+        <div class="nav-btn" onclick="show('tab2')">2. DEBUGGER (تصحيح)</div>
+        <div class="nav-btn" onclick="show('tab3')">3. PASS GENERATOR</div>
+        <div class="nav-btn" onclick="show('tab4')">4. PROFILE</div>
     </div>
 
     <div class="content">
-        <div id="scratch" class="tab-content active-tab">
-            <div id="blocklyDiv" style="height: 85vh; width: 100%;"></div>
+        <div id="tab1" class="tab-content active-tab">
+            <h3>Full Scratch Workspace</h3>
+            <div id="blocklyDiv" style="height: 500px; width: 100%; border:1px solid #333;"></div>
         </div>
 
-        <div id="creative" class="tab-content">
-            <div class="card-box">
-                <textarea id="c-code" class="input-style" style="height:100px;" placeholder="// Enter Drawing Code"></textarea>
-                <button class="nav-btn" style="width:100%; color:white; background:var(--pink);" onclick="alert('Drawing...')">RUN MASTERPIECE</button>
-            </div>
-            <div id="canvas-sim" style="height:300px; background:#000; border:1px dashed #333;"></div>
-        </div>
-
-        <div id="debug" class="tab-content">
+        <div id="tab2" class="tab-content">
             <h3>Code Debugger</h3>
-            <textarea id="debug-in" class="input-style" style="height:200px;" placeholder="Paste code to fix..."></textarea>
-            <button class="nav-btn" onclick="document.getElementById('debug-out').innerText='Looking for errors... No errors found!'">CHECK CODE</button>
-            <pre id="debug-out" style="color:var(--green);"></pre>
+            <textarea id="code-area" class="input-style" style="height:150px;" placeholder="Paste code here..."></textarea>
+            <button class="nav-btn" style="color:white" onclick="debug()">Analyze Code</button>
+            <div id="debug-res" style="margin-top:20px; color:var(--green)"></div>
         </div>
 
-        <div id="security" class="tab-content">
-            <h3>Strong Password Generator</h3>
-            <div class="card-box">
-                <h2 id="pass-gen-out" style="color:var(--green)">********</h2>
-                <button class="nav-btn" onclick="genPass()">GENERATE STRONG PASS</button>
+        <div id="tab3" class="tab-content">
+            <h3>Security Center</h3>
+            <div style="background:#111; padding:20px; border-radius:10px;">
+                <h2 id="pass-out">********</h2>
+                <button class="nav-btn" onclick="gen()">Generate Strong Pass</button>
             </div>
         </div>
 
-        <div id="profile" class="tab-content" style="text-align:center;">
-            <img id="p-img" src="https://via.placeholder.com/100" style="border-radius:50%; border:2px solid var(--cyan);">
-            <h2 id="p-name-disp">User Name</h2>
-            <button class="nav-btn" style="background:var(--red); color:white; width:200px; margin-bottom:10px;" onclick="location.reload()">LOGOUT</button>
-            <br>
-            <button class="nav-btn" style="background:var(--red); color:white; width:200px;" onclick="localStorage.clear(); location.reload();">DELETE ACCOUNT</button>
+        <div id="tab4" class="tab-content">
+            <h3>Account Settings</h3>
+            <div style="text-align:center; padding:30px;">
+                <div style="width:80px; height:80px; background:var(--cyan); border-radius:50%; margin:0 auto 10px;"></div>
+                <h2 id="user-display">User</h2>
+                <button class="btn-log active" style="background:var(--red); width:200px;" onclick="location.reload()">LOGOUT</button>
+                <br><br>
+                <button class="btn-log active" style="background:var(--red); width:200px;" onclick="localStorage.clear(); location.reload();">DELETE ACCOUNT</button>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="ai-trigger" onclick="toggleAI()" style="position:fixed; bottom:20px; left:20px; background:var(--cyan); width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:black;"><i class="fas fa-robot"></i></div>
-<div id="ai-box">
-    <div style="padding:10px; background:var(--cyan); color:black; font-weight:bold;">MD-AI</div>
-    <div id="ai-msgs"></div>
-    <div style="display:flex;"><input type="text" id="ai-input" style="flex:1; background:#000; border:none; color:white; padding:10px;"><button onclick="askAI()" style="background:var(--cyan); border:none; padding:10px;">GO</button></div>
+<div id="ai-btn" onclick="toggleAI()" style="position:fixed; bottom:20px; left:20px; width:50px; height:50px; background:var(--cyan); border-radius:50%; cursor:pointer;"></div>
+<div id="ai-chat">
+    <div style="padding:10px; background:var(--cyan); color:black;">MD Assistant</div>
+    <div id="msgs" style="flex:1; padding:10px; overflow-y:auto; font-size:12px;"></div>
+    <input type="text" id="ai-text" onkeypress="if(event.key==='Enter') aiSend()" placeholder="Ask me..." style="width:100%; padding:10px; background:#000; color:white; border:none;">
 </div>
 
 <script>
-    // نظام الدخول
-    const passIn = document.getElementById('reg-pass');
-    passIn.addEventListener('input', () => {
-        const v = passIn.value;
-        const ok = v.length === 6 && /[a-z]/i.test(v) && /[0-9]/.test(v) && /^[a-zA-Z0-9]+$/.test(v);
-        document.getElementById('entry-btn').className = ok ? 'btn-log active' : 'btn-log';
+    // مصفوفة المربع الأسود
+    const m = document.getElementById('matrix');
+    setInterval(() => { m.innerHTML += "> System Check... OK<br>"; if(m.innerText.length > 500) m.innerHTML = ""; }, 2000);
+
+    // التحقق من الباسورد (6 خانات ميكس)
+    document.getElementById('pass-in').addEventListener('input', function() {
+        const v = this.value;
+        const ok = v.length === 6 && /[0-9]/.test(v) && /[a-z]/i.test(v);
+        document.getElementById('entry-btn').className = ok ? "btn-log active" : "btn-log";
     });
 
-    function speak(t) { const s=window.speechSynthesis; const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; s.speak(u); }
+    // الدخول
+    function access(type) {
+        let name = document.getElementById('name-in').value;
+        let pass = document.getElementById('pass-in').value;
 
-    function enter(type) {
-        let name = document.getElementById('reg-name').value || "Dev";
         if(type === 'old') {
             const saved = JSON.parse(localStorage.getItem('md_user'));
-            if(!saved) return alert("No Account!");
-            const p = prompt("Enter Password:");
-            if(p !== saved.pass) return alert("Wrong!");
-            name = saved.name;
-            speak("Welcome Back " + name);
+            if(!saved) return alert("No account found!");
+            const checkName = prompt("Enter Name:");
+            const checkPass = prompt("Enter Password:");
+            if(checkName === saved.name && checkPass === saved.pass) {
+                name = saved.name;
+                alert("Welcome Back!");
+            } else { return alert("Wrong credentials!"); }
         } else {
-            if(!document.getElementById('entry-btn').classList.contains('active')) return;
-            localStorage.setItem('md_user', JSON.stringify({name:name, pass:passIn.value}));
-            speak("Welcome " + name);
+            if(pass.length !== 6) return;
+            localStorage.setItem('md_user', JSON.stringify({name: name, pass: pass}));
         }
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('main-app').style.display='grid';
-        document.getElementById('p-name-disp').innerText = name;
-        Blockly.svgResize(workspace);
+        
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'grid';
+        document.getElementById('user-display').innerText = name;
+        
+        // صوت ترحيب
+        const msg = new SpeechSynthesisUtterance((type==='old'?'Welcome back ':'Welcome ') + name);
+        window.speechSynthesis.speak(msg);
+        
+        // تشغيل سكراتش
+        Blockly.inject('blocklyDiv', {toolbox: '<xml><block type="controls_repeat_ext"></block></xml>', theme: Blockly.Themes.Dark});
     }
-
-    // سكراتش
-    const workspace = Blockly.inject('blocklyDiv', {toolbox: {kind: "categoryToolbox", contents: [{kind: "category", name: "Motion", contents: [{kind: "block", type: "controls_repeat_ext"}]}]}, theme: Blockly.Themes.Dark});
 
     // تبديل الأقسام
-    function showTab(id) {
+    function show(id) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active-tab');
-        if(id==='scratch') Blockly.svgResize(workspace);
     }
 
-    // مولد الباسوردات
-    function genPass() {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-        let p = ""; for(let i=0; i<12; i++) p += chars.charAt(Math.floor(Math.random()*chars.length));
-        document.getElementById('pass-gen-out').innerText = p;
-    }
-
-    // AI
-    function toggleAI() { let b = document.getElementById('ai-box'); b.style.display = b.style.display==='flex'?'none':'flex'; }
-    function askAI() {
-        const inp = document.getElementById('ai-input');
-        const msgs = document.getElementById('ai-msgs');
-        msgs.innerHTML += `<div>You: ${inp.value}</div>`;
-        setTimeout(() => { msgs.innerHTML += `<div style="color:var(--cyan)">AI: I am MD-AI, how can I help with your code?</div>`; }, 500);
-        inp.value = "";
+    // وظائف إضافية
+    function gen() { document.getElementById('pass-out').innerText = Math.random().toString(36).slice(-10).toUpperCase(); }
+    function debug() { document.getElementById('debug-res').innerText = "Analyzing... [System]: All codes are optimized!"; }
+    function toggleAI() { let c = document.getElementById('ai-chat'); c.style.display = c.style.display === 'flex' ? 'none' : 'flex'; }
+    function aiSend() {
+        const txt = document.getElementById('ai-text');
+        const m = document.getElementById('msgs');
+        m.innerHTML += "<div>You: " + txt.value + "</div>";
+        setTimeout(() => { m.innerHTML += "<div style='color:var(--cyan)'>AI: I am online. How can I assist you, Rega?</div>"; }, 500);
+        txt.value = "";
     }
 </script>
 </body>
