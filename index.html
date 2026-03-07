@@ -11,169 +11,165 @@
         :root { --cyan: #00f2ff; --pink: #ff0077; --green: #00ff88; --dark: #05050a; }
         body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
-        /* 🔐 Login */
-        #login-gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: #0a0a15; padding: 40px; border: 2px solid var(--cyan); border-radius: 25px; text-align: center; width: 320px; box-shadow: 0 0 30px var(--cyan); }
-        .inp { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 10px; outline: none; box-sizing: border-box; }
+        /* 🔐 شاشة الدخول */
+        #gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .box { background: #0a0a15; padding: 40px; border: 2px solid var(--cyan); border-radius: 20px; text-align: center; width: 320px; box-shadow: 0 0 30px var(--cyan); }
+        .inp { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 8px; outline: none; box-sizing: border-box; }
+        
+        /* 📱 النظام الرئيسي */
+        #app { display: none; height: 100vh; grid-template-columns: 260px 1fr; }
+        .sidebar { background: #080810; border-right: 2px solid #1a1a25; padding: 25px; display: flex; flex-direction: column; gap: 10px; }
+        .nav { padding: 15px; background: #111; border: 1px solid #222; border-radius: 12px; cursor: pointer; color: #777; font-weight: bold; }
+        .nav.active { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
 
-        /* 📱 Layout */
-        #main-shell { display: none; height: 100vh; grid-template-columns: 260px 1fr; }
-        .sidebar { background: #080810; border-right: 2px solid #111; padding: 25px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-btn { padding: 15px; background: #111; border: 1px solid #222; border-radius: 12px; cursor: pointer; color: #777; font-weight: bold; }
-        .nav-btn.active { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
-
-        .view-port { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
         .page { display: none; }
         .page.active { display: block; }
 
-        /* 🧩 سكراتش */
-        #blocklyDiv { height: 75vh; width: 100%; border-radius: 15px; border: 1px solid #222; }
+        /* سكراتش */
+        #blocklyDiv { height: 70vh; width: 100%; border-radius: 15px; border: 1px solid #222; }
 
-        /* 👤 البروفايل المطور */
-        .profile-card { background: #0a0a15; padding: 30px; border-radius: 20px; border: 1px solid #222; max-width: 500px; margin: auto; text-align: center; }
-        .user-img { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--cyan); object-fit: cover; margin-bottom: 15px; }
+        /* البروفايل */
+        .card { background: #0a0a15; padding: 30px; border-radius: 20px; border: 1px solid #222; max-width: 500px; margin: auto; text-align: center; }
+        .avatar { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--cyan); object-fit: cover; margin-bottom: 10px; }
 
-        /* 🤖 البوت */
-        #bot-ui { position: fixed; bottom: 20px; left: 20px; width: 300px; height: 400px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 20px; display: none; flex-direction: column; overflow: hidden; z-index: 5000; }
-        #msgs { flex: 1; padding: 15px; overflow-y: auto; background: #05050a; font-size: 14px; }
-
-        /* Footer */
-        .footer { position: fixed; bottom: 10px; right: 20px; color: var(--cyan); font-weight: bold; letter-spacing: 1px; font-size: 14px; opacity: 0.8; }
+        /* التوقيع */
+        .footer-tag { position: fixed; bottom: 10px; right: 20px; color: var(--cyan); font-weight: bold; font-family: cursive; }
+        
+        /* البوت */
+        #bot { position: fixed; bottom: 20px; left: 20px; width: 300px; height: 400px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 20px; display: none; flex-direction: column; overflow: hidden; }
     </style>
 </head>
 <body>
 
-<div id="login-gate">
-    <div class="login-box">
-        <h2 style="color:var(--cyan)">MD ACCESS</h2>
-        <input type="text" id="log-user" class="inp" placeholder="Username">
-        <input type="password" id="log-pass" class="inp" placeholder="Password">
-        <button class="nav-btn" style="width:100%; color:cyan" onclick="entry()">LOGIN</button>
+<div id="gate">
+    <div class="box">
+        <h2 style="color:var(--cyan)">SYSTEM ACCESS</h2>
+        <input type="text" id="in-user" class="inp" placeholder="Your Name">
+        <input type="password" id="in-pass" class="inp" placeholder="Password">
+        <button class="nav" style="width:100%; color:cyan" onclick="login()">ENTER EMPIRE</button>
     </div>
 </div>
 
-<div id="main-shell">
+<div id="app">
     <div class="sidebar">
-        <h2 style="color:var(--cyan)">REGA EMPIRE</h2>
-        <div class="nav-btn active" onclick="tab('t1', this)">🧩 FULL SCRATCH</div>
-        <div class="nav-btn" onclick="tab('t2', this)">🎨 CODE ART</div>
-        <div class="nav-btn" onclick="tab('t3', this)">👤 EDIT PROFILE</div>
-        <div class="nav-btn" onclick="tab('t4', this)">🛡️ DEBUGGER</div>
+        <h2 id="side-title" style="color:var(--cyan)">RETAJ STUDIO</h2>
+        <div class="nav active" onclick="show('p1', this)">🧩 SCRATCH FULL</div>
+        <div class="nav" onclick="show('p2', this)">🎨 CODE ART</div>
+        <div class="nav" onclick="show('p3', this)">👤 EDIT PROFILE</div>
+        <div class="nav" onclick="show('p4', this)">🛡️ DEBUGGER</div>
     </div>
 
-    <div class="view-port">
-        <div id="t1" class="page active">
-            <h1>Scratch Full Workspace</h1>
+    <div class="content">
+        <div id="p1" class="page active">
+            <h1>Scratch Complete Workspace</h1>
             <div id="blocklyDiv"></div>
         </div>
 
-        <div id="t2" class="page">
-            <h1>Art by Code</h1>
-            <textarea id="art-code" class="inp" style="height:100px; color:var(--green)" placeholder="Type 'circle' or JS code..."></textarea>
-            <button class="nav-btn" style="color:var(--pink); margin-top:10px" onclick="runArt()">RENDER</button>
-            <canvas id="cv" width="500" height="300" style="background:white; border-radius:15px; margin-top:15px; display:block;"></canvas>
+        <div id="p2" class="page">
+            <h1>Art Laboratory</h1>
+            <textarea id="art-in" class="inp" style="height:100px; color:var(--green)" placeholder="Type 'circle' or JS..."></textarea>
+            <button class="nav" style="color:var(--pink)" onclick="draw()">RENDER</button>
+            <canvas id="canvas" width="500" height="300" style="background:white; margin-top:15px; border-radius:15px; display:block;"></canvas>
         </div>
 
-        <div id="t3" class="page">
-            <div class="profile-card">
-                <img id="p-img" src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" class="user-img">
-                <h2 id="p-name" style="color:var(--cyan)">Retaj</h2>
-                <hr style="border:0.5px solid #222; margin:20px 0;">
-                <input type="text" id="edit-name" class="inp" placeholder="Change Name">
-                <input type="text" id="edit-pass" class="inp" placeholder="Change Password">
-                <input type="text" id="edit-img" class="inp" placeholder="Image URL (Link)">
-                <button class="nav-btn" style="width:100%; background:var(--green); color:black" onclick="updateProfile()">SAVE CHANGES</button>
+        <div id="p3" class="page">
+            <div class="card">
+                <img id="my-img" src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" class="avatar">
+                <h2 id="my-name" style="color:var(--cyan)">Retaj</h2>
+                <hr style="border:0.1px solid #222; margin:15px 0;">
+                <input type="text" id="new-name" class="inp" placeholder="New Display Name">
+                <input type="text" id="new-pass" class="inp" placeholder="New Password">
+                <input type="text" id="new-img" class="inp" placeholder="New Image URL">
+                <button class="nav" style="width:100%; background:var(--green); color:black" onclick="save()">SAVE CHANGES</button>
             </div>
         </div>
 
-        <div id="t4" class="page">
-            <h1>Logic Debugger</h1>
-            <textarea id="dbg-inp" class="inp" style="height:150px" placeholder="Paste code to check..."></textarea>
-            <button class="nav-btn" style="color:var(--green)" onclick="debug()">CHECK CODE</button>
-            <div id="dbg-out" style="margin-top:20px; font-weight:bold;">Status: Ready.</div>
+        <div id="p4" class="page">
+            <h1>Code Debugger</h1>
+            <textarea id="db-in" class="inp" style="height:150px" placeholder="Paste code..."></textarea>
+            <button class="nav" style="color:var(--green)" onclick="debug()">CHECK LOGIC</button>
+            <div id="db-out" style="margin-top:15px; font-weight:bold;">Status: Ready.</div>
         </div>
     </div>
 </div>
 
-<div class="footer">Made with Retaj</div>
+<div class="footer-tag">Made with Retaj</div>
 
-<div id="bot-ui">
-    <div style="background:var(--cyan); color:black; padding:10px; font-weight:bold;">MD BOT</div>
-    <div id="msgs"></div>
-    <input type="text" id="bin" class="inp" style="margin:5px" placeholder="Chat..." onkeypress="if(event.key==='Enter') chat()">
-</div>
 <button style="position:fixed; bottom:20px; left:20px; width:60px; height:60px; border-radius:50%; background:var(--cyan); border:none; cursor:pointer;" onclick="toggleBot()">🤖</button>
+<div id="bot">
+    <div style="background:var(--cyan); color:black; padding:10px; font-weight:bold;">MD BOT</div>
+    <div id="msg-box" style="flex:1; padding:15px; overflow-y:auto; background:#05050a; font-size:14px;"></div>
+    <input type="text" id="chat-in" class="inp" style="margin:5px" placeholder="Chat..." onkeypress="if(event.key==='Enter') chatBot()">
+</div>
 
 <script>
-    let currentName = "Retaj";
-    let currentPass = "123456";
+    let userName = "Retaj";
 
-    function entry() {
-        const u = document.getElementById('log-user').value;
-        const p = document.getElementById('log-pass').value;
-        if(u && p) {
-            currentName = u; currentPass = p;
-            document.getElementById('login-gate').style.display = 'none';
-            document.getElementById('main-shell').style.display = 'grid';
-            document.getElementById('p-name').innerText = u;
+    function login() {
+        const u = document.getElementById('in-user').value;
+        if(u) {
+            userName = u;
+            document.getElementById('gate').style.display = 'none';
+            document.getElementById('app').style.display = 'grid';
+            document.getElementById('my-name').innerText = u;
             
-            // ترحيب صوتي
-            const s = new SpeechSynthesisUtterance("Welcome " + u);
-            window.speechSynthesis.speak(s);
+            // ترحيب صوتي (Welcome + Name)
+            const speech = new SpeechSynthesisUtterance("Welcome " + u);
+            window.speechSynthesis.speak(speech);
             
             initScratch();
         }
     }
 
-    function updateProfile() {
-        const newN = document.getElementById('edit-name').value;
-        const newP = document.getElementById('edit-pass').value;
-        const newI = document.getElementById('edit-img').value;
-        if(newN) { currentName = newN; document.getElementById('p-name').innerText = newN; }
-        if(newP) { currentPass = newP; }
-        if(newI) { document.getElementById('p-img').src = newI; }
-        alert("Profile Updated, Retaj!");
+    function save() {
+        const n = document.getElementById('new-name').value;
+        const i = document.getElementById('new-img').value;
+        if(n) { userName = n; document.getElementById('my-name').innerText = n; }
+        if(i) { document.getElementById('my-img').src = i; }
+        alert("Settings Saved, Retaj!");
     }
 
     function initScratch() {
-        const toolbox = `<xml>
+        const tb = `<xml>
             <category name="Logic" colour="210"><block type="controls_if"></block></category>
             <category name="Loops" colour="120"><block type="controls_repeat_ext"></block></category>
             <category name="Math" colour="230"><block type="math_number"></block></category>
-            <category name="Text" colour="160"><block type="text"></block></category>
             <category name="Variables" colour="330" custom="VARIABLE"></category>
+            <category name="Text" colour="160"><block type="text"></block></category>
         </xml>`;
-        Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: Blockly.Themes.Dark});
+        Blockly.inject('blocklyDiv', {toolbox: tb, theme: Blockly.Themes.Dark});
     }
 
-    function tab(id, b) {
+    function show(id, b) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.nav').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         b.classList.add('active');
+        if(id === 'p1') Blockly.svgResize(Blockly.mainWorkspace);
     }
 
-    function runArt() {
-        const c = document.getElementById('cv'); const ctx = c.getContext('2d');
-        const code = document.getElementById('art-code').value.toLowerCase();
+    function draw() {
+        const ctx = document.getElementById('canvas').getContext('2d');
+        const code = document.getElementById('art-in').value.toLowerCase();
         ctx.clearRect(0,0,500,300);
         if(code.includes('circle')) { ctx.beginPath(); ctx.arc(150,75,50,0,7); ctx.fill(); }
-        else { try{ eval(code); } catch(e){ alert("Error"); } }
+        else { try { eval(code); } catch(e) { alert("Code Error"); } }
     }
 
     function debug() {
-        const code = document.getElementById('dbg-inp').value;
-        const out = document.getElementById('dbg-out');
-        if(code.includes(';') || code.includes('{')) { out.style.color = "var(--green)"; out.innerText = "✅ Code Correct!"; }
-        else { out.style.color = "red"; out.innerText = "❌ Error: Missing syntax."; }
+        const c = document.getElementById('db-in').value;
+        const o = document.getElementById('db-out');
+        if(c.includes(';') || c.includes('{')) { o.style.color="var(--green)"; o.innerText="✅ Logic Correct!"; }
+        else { o.style.color="red"; o.innerText="❌ Syntax Error!"; }
     }
 
-    function toggleBot() { const b = document.getElementById('bot-ui'); b.style.display = (b.style.display==='flex')?'none':'flex'; }
-    function chat() {
-        const i = document.getElementById('bin'); const m = document.getElementById('msgs');
+    function toggleBot() { const b = document.getElementById('bot'); b.style.display = (b.style.display==='flex')?'none':'flex'; }
+    function chatBot() {
+        const i = document.getElementById('chat-in'); const m = document.getElementById('msg-box');
         m.innerHTML += `<div><b>You:</b> ${i.value}</div>`;
-        let r = "I'm here to help, " + currentName + "!";
-        if(i.value.includes("hi")) r = "Hello Chief Retaj!";
+        let r = "I am ready, " + userName;
+        if(i.value.toLowerCase().includes("hi")) r = "Hello Chief Retaj!";
         setTimeout(() => { m.innerHTML += `<div style="color:cyan"><b>Bot:</b> ${r}</div>`; m.scrollTop=m.scrollHeight; }, 300);
         i.value = "";
     }
