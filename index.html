@@ -12,187 +12,171 @@
         :root { --cyan: #00f2ff; --pink: #ff0077; --green: #00ff88; --red: #ff3333; --dark: #020205; }
         body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
-        /* 🔐 شاشة الدخول الأساسية */
+        /* 🔐 شاشة الدخول */
         #login-screen { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: black; gap: 30px; }
         .matrix-box { width: 300px; height: 350px; background: #000; border: 1px solid #111; color: #0f8; padding: 15px; font-family: monospace; overflow: hidden; font-size: 11px; }
         .login-card { width: 320px; padding: 30px; background: #0a0a0f; border: 1px solid #222; border-radius: 20px; text-align: center; }
-        .input-style { width: 100%; padding: 12px; margin: 10px 0 5px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 8px; outline: none; }
-        #pass-warn { color: var(--red); font-size: 11px; display: block; height: 15px; text-align: left; }
-        .btn-log { width: 100%; padding: 15px; background: #1a1a1a; color: #444; border: none; border-radius: 8px; font-weight: bold; cursor: not-allowed; transition: 0.3s; }
-        .btn-log.active { background: var(--green) !important; color: black !important; box-shadow: 0 0 20px var(--green); cursor: pointer; }
+        .input-style { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 8px; outline: none; }
+        .btn-log { width: 100%; padding: 15px; background: #1a1a1a; color: #444; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-log.active { background: var(--green) !important; color: black !important; box-shadow: 0 0 20px var(--green); }
 
-        /* 📱 الواجهة الرئيسية */
-        #main-app { display: none; grid-template-columns: 240px 1fr; height: 100vh; }
+        /* 📱 الهيكل الرئيسي */
+        #main-app { display: none; grid-template-columns: 250px 1fr; height: 100vh; }
         .sidebar { background: #05050a; border-right: 2px solid #111; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-btn { padding: 12px; background: #111; border: 1px solid #222; border-radius: 10px; cursor: pointer; color: #888; font-size: 12px; text-align: left; transition: 0.3s; }
-        .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: #000; font-weight: bold; }
+        .nav-btn { padding: 14px; background: #111; border: 1px solid #222; border-radius: 10px; cursor: pointer; color: #888; font-size: 13px; text-align: left; }
+        .nav-btn.active { background: var(--cyan); color: #000; font-weight: bold; }
 
-        .content { position: relative; background: var(--dark); overflow-y: auto; }
-        .tab-content { display: none; padding: 30px; }
-        .active-tab { display: block; }
+        /* 🎊 ترحيب الأنيميشن */
+        #welcome-popup { position: fixed; top: 50%; left: 55%; transform: translate(-50%, -50%); font-size: 50px; font-weight: bold; color: var(--cyan); text-shadow: 0 0 20px var(--cyan); display: none; z-index: 9999; animation: fadeOut 3s forwards; }
+        @keyframes fadeOut { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -60%) scale(0.8); display: none; } }
 
-        /* 🎨 قسم الرسم الحي */
-        #canvas-container { position: relative; width: 500px; height: 500px; background: #000; border: 2px solid #222; margin-top: 20px; border-radius: 10px; }
+        /* 🎨 الرسم الحي */
+        #canvas-container { width: 500px; height: 500px; background: #000; border: 2px solid #222; margin-top: 20px; position: relative; border-radius: 15px; }
         canvas { position: absolute; top: 0; left: 0; }
 
-        /* 🔍 المصحح */
-        .debug-area { background: #000; color: #0f8; padding: 15px; border-radius: 10px; border: 1px solid #333; min-height: 100px; margin-top: 15px; font-family: monospace; white-space: pre-wrap; }
-
-        /* 🤖 البوت المتطور (واضح وكبير) */
+        /* 🤖 البوت */
         #ai-trigger { position: fixed; bottom: 30px; left: 30px; width: 80px; height: 80px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 25px var(--cyan); border: 4px solid #000; }
-        #ai-trigger img { width: 60%; }
-        #ai-chat { position: fixed; bottom: 120px; left: 30px; width: 320px; height: 450px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 20px; display: none; flex-direction: column; z-index: 1000; overflow: hidden; }
-        #msgs { flex: 1; padding: 15px; overflow-y: auto; color: #fff; font-size: 14px; background: #05050a; }
+        #ai-chat { position: fixed; bottom: 120px; left: 30px; width: 320px; height: 400px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 20px; display: none; flex-direction: column; z-index: 1000; overflow: hidden; }
+        #msgs { flex: 1; padding: 15px; overflow-y: auto; color: white; }
     </style>
 </head>
 <body>
+
+<div id="welcome-popup">WELCOME REGA</div>
 
 <div id="login-screen">
     <div class="matrix-box" id="matrix"></div>
     <div class="login-card">
         <h2 style="color:var(--cyan)">MD STUDIO</h2>
-        <input type="text" id="reg-name" class="input-style" placeholder="Developer Name">
-        <input type="text" id="reg-pass" class="input-style" placeholder="Password (6 Chars)">
-        <span id="pass-warn">waiting for input...</span>
-        <button id="entry-btn" class="btn-log" onclick="handleEntry('new')">INITIALIZE ENGINE</button>
-        <button onclick="handleEntry('old')" style="background:none; border:none; color:#444; margin-top:15px; cursor:pointer;">I have an account</button>
+        <input type="text" id="reg-name" class="input-style" placeholder="Your Name">
+        <input type="text" id="reg-pass" class="input-style" placeholder="6 Chars Password">
+        <button id="entry-btn" class="btn-log" onclick="handleEntry()">LOGIN / CREATE</button>
     </div>
 </div>
 
 <div id="main-app">
     <div class="sidebar">
-        <h2 style="color:var(--cyan); font-size: 16px;">EMPIRE MENU</h2>
+        <h2 style="color:var(--cyan); font-size: 18px;">MD MENU</h2>
         <div class="nav-btn active" onclick="showTab('tab1')">🧩 SCRATCH FULL</div>
-        <div class="nav-btn" onclick="showTab('tab2')">🎨 ART & CODE (LIVE)</div>
-        <div class="nav-btn" onclick="showTab('tab3')">🔍 SMART DEBUGGER</div>
-        <div class="nav-btn" onclick="showTab('tab4')">👤 PROFILE SETTINGS</div>
+        <div class="nav-btn" onclick="showTab('tab2')">🎨 ART (LIVE DRAW)</div>
+        <div class="nav-btn" onclick="showTab('tab3')">🔍 DEBUGGER</div>
+        <div class="nav-btn" onclick="showTab('tab4')" style="margin-top:auto;">👤 PROFILE</div>
     </div>
 
     <div class="content">
         <div id="tab1" class="tab-content active-tab">
-            <h3 style="color:var(--cyan)">Scratch Visual Programming</h3>
-            <div id="blocklyDiv" style="height: 80vh; width: 100%; border-radius: 15px; border: 1px solid #222;"></div>
+            <h3 style="color:var(--cyan)">Blockly Workspace</h3>
+            <div id="blocklyDiv" style="height: 80vh; width: 100%; border-radius: 15px;"></div>
         </div>
 
         <div id="tab2" class="tab-content">
-            <h3 style="color:var(--pink)">Creative Coding (Live Drawing)</h3>
-            <button class="nav-btn active" style="width:200px; background:var(--pink); color:white;" onclick="startLiveDrawing()">RUN MASTERPIECE</button>
-            <div id="canvas-container">
-                <canvas id="artCanvas" width="500" height="500"></canvas>
-            </div>
+            <h3 style="color:var(--pink)">Live Art Generator</h3>
+            <button class="nav-btn" style="background:var(--pink); color:white; width:150px; display:inline-block;" onclick="startLiveDraw()">RUN DRAW</button>
+            <button class="nav-btn" style="background:var(--green); color:black; width:150px; display:inline-block;" onclick="saveImg()">SAVE PNG</button>
+            <div id="canvas-container"><canvas id="artCanvas" width="500" height="500"></canvas></div>
         </div>
 
         <div id="tab3" class="tab-content">
-            <h3>AI Code Debugger</h3>
-            <textarea id="debug-in" class="input-style" style="height:150px;" placeholder="Paste your code..."></textarea>
-            <button class="nav-btn" style="background:var(--green); color:black; width:100%;" onclick="smartFix()">ANALYZE & FIX</button>
-            <div id="debug-out" class="debug-area">Result will appear here...</div>
+            <h3>AI Debugger</h3>
+            <textarea id="debug-in" class="input-style" style="height:150px;" placeholder="Paste code..."></textarea>
+            <button class="nav-btn" style="background:var(--green); color:black; width:100%;" onclick="runDebug()">ANALYZE</button>
+            <div id="debug-out" style="margin-top:20px; padding:15px; background:#000; border-radius:10px;"></div>
+        </div>
+
+        <div id="tab4" class="tab-content" style="text-align:center;">
+            <div style="background:#0a0a0f; padding:40px; border-radius:20px; border:1px solid #222;">
+                <img src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" style="width:100px; border:2px solid var(--cyan); border-radius:50%;">
+                <h3 id="p-name">Name: Rega ✎</h3>
+                <h3 id="p-pass">Pass: ****** ✎</h3>
+                <button class="nav-btn" style="background:var(--red); color:white; width:200px; margin-top:20px;" onclick="location.reload()">LOGOUT</button>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="ai-trigger" onclick="toggleAI()">
-    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="Robot">
-</div>
+<div id="ai-trigger" onclick="toggleAI()">🤖</div>
 <div id="ai-chat">
-    <div style="background:var(--cyan); color:black; padding:15px; font-weight:bold;">MD ASSISTANT (REGA)</div>
+    <div style="background:var(--cyan); color:black; padding:15px; font-weight:bold;">MD BOT</div>
     <div id="msgs"></div>
-    <div style="display:flex; border-top: 1px solid #222;">
-        <input type="text" id="ai-input" style="flex:1; background:transparent; border:none; color:white; padding:15px;" placeholder="Talk to me, Rega...">
-        <button onclick="askAI()" style="background:var(--cyan); border:none; padding:15px; cursor:pointer;">GO</button>
-    </div>
+    <input type="text" id="ai-input" onkeypress="if(event.key==='Enter') askAI()" style="width:100%; padding:15px; background:#000; color:white; border:none;" placeholder="Ask me...">
 </div>
 
 <script>
-    // 1. نظام الدخول والحماية
-    const matrix = document.getElementById('matrix');
-    setInterval(() => { matrix.innerHTML += "> System Check: OK<br>"; if(matrix.innerText.length > 500) matrix.innerHTML = ""; }, 2000);
+    // 1. الدخول والترحيب
+    function handleEntry() {
+        const name = document.getElementById('reg-name').value || "Developer";
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'grid';
+        
+        // ترحيب بصري
+        const popup = document.getElementById('welcome-popup');
+        popup.innerText = "WELCOME " + name.toUpperCase();
+        popup.style.display = 'block';
 
-    const passIn = document.getElementById('reg-pass');
-    const passWarn = document.getElementById('pass-warn');
-    passIn.addEventListener('input', () => {
-        const v = passIn.value;
-        const ok = v.length === 6 && /[a-z]/i.test(v) && /[0-9]/.test(v);
-        if(!ok) { passWarn.innerText = "Error: Use 6 chars (Letters + Numbers)"; passWarn.style.color = "red"; }
-        else { passWarn.innerText = "Password Correct ✓"; passWarn.style.color = "var(--green)"; document.getElementById('entry-btn').classList.add('active'); }
-    });
+        // ترحيب صوتي
+        const msg = new SpeechSynthesisUtterance("Welcome " + name + ", System is online");
+        window.speechSynthesis.speak(msg);
 
-    function handleEntry(type) {
-        let name = document.getElementById('reg-name').value;
-        if(type === 'new') {
-            if(!document.getElementById('entry-btn').classList.contains('active')) return;
-            localStorage.setItem('md_user', JSON.stringify({name: name, pass: passIn.value}));
-        } else {
-            const saved = JSON.parse(localStorage.getItem('md_user'));
-            if(!saved) return alert("No account!");
-            const p = prompt("Enter Password:");
-            if(p !== saved.pass) return alert("Wrong!");
-            name = saved.name;
-        }
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('main-app').style.display='grid';
+        document.getElementById('p-name').innerText = "Name: " + name + " ✎";
         initScratch();
     }
 
-    // 2. سكراتش الكامل بمكعباته
+    // 2. سكراتش الكامل
     function initScratch() {
-        const toolbox = `<xml>
+        const tb = `<xml>
             <category name="Motion" colour="210"><block type="controls_repeat_ext"></block></category>
             <category name="Logic" colour="210"><block type="controls_if"></block><block type="logic_compare"></block></category>
             <category name="Loops" colour="120"><block type="controls_for"></block></category>
             <category name="Math" colour="230"><block type="math_number"></block><block type="math_arithmetic"></block></category>
-            <category name="Text" colour="160"><block type="text"></block><block type="text_print"></block></category>
+            <category name="Variables" custom="VARIABLE" colour="330"></category>
         </xml>`;
-        Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: Blockly.Themes.Dark});
+        Blockly.inject('blocklyDiv', {toolbox: tb, theme: Blockly.Themes.Dark});
     }
 
-    // 3. الرسم الحي (قصاد عينك)
-    function startLiveDrawing() {
+    // 3. الرسم الحي
+    function startLiveDraw() {
         const canvas = document.getElementById('artCanvas');
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0,0,500,500);
         let i = 0;
-        ctx.strokeStyle = "var(--pink)";
-        ctx.lineWidth = 2;
-        
-        function draw() {
+        ctx.strokeStyle = "cyan";
+        function animate() {
             if(i < 300) {
                 ctx.beginPath();
-                ctx.moveTo(250 + (i-1) * Math.cos((i-1)*0.1), 250 + (i-1) * Math.sin((i-1)*0.1));
-                ctx.lineTo(250 + i * Math.cos(i*0.1), 250 + i * Math.sin(i*0.1));
+                ctx.moveTo(250 + (i-1)*Math.cos(i*0.2), 250 + (i-1)*Math.sin(i*0.2));
+                ctx.lineTo(250 + i*Math.cos(i*0.2), 250 + i*Math.sin(i*0.2));
                 ctx.stroke();
-                i++;
-                requestAnimationFrame(draw);
+                i++; requestAnimationFrame(animate);
             }
         }
-        draw();
+        animate();
     }
 
-    // 4. المصحح الذكي (Correcting)
-    function smartFix() {
+    function saveImg() {
+        const link = document.createElement('a');
+        link.download = 'rega_art.png';
+        link.href = document.getElementById('artCanvas').toDataURL();
+        link.click();
+    }
+
+    // 4. المصحح والبوت
+    function runDebug() {
         const code = document.getElementById('debug-in').value;
         const out = document.getElementById('debug-out');
-        if(code.includes("while") && !code.includes("count++")) {
-            out.innerHTML = `<span style="color:var(--red)">[ERROR]: Infinite Loop detected!</span>\n\n<b>Fixed Code:</b>\nwhile(count < 10) {\n   console.log(count);\n   count++; // Added this\n}`;
+        if(code.includes("while") && !code.includes("++")) {
+            out.innerHTML = "<b style='color:red'>❌ ERROR: Infinite Loop!</b><br>Fix: Add 'i++' inside your loop.";
         } else {
-            out.innerHTML = `<span style="color:var(--green)">[SUCCESS]: Logic seems fine, Rega!</span>`;
+            out.innerHTML = "<b style='color:var(--green)'>✓ Perfect Logic, Boss!</b>";
         }
     }
 
-    // 5. البوت الذكي (الرد على أي شيء)
+    function showTab(id) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab')); document.getElementById(id).classList.add('active-tab'); }
     function toggleAI() { let c = document.getElementById('ai-chat'); c.style.display = c.style.display==='flex'?'none':'flex'; }
     function askAI() {
         const inp = document.getElementById('ai-input');
         const msgs = document.getElementById('msgs');
-        if(!inp.value) return;
-        msgs.innerHTML += `<div><b>You:</b> ${inp.value}</div>`;
-        
-        const v = inp.value.toLowerCase();
-        let res = "That's an interesting question, Rega! As your AI, I suggest exploring the Creative Coding tab to see how logic turns into art.";
-        if(v.includes("hello")) res = "Hello, Rega! I'm your MD-Bot. How can I help you build your empire today?";
-        if(v.includes("fix")) res = "Paste your code in the Debugger tab, and I will find the errors for you!";
-        
-        setTimeout(() => { msgs.innerHTML += `<div style="color:var(--cyan)"><b>Bot:</b> ${res}</div>`; msgs.scrollTop = msgs.scrollHeight; }, 500);
+        msgs.innerHTML += `<div>You: ${inp.value}</div>`;
+        setTimeout(() => { msgs.innerHTML += `<div style="color:var(--cyan)">Bot: I'm here for you, Rega!</div>`; }, 500);
         inp.value = "";
     }
 </script>
