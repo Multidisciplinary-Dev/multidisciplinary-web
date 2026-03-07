@@ -2,134 +2,129 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MD Studio | Ultimate Space</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD Studio | Space Empire</title>
     <style>
         :root { --accent: #00d2ff; --err: #ff4d4d; --dark: #000; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        
-        /* 🌌 خلفية الفضاء والماتريكس */
         canvas { position: fixed; inset: 0; z-index: -1; }
-
-        /* 🔐 شاشة الدخول */
-        #auth-screen { height: 100vh; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); }
-        .login-card { background: rgba(10, 10, 25, 0.95); padding: 40px; border: 2px solid var(--accent); border-radius: 20px; width: 320px; text-align: center; box-shadow: 0 0 20px var(--accent); }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #333; color: var(--accent); border-radius: 8px; box-sizing: border-box; outline: none; }
         
-        /* 🔴 الرسالة الحمراء تحت الباسورد فوراً */
-        .error-hint { color: var(--err); font-size: 12px; text-align: left; min-height: 18px; font-weight: bold; margin-bottom: 10px; }
+        /* 🔐 Login Box */
+        #gate { height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .card { background: rgba(10, 10, 25, 0.95); padding: 40px; border: 2px solid var(--accent); border-radius: 20px; width: 330px; text-align: center; box-shadow: 0 0 20px var(--accent); }
+        input { width: 100%; padding: 14px; margin: 10px 0; background: #111; border: 1px solid #333; color: var(--accent); border-radius: 8px; box-sizing: border-box; outline: none; font-size: 16px; }
+        
+        /* 🔴 الرسالة الحمراء تحت المربع فوراً */
+        .err-hint { color: var(--err); font-size: 12px; text-align: left; min-height: 18px; font-weight: bold; margin-bottom: 10px; padding-left: 5px; }
 
         /* 📱 الواجهة الرئيسية */
-        #main-app { display: none; height: 100vh; flex-direction: column; }
-        .sidebar { width: 220px; background: rgba(0,0,0,0.9); border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .nav-item { padding: 12px; cursor: pointer; border: 1px solid #333; border-radius: 10px; text-align: center; transition: 0.3s; }
-        .nav-item.active, .nav-item:hover { background: var(--accent); color: #000; font-weight: bold; }
+        #main { display: none; height: 100vh; flex-direction: column; }
+        nav { height: 60px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; padding: 0 20px; background: #000; }
+        .sidebar { width: 200px; background: rgba(0,0,0,0.9); border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .nav-btn { padding: 12px; cursor: pointer; border: 1px solid #333; border-radius: 10px; text-align: center; }
+        .nav-btn.active { background: var(--accent); color: #000; font-weight: bold; }
 
-        .content { flex: 1; padding: 30px; overflow-y: auto; }
-        .page { display: none; }
-        .page.active { display: block; }
+        .view { flex: 1; padding: 30px; display: none; overflow-y: auto; }
+        .view.active { display: block; }
 
         /* 🎮 محرك التاتش */
-        #game-area { height: 400px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 15px; position: relative; overflow: hidden; touch-action: none; }
-        .item { position: absolute; font-size: 50px; cursor: move; touch-action: none; user-select: none; }
+        #zone { height: 400px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 15px; position: relative; overflow: hidden; touch-action: none; }
+        .sprite { position: absolute; font-size: 50px; cursor: move; touch-action: none; user-select: none; }
     </style>
 </head>
 <body>
 
-<canvas id="spaceCanvas"></canvas>
+<canvas id="stars"></canvas>
 
-<div id="auth-screen">
-    <div class="login-card">
-        <h2 style="color:var(--accent)">MD STUDIO</h2>
+<div id="gate">
+    <div class="card">
+        <h2 style="color:var(--accent)">MD LOGIN</h2>
         <input type="text" placeholder="Username">
-        <input type="password" id="passInput" placeholder="Password (6 Chars)" oninput="validatePass()">
-        <div id="errMsg" class="error-hint"></div>
-        <button id="loginBtn" onclick="openApp()" disabled style="width:100%; padding:15px; background:#222; border:none; color:#555; border-radius:10px; cursor:not-allowed; font-weight:bold;">LAUNCH</button>
+        <input type="password" id="pass" placeholder="Name + Number (6 Chars)" oninput="check()">
+        <div id="msg" class="err-hint"></div>
+        <button id="btn" onclick="start()" disabled style="width:100%; padding:15px; background:#222; border:none; color:#555; border-radius:10px; cursor:not-allowed; font-weight:bold;">LAUNCH ENGINE</button>
     </div>
 </div>
 
-<div id="main-app">
-    <nav style="padding:15px; border-bottom:2px solid var(--accent); background:#000; font-weight:bold; color:var(--accent);">MD STUDIO | EMPIRE</nav>
+<div id="main">
+    <nav><span style="color:var(--accent); font-weight:bold;">MD STUDIO v11.0</span></nav>
     <div style="display:flex; flex:1;">
         <div class="sidebar">
-            <div class="nav-item active" onclick="showPage('game-page', this)">🎮 Engine</div>
-            <div class="nav-item" onclick="showPage('profile-page', this)">👤 Profile</div>
+            <div class="nav-btn active" onclick="tab('g-view', this)">🎮 Engine</div>
+            <div class="nav-btn" onclick="tab('p-view', this)">👤 Profile</div>
             <button onclick="location.reload()" style="margin-top:auto; background:#ff0080; border:none; padding:10px; color:white; border-radius:5px;">Logout</button>
         </div>
-        <div class="content">
-            <div id="game-page" class="page active">
-                <h2>Game Engine (Touch Support)</h2>
-                <button onclick="spawn('🚀')">Add Ship</button> <button onclick="spawn('👾')">Add Enemy</button>
-                <div id="game-area" style="margin-top:20px;"></div>
-            </div>
-            <div id="profile-page" class="page">
-                <div style="text-align:center; border:1px solid var(--accent); padding:40px; border-radius:20px; background:#0a0a0a;">
-                    <div style="width:100px; height:100px; background:var(--accent); border-radius:50%; margin:auto; margin-bottom:20px;"></div>
-                    <h1>Multidisciplinary Developer</h1>
-                    <p style="color:var(--accent)">System Administrator</p>
-                </div>
+        <div id="g-view" class="view active">
+            <h2>Game Studio</h2>
+            <button onclick="add('🚀')">Add Ship</button>
+            <div id="zone" style="margin-top:20px;"></div>
+        </div>
+        <div id="p-view" class="view">
+            <div style="text-align:center; border:1px solid var(--accent); padding:40px; border-radius:20px;">
+                <div style="width:100px; height:100px; background:var(--accent); border-radius:50%; margin:auto; margin-bottom:20px;"></div>
+                <h1>Multidisciplinary Developer</h1>
+                <p>Status: Ready</p>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // 🌌 خلفية الفضاء
-    const canvas = document.getElementById('spaceCanvas');
-    const ctx = canvas.getContext('2d');
-    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.onresize = resize; resize();
+    const cv = document.getElementById('stars'), ct = cv.getContext('2d');
+    function res() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+    window.onresize = res; res();
+    const drops = Array(Math.floor(cv.width/20)).fill(1);
+    function draw() {
+        ct.fillStyle = "rgba(0,0,0,0.1)"; ct.fillRect(0,0,cv.width,cv.height);
+        ct.fillStyle = "#00d2ff"; ct.font = "15px monospace";
+        drops.forEach((y, i) => {
+            ct.fillText(Math.random() > 0.5 ? "1" : "0", i*20, y*20);
+            if(y*20 > cv.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        });
+    } setInterval(draw, 50);
 
-    function drawSpace() {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#00d2ff"; ctx.font = "15px monospace";
-        for(let i=0; i<20; i++) {
-            ctx.fillText(Math.random() > 0.5 ? "1" : "0", Math.random()*canvas.width, Math.random()*canvas.height);
-        }
-    } setInterval(drawSpace, 50);
+    // 🔐 فحص الباسورد (حروف + أرقام)
+    function check() {
+        const p = document.getElementById('pass').value;
+        const m = document.getElementById('msg');
+        const b = document.getElementById('btn');
+        
+        const hasChar = /[a-zA-Z]/.test(p);  // فيه حروف
+        const hasNum = /[0-9]/.test(p);      // فيه أرقام
 
-    // 🔐 فحص الباسورد (الرسالة الحمراء)
-    function validatePass() {
-        const p = document.getElementById('passInput').value;
-        const m = document.getElementById('errMsg');
-        const b = document.getElementById('loginBtn');
-        const hasChar = /[a-zA-Z]/.test(p);
-        const hasSym = /[!@#$%^&*]/.test(p);
-
-        if(p.length === 0) m.innerText = "";
-        else if(p.length < 6) m.innerText = "❌ Too Short! (Must be 6)";
-        else if(p.length > 6) m.innerText = "❌ Too Long! (Must be 6)";
-        else if(!hasChar || !hasSym) m.innerText = "❌ Need Letters & Symbols";
+        if(p.length === 0) { m.innerText = ""; }
+        else if(p.length < 6) { m.innerText = "❌ Too Short! (Must be exactly 6)"; }
+        else if(p.length > 6) { m.innerText = "❌ Too Long! (Must be exactly 6)"; }
+        else if(!hasChar || !hasNum) { m.innerText = "❌ Must include Letters and Numbers"; }
         else {
-            m.innerHTML = "<span style='color:#00ff88'>✅ Ready!</span>";
+            m.innerHTML = "<span style='color:#0f8'>✅ Perfect! Access Ready</span>";
             b.disabled = false; b.style.background = "#00d2ff"; b.style.color = "#000"; b.style.cursor = "pointer";
             return;
         }
         b.disabled = true; b.style.background = "#222"; b.style.color = "#555"; b.style.cursor = "not-allowed";
     }
 
-    function openApp() { document.getElementById('auth-screen').style.display='none'; document.getElementById('main-app').style.display='flex'; }
-    
-    function showPage(id, el) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    function start() { document.getElementById('gate').style.display='none'; document.getElementById('main').style.display='flex'; }
+    function tab(id, el) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         el.classList.add('active');
     }
 
-    // 🎮 سحب العناصر (تاتش وماوس)
-    function spawn(emoji) {
-        const d = document.createElement('div'); d.className = 'item'; d.innerText = emoji;
+    function add(e) {
+        const d = document.createElement('div'); d.className = 'sprite'; d.innerText = e;
         d.style.left = '50px'; d.style.top = '50px';
-        const move = (e) => {
-            e.preventDefault(); const pt = e.touches ? e.touches[0] : e;
-            const r = document.getElementById('game-area').getBoundingClientRect();
+        const mv = (ev) => {
+            ev.preventDefault(); const pt = ev.touches ? ev.touches[0] : ev;
+            const r = document.getElementById('zone').getBoundingClientRect();
             d.style.left = (pt.clientX - r.left - 25) + 'px';
             d.style.top = (pt.clientY - r.top - 25) + 'px';
         };
-        d.onmousedown = d.ontouchstart = () => { window.onmousemove = window.ontouchmove = move; };
+        d.onmousedown = d.ontouchstart = () => { window.onmousemove = window.ontouchmove = mv; };
         window.onmouseup = window.ontouchend = () => { window.onmousemove = window.ontouchmove = null; };
-        document.getElementById('game-area').appendChild(d);
+        document.getElementById('zone').appendChild(d);
     }
 </script>
 </body>
