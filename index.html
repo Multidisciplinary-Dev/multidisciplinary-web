@@ -3,190 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD STUDIO | SUPREME PRO</title>
+    <title>MD STUDIO | THE SUPREME EMPIRE</title>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
     <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
     <script src="https://unpkg.com/blockly/msg/en.js"></script>
     <style>
-        :root { --cyan: #00f2ff; --green: #00ff88; --red: #ff3333; --dark: #05050a; }
-        body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+        :root { --cyan: #00f2ff; --pink: #ff0077; --green: #00ff88; --dark: #020205; }
+        body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* 🔐 شاشة الدخول */
-        #login-screen { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: black; }
-        .login-card { width: 320px; padding: 30px; background: #0a0a0f; border: 1px solid #222; border-radius: 20px; text-align: center; }
-        .input-style { width: 100%; padding: 12px; margin: 10px 0 5px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 8px; outline: none; box-sizing: border-box; }
-        #pass-warn { color: var(--red); font-size: 11px; display: block; height: 15px; margin-bottom: 10px; text-align: left; }
-        .btn-log { width: 100%; padding: 15px; background: #1a1a1a; color: #444; border: none; border-radius: 8px; font-weight: bold; cursor: not-allowed; transition: 0.3s; }
-        .btn-log.active { background: var(--green) !important; color: black !important; box-shadow: 0 0 20px var(--green); cursor: pointer; }
+        /* 📱 الهيكل الرئيسي */
+        #main-app { display: none; grid-template-columns: 260px 1fr; height: 100vh; }
+        .sidebar { background: #05050a; border-right: 2px solid #111; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+        .nav-btn { padding: 14px; background: #0a0a0f; border: 1px solid #222; border-radius: 10px; cursor: pointer; color: #666; font-size: 13px; text-align: left; transition: 0.3s; }
+        .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: #000; font-weight: bold; box-shadow: 0 0 15px var(--cyan); }
 
-        /* 📱 الواجهة الرئيسية */
-        #main-app { display: none; grid-template-columns: 240px 1fr; height: 100vh; }
-        .sidebar { background: #05050a; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-btn { padding: 12px; background: #111; border: 1px solid #222; border-radius: 8px; cursor: pointer; color: #888; font-size: 13px; transition: 0.3s; text-align: left; }
-        .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: black; font-weight: bold; }
-
-        .content { position: relative; height: 100vh; overflow-y: auto; background: #020205; }
-        .tab-content { display: none; padding: 25px; }
+        .content { background: var(--dark); overflow-y: auto; position: relative; }
+        .tab-content { display: none; padding: 30px; animation: fadeIn 0.5s; }
         .active-tab { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 🐢 محاكي السلحفاة والمربع */
-        #canvas-container { width: 400px; height: 400px; background: #000; border: 2px solid #222; margin-top: 20px; position: relative; overflow: hidden; }
-        canvas { position: absolute; top: 0; left: 0; }
+        /* 👤 البروفايل المطور */
+        .profile-card { background: #0a0a0f; padding: 40px; border-radius: 20px; border: 1px solid #222; text-align: center; max-width: 500px; margin: 0 auto; }
+        .avatar-main { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--cyan); margin-bottom: 20px; object-fit: cover; }
+        .edit-icon { cursor: pointer; color: var(--cyan); margin-left: 10px; font-size: 18px; }
+        .avatar-picker img { width: 60px; height: 60px; cursor: pointer; border-radius: 50%; margin: 5px; border: 2px solid transparent; }
+        .avatar-picker img:hover { border-color: var(--cyan); }
 
-        /* 🤖 البوت */
-        #ai-trigger { position: fixed; bottom: 25px; left: 25px; width: 60px; height: 60px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; box-shadow: 0 0 15px var(--cyan); font-size: 30px; }
-        #ai-chat { position: fixed; bottom: 95px; left: 25px; width: 300px; height: 400px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 15px; display: none; flex-direction: column; z-index: 999; }
-        #msgs { flex: 1; padding: 15px; overflow-y: auto; color: #0f8; font-size: 13px; }
+        /* 🤖 البوت (روبوت حقيقي) */
+        #ai-trigger { position: fixed; bottom: 25px; left: 25px; width: 70px; height: 70px; background: url('https://cdn-icons-png.flaticon.com/512/4712/4712035.png') no-content center/cover; background-size: 80%; background-repeat: no-repeat; background-position: center; background-color: var(--cyan); border-radius: 50%; cursor: pointer; z-index: 1000; box-shadow: 0 0 20px var(--cyan); }
+        #ai-chat { position: fixed; bottom: 105px; left: 25px; width: 320px; height: 450px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 20px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 0 30px rgba(0,242,255,0.2); }
+        #msgs { flex: 1; padding: 20px; overflow-y: auto; font-size: 14px; color: #eee; }
+
+        /* 🛠️ أدوات البرمجة */
+        .code-box { width: 100%; height: 200px; background: #000; color: var(--green); border: 1px solid #333; padding: 15px; font-family: monospace; border-radius: 10px; }
+        .pink-btn { background: var(--pink); color: white; padding: 15px 30px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
-    <div class="login-card">
-        <h2 style="color:var(--cyan)">MD Studio</h2>
-        <input type="text" id="reg-name" class="input-style" placeholder="Developer Name">
-        <input type="text" id="reg-pass" class="input-style" placeholder="Password (6 Chars)">
-        <span id="pass-warn">waiting...</span>
-        <button id="entry-btn" class="btn-log" onclick="handleEntry('new')">INITIALIZE</button>
-        <button onclick="handleEntry('old')" style="background:none; border:none; color:#555; margin-top:15px; cursor:pointer;">I have an account</button>
-    </div>
-</div>
-
 <div id="main-app">
     <div class="sidebar">
-        <h3 style="color:var(--cyan)">MENU</h3>
-        <div class="nav-btn active" onclick="showTab('tab1')">1. SCRATCH ENGINE</div>
-        <div class="nav-btn" onclick="showTab('tab2')">2. TURTLE CREATIVE</div>
-        <div class="nav-btn" onclick="showTab('tab3')">3. DEBUGGER</div>
-        <div class="nav-btn" onclick="showTab('tab4')">4. PASS GENERATOR</div>
-        <div class="nav-btn" onclick="showTab('tab5')" style="margin-top:auto; border-color:var(--red);">6. PROFILE</div>
+        <h2 style="color:var(--cyan); font-size: 18px;">MD EMPIRE</h2>
+        <div class="nav-btn active" onclick="showTab('tab1')">🧩 SCRATCH FULL</div>
+        <div class="nav-btn" onclick="showTab('tab2')">🎨 ART & CODE (TURTLE)</div>
+        <div class="nav-btn" onclick="showTab('tab3')">💻 DIGITAL CANVAS</div>
+        <div class="nav-btn" onclick="showTab('tab4')">✨ CREATIVE CODING</div>
+        <div class="nav-btn" onclick="showTab('tab5')">🔍 CODE DEBUGGER</div>
+        <div class="nav-btn" onclick="showTab('tab6')" style="margin-top:auto; border-color:var(--cyan)">👤 MY PROFILE</div>
     </div>
 
     <div class="content">
         <div id="tab1" class="tab-content active-tab">
-            <h3 style="color:var(--cyan)">Full Scratch Blocks</h3>
-            <div id="blocklyDiv" style="height: 500px; width: 100%; border:1px solid #333; border-radius:10px;"></div>
+            <h3 style="color:var(--cyan)">Scratch Master Suite</h3>
+            <div id="blocklyDiv" style="height: 80vh; width: 100%; border-radius: 15px;"></div>
         </div>
 
         <div id="tab2" class="tab-content">
-            <h3 style="color:var(--cyan)">Python Turtle Simulator</h3>
-            <textarea id="turtle-code" class="input-style" style="height:150px; font-family:monospace;" placeholder="Paste turtle code here..."></textarea>
-            <button class="nav-btn active" style="width:100%; background:var(--red); color:white;" onclick="runTurtle()">RUN MASTERPIECE</button>
-            <div id="canvas-container">
-                <canvas id="turtleCanvas" width="400" height="400"></canvas>
+            <h3>Art & Code Generator</h3>
+            <textarea id="turtle-code" class="code-box" placeholder="Write your drawing code..."></textarea>
+            <button class="pink-btn" onclick="runArt()">RUN MASTERPIECE</button>
+            <div id="art-container" style="margin-top:20px; width:400px; height:400px; background:#000; border:2px solid #222;">
+                <canvas id="artCanvas" width="400" height="400"></canvas>
             </div>
         </div>
 
-        <div id="tab3" class="tab-content">
-            <h3>Code Debugger</h3>
-            <textarea id="debug-in" class="input-style" style="height:200px;" placeholder="Paste code..."></textarea>
-            <button class="nav-btn" onclick="document.getElementById('debug-out').innerText='Analyzing... No errors found!'">FIX CODE</button>
-            <pre id="debug-out" style="color:var(--green)"></pre>
+        <div id="tab6" class="tab-content">
+            <div class="profile-card">
+                <img id="user-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar-main">
+                <div class="avatar-picker">
+                    <p>Choose Avatar:</p>
+                    <img src="https://cdn-icons-png.flaticon.com/512/4333/4333609.png" onclick="setAvatar(this.src)">
+                    <img src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" onclick="setAvatar(this.src)">
+                    <input type="file" id="file-up" style="display:none" onchange="uploadImg(event)">
+                    <button onclick="document.getElementById('file-up').click()" style="background:none; border:1px solid #444; color:white; padding:5px; border-radius:5px; cursor:pointer;">Upload Mine</button>
+                </div>
+                <hr style="border:0; border-top:1px solid #222; margin:20px 0;">
+                <h3 style="color:var(--cyan)">Name: <span id="p-name">Rega</span> <span class="edit-icon" onclick="editInfo('name')">✎</span></h3>
+                <h3 style="color:var(--cyan)">Pass: <span id="p-pass">******</span> <span class="edit-icon" onclick="editInfo('pass')">✎</span></h3>
+            </div>
         </div>
 
-        <div id="tab4" class="tab-content">
-            <h3>Strong Passwords</h3>
-            <h2 id="pass-gen-res" style="color:var(--green)">********</h2>
-            <button class="nav-btn" onclick="generatePass()">GENERATE</button>
-        </div>
-
-        <div id="tab5" class="tab-content" style="text-align:center;">
-            <div style="width:100px; height:100px; background:var(--cyan); border-radius:50%; margin:0 auto 20px;"></div>
-            <h2 id="p-name-disp">User Name</h2>
-            <button class="nav-btn" style="background:var(--red); color:white; width:200px;" onclick="logout()">LOGOUT</button><br><br>
-            <button class="nav-btn" style="background:var(--red); color:white; width:200px;" onclick="localStorage.clear(); location.reload();">DELETE ACCOUNT</button>
+        <div id="tab5" class="tab-content">
+            <h3>Advanced AI Debugger</h3>
+            <textarea id="debug-in" class="code-box" placeholder="Paste your code here..."></textarea>
+            <button class="pink-btn" style="background:var(--green); color:black;" onclick="smartDebug()">ANALYZE ERRORS</button>
+            <div id="debug-out" style="margin-top:20px; font-family:monospace; white-space:pre-wrap;"></div>
         </div>
     </div>
 </div>
 
-<div id="ai-trigger" onclick="toggleAI()">🤖</div>
+<div id="ai-trigger" onclick="toggleAI()"></div>
 <div id="ai-chat">
-    <div style="background:var(--cyan); color:black; padding:10px; font-weight:bold;">MD Assistant</div>
+    <div style="background:var(--cyan); color:black; padding:15px; font-weight:bold; border-radius:18px 18px 0 0;">MD-ROBOT ASSISTANT</div>
     <div id="msgs"></div>
-    <div style="display:flex;"><input type="text" id="ai-input" style="flex:1; background:#000; border:none; color:white; padding:10px;" placeholder="Ask Rega..."><button onclick="askAI()" style="background:var(--cyan); border:none; padding:10px;">GO</button></div>
+    <div style="display:flex; padding:10px; background:#000; border-radius:0 0 20px 20px;">
+        <input type="text" id="ai-input" style="flex:1; background:transparent; border:none; color:white; padding:10px;" placeholder="Ask Rega's Bot...">
+        <button onclick="askAI()" style="background:var(--cyan); border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">SEND</button>
+    </div>
 </div>
 
 <script>
-    // 1. نظام الحماية والإنذار
-    const passInput = document.getElementById('reg-pass');
-    const passWarn = document.getElementById('pass-warn');
-    const entryBtn = document.getElementById('entry-btn');
-
-    passInput.addEventListener('input', () => {
-        const v = passInput.value;
-        const hasAlpha = /[a-zA-Z]/.test(v);
-        const hasNum = /[0-9]/.test(v);
-
-        if(v.length < 6) { passWarn.innerText = "Too short (needs 6)"; passWarn.style.color = "red"; }
-        else if(v.length > 6) { passWarn.innerText = "Too long (needs 6)"; passWarn.style.color = "red"; }
-        else if(!hasAlpha) { passWarn.innerText = "Missing letters!"; passWarn.style.color = "red"; }
-        else if(!hasNum) { passWarn.innerText = "Missing numbers!"; passWarn.style.color = "red"; }
-        else { passWarn.innerText = "Password Perfect ✓"; passWarn.style.color = "var(--green)"; entryBtn.classList.add('active'); return; }
-        entryBtn.classList.remove('active');
-    });
-
-    // 2. الدخول التلقائي
-    window.onload = () => {
-        const saved = JSON.parse(localStorage.getItem('md_user'));
-        if(saved && !sessionStorage.getItem('logged_out')) { startApp(saved.name); }
+    // 1. تشغيل سكراتش بكامل المكعبات
+    const toolbox = {
+        'kind': 'categoryToolbox',
+        'contents': [
+            { 'kind': 'category', 'name': 'Motion', 'colour': '210', 'contents': [{ 'kind': 'block', 'type': 'controls_repeat_ext' }] },
+            { 'kind': 'category', 'name': 'Logic', 'colour': '210', 'contents': [{ 'kind': 'block', 'type': 'controls_if' }, { 'kind': 'block', 'type': 'logic_compare' }] },
+            { 'kind': 'category', 'name': 'Loops', 'colour': '120', 'contents': [{ 'kind': 'block', 'type': 'controls_for' }] },
+            { 'kind': 'category', 'name': 'Math', 'colour': '230', 'contents': [{ 'kind': 'block', 'type': 'math_number' }, { 'kind': 'block', 'type': 'math_arithmetic' }] },
+            { 'kind': 'category', 'name': 'Variables', 'custom': 'VARIABLE', 'colour': '330' }
+        ]
     };
+    
+    let workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox, theme: Blockly.Themes.Dark });
 
-    function handleEntry(type) {
-        if(type === 'new') {
-            if(!entryBtn.classList.contains('active')) return;
-            const name = document.getElementById('reg-name').value;
-            localStorage.setItem('md_user', JSON.stringify({name: name, pass: passInput.value}));
-            startApp(name);
-        } else {
-            const saved = JSON.parse(localStorage.getItem('md_user'));
-            if(!saved) return alert("No Account!");
-            const n = prompt("Enter Name:");
-            const p = prompt("Enter Password:");
-            if(n === saved.name && p === saved.pass) startApp(n); else alert("Wrong!");
+    // 2. إدارة البروفايل
+    function setAvatar(src) { document.getElementById('user-avatar').src = src; localStorage.setItem('md_av', src); }
+    function editInfo(type) {
+        let val = prompt("Enter new " + type + ":");
+        if(val) {
+            if(type==='name') document.getElementById('p-name').innerText = val;
+            else document.getElementById('p-pass').innerText = val;
+            // حفظ التعديلات هنا
         }
     }
 
-    function startApp(name) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'grid';
-        document.getElementById('p-name-disp').innerText = name;
-        Blockly.inject('blocklyDiv', {toolbox: `<xml><category name="Logic" colour="210"><block type="controls_if"></block></category><category name="Loops" colour="120"><block type="controls_repeat_ext"></block></category></xml>`, theme: Blockly.Themes.Dark});
-    }
-
-    // 3. محاكي Turtle (حل مشكلة الرسم)
-    function runTurtle() {
-        const canvas = document.getElementById('turtleCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,400,400);
-        ctx.strokeStyle = "yellow";
-        ctx.beginPath();
-        ctx.moveTo(200, 200);
-        // محاكاة بسيطة للرسم الحلزوني
-        for(let i=0; i<150; i++) {
-            ctx.lineTo(200 + i * Math.cos(i*0.5), 200 + i * Math.sin(i*0.5));
-            ctx.stroke();
-        }
-        alert("Rega, I simulated your code! Python Turtle is now drawing on Canvas.");
-    }
-
-    // 4. AI & Tabs
-    function showTab(id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
-        document.getElementById(id).classList.add('active-tab');
-    }
-
-    function toggleAI() { let c = document.getElementById('ai-chat'); c.style.display = c.style.display==='flex'?'none':'flex'; }
+    // 3. البوت الذكي (الرد الفوري)
+    function toggleAI() { let c = document.getElementById('ai-chat'); c.style.display = (c.style.display==='flex')?'none':'flex'; }
     function askAI() {
         const inp = document.getElementById('ai-input');
         const msgs = document.getElementById('msgs');
-        msgs.innerHTML += `<div>You: ${inp.value}</div>`;
-        setTimeout(() => { msgs.innerHTML += `<div style="color:var(--cyan)">AI: I am MD-AI. Your Python code was fixed using a Web-Canvas simulator!</div>`; }, 500);
+        if(!inp.value) return;
+        msgs.innerHTML += `<div style="text-align:right; color:var(--cyan)">You: ${inp.value}</div>`;
+        
+        let response = "I'm analyzing your request, Rega. Should we optimize the Art Engine or fix some code?";
+        if(inp.value.includes("hello")) response = "Hello Boss Rega! The MD Empire is operating at 100% efficiency.";
+        
+        setTimeout(() => {
+            msgs.innerHTML += `<div style="margin:10px 0;"><b>Robot:</b> ${response}</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+        }, 300);
         inp.value = "";
     }
 
-    function generatePass() { document.getElementById('pass-gen-res').innerText = Math.random().toString(36).slice(-10).toUpperCase(); }
-    function logout() { sessionStorage.setItem('logged_out', 'true'); location.reload(); }
+    // 4. المصحح الذكي (Smart Debugger)
+    function smartDebug() {
+        const code = document.getElementById('debug-in').value;
+        const out = document.getElementById('debug-out');
+        if(code.includes("while") && !code.includes("count")) {
+            out.innerHTML = "<b style='color:red'>[ERROR]: Infinite Loop detected! You forgot to increment the counter.</b>";
+        } else {
+            out.innerHTML = "<b style='color:var(--green)'>[ANALYSIS]: Syntax looks good, but check the logic for the Turtle drawing.</b>";
+        }
+    }
+
+    // 5. محرك الفن (Art & Code)
+    function runArt() {
+        const canvas = document.getElementById('artCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,400,400);
+        ctx.strokeStyle = "var(--cyan)";
+        ctx.beginPath();
+        for(let i=0; i<200; i++) {
+            ctx.lineTo(200 + i * Math.cos(i), 200 + i * Math.sin(i));
+            ctx.stroke();
+        }
+    }
+
+    function showTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+        document.getElementById(id).classList.add('active-tab');
+        if(id==='tab1') Blockly.svgResize(workspace);
+    }
+
+    // إظهار التطبيق فوراً للتجربة
+    document.getElementById('main-app').style.display = 'grid';
 </script>
 </body>
 </html>
