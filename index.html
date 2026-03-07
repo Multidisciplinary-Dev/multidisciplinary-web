@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retaj Studio | Ultimate Edition</title>
+    <title>Retaj Studio | MD Ultimate</title>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
     <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
@@ -12,32 +12,34 @@
         :root { --cyan: #00f2ff; --pink: #ff0077; --green: #00ff88; --dark: #05050a; }
         body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
 
-        /* 🔐 شاشة الدخول الأساسية */
+        /* 🔐 شاشة الدخول */
         #login-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .login-card { background: #0a0a15; padding: 40px; border: 2px solid var(--cyan); border-radius: 20px; text-align: center; width: 320px; box-shadow: 0 0 30px var(--cyan); }
         .input-style { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 8px; outline: none; box-sizing: border-box; }
 
-        /* 📱 الواجهة الرئيسية */
+        /* 📱 الواجهة */
         #main-app { display: none; height: 100vh; grid-template-columns: 260px 1fr; }
         @media (max-width: 768px) { #main-app { grid-template-columns: 1fr; } .sidebar { display: none; } }
         
         .sidebar { background: #080810; border-right: 2px solid #1a1a25; padding: 25px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-link { padding: 15px; background: #111; border: 1px solid #222; border-radius: 12px; cursor: pointer; color: #777; font-weight: bold; transition: 0.3s; }
+        .nav-link { padding: 15px; background: #111; border: 1px solid #222; border-radius: 12px; cursor: pointer; color: #777; font-weight: bold; transition: 0.3s; text-align: center; }
         .nav-link.active { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
 
         .content-view { flex: 1; padding: 30px; overflow-y: auto; }
         .page { display: none; }
         .page.active { display: block; }
 
-        /* 🎨 Art Lab */
-        .art-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        /* 🎨 Art Lab المربعين */
+        .art-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
         canvas { background: white; border-radius: 15px; width: 100%; height: 300px; }
 
-        /* 👤 Profile & Security */
-        .security-box { background: #111; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid var(--pink); text-align: left; font-family: monospace; }
+        /* 🛡️ AI Debugger */
+        #dbg-status { margin-top: 15px; padding: 15px; background: #0a0a15; border-radius: 12px; border: 1px dashed var(--cyan); white-space: pre-wrap; font-size: 14px; }
 
-        /* 🏷️ التوقيع */
-        .made-by { position: fixed; bottom: 15px; right: 20px; color: var(--cyan); font-weight: bold; }
+        /* 👤 Profile Security */
+        .security-box { background: #111; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid var(--pink); text-align: left; font-family: monospace; }
+        
+        .made-by { position: fixed; bottom: 15px; right: 20px; color: var(--cyan); font-weight: bold; font-size: 14px; }
 
         /* 🤖 البوت */
         #bot-window { position: fixed; bottom: 80px; left: 20px; width: 280px; height: 350px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 20px; display: none; flex-direction: column; overflow: hidden; z-index: 1000; }
@@ -49,135 +51,4 @@
 <div id="login-screen">
     <div class="login-card">
         <h2 style="color:var(--cyan)">MADE WITH RETAJ</h2>
-        <input type="text" id="user-input" class="input-style" placeholder="Admin Name">
-        <input type="password" id="pass-input" class="input-style" placeholder="Password">
-        <button class="nav-link" style="width:100%; color:cyan" onclick="access()">LOGIN</button>
-    </div>
-</div>
-
-<div id="main-app">
-    <div class="sidebar">
-        <h2 style="color:var(--cyan)">RETAJ STUDIO</h2>
-        <div class="nav-link active" onclick="showPage('p1', this)">🧩 SCRATCH</div>
-        <div class="nav-link" onclick="showPage('p2', this)">🎨 ART LAB</div>
-        <div class="nav-link" onclick="showPage('p4', this)">🛡️ AI DEBUGGER</div>
-        <div class="nav-link" onclick="showPage('p3', this)">👤 PROFILE</div>
-    </div>
-
-    <div class="content-view">
-        <div id="p1" class="page active">
-            <h1>Scratch Full Engine</h1>
-            <div id="blocklyDiv" style="height: 70vh; width: 100%; border-radius: 15px;"></div>
-        </div>
-
-        <div id="p2" class="page">
-            <h1>Art Laboratory</h1>
-            <div class="art-container">
-                <textarea id="art-input" class="input-style" style="height:250px" placeholder="Type: circle or JS code..."></textarea>
-                <canvas id="main-canvas"></canvas>
-            </div>
-            <button class="nav-link" style="color:var(--pink); margin-top:10px" onclick="renderArt()">RENDER ART</button>
-        </div>
-
-        <div id="p4" class="page">
-            <h1>🛡️ AI Intelligent Debugger</h1>
-            <textarea id="dbg-input" class="input-style" style="height:150px" placeholder="Paste broken code..."></textarea>
-            <button class="nav-link" style="color:var(--green); width: 200px;" onclick="runAIDebug()">ANALYSIS BY AI</button>
-            <div id="dbg-status" style="margin-top:15px; padding:15px; background:#0a0a15; border:1px dashed var(--cyan);">Ready to fix.</div>
-        </div>
-
-        <div id="p3" class="page">
-            <div style="background:#0a0a15; padding:30px; border-radius:20px; border:1px solid #222; text-align:center;">
-                <img id="avatar-img" src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" style="width:100px; border-radius:50%; border:3px solid var(--cyan);">
-                <h2 id="display-username">Retaj</h2>
-                <input type="text" id="edit-name" class="input-style" placeholder="New Name">
-                <textarea id="edit-bio" class="input-style" placeholder="Admin Bio"></textarea>
-                
-                <div class="security-box">
-                    <div style="color:var(--pink)">🔒 SERVER SECURITY</div>
-                    <div id="user-ip">Your IP: 192.168.1.104 (Protected)</div>
-                    <div id="strong-pass">Strong Pass: R3t@j_Sec_2026!</div>
-                </div>
-                <button class="nav-link" style="width:100%; background:var(--green); color:black; margin-top:10px" onclick="saveProfile()">SAVE SETTINGS</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="made-by">Made with Retaj</div>
-
-<button style="position:fixed; bottom:20px; left:20px; width:50px; height:50px; border-radius:50%; background:var(--cyan); border:none; cursor:pointer;" onclick="toggleBot()">🤖</button>
-<div id="bot-window">
-    <div style="background:var(--cyan); color:black; padding:10px; font-weight:bold;">RETAJ BOT</div>
-    <div id="chat-logs"></div>
-    <input type="text" id="chat-input" class="input-style" style="margin:5px" placeholder="Talk to Retaj Bot..." onkeypress="if(event.key==='Enter') botTalk()">
-</div>
-
-<script>
-    const GEMINI_KEY = "AIzaSyA4FGIf0tWe1JqEaDHoVRXHpiEJlMByDKE"; //
-
-    function access() {
-        const u = document.getElementById('user-input').value;
-        if(u) {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'grid';
-            document.getElementById('display-username').innerText = u;
-            initScratch();
-        }
-    }
-
-    async function runAIDebug() {
-        const code = document.getElementById('dbg-input').value;
-        const status = document.getElementById('dbg-status');
-        if(!code) return;
-        status.innerText = "🧠 AI analyzing...";
-        try {
-            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: [{ parts: [{ text: "Fix this code: " + code }] }] })
-            });
-            const d = await r.json();
-            status.innerText = d.candidates[0].content.parts[0].text;
-        } catch (e) { status.innerText = "❌ Error. Check connection."; }
-    }
-
-    function renderArt() {
-        const ctx = document.getElementById('main-canvas').getContext('2d');
-        const code = document.getElementById('art-input').value.toLowerCase();
-        ctx.clearRect(0,0,500,500);
-        if(code.includes('circle')) { ctx.beginPath(); ctx.arc(100,75,50,0,7); ctx.fill(); }
-        else { try { eval(code); } catch(e) { alert("Code Error"); } }
-    }
-
-    function saveProfile() { alert("Saved! Made with Retaj."); }
-
-    function initScratch() {
-        const tb = `<xml>
-            <category name="Logic" colour="210"><block type="controls_if"></block></category>
-            <category name="Loops" colour="120"><block type="controls_repeat_ext"></block></category>
-            <category name="Math" colour="230"><block type="math_number"></block></category>
-            <category name="Variables" colour="330" custom="VARIABLE"></category>
-            <category name="Text" colour="160"><block type="text"></block></category>
-        </xml>`;
-        Blockly.inject('blocklyDiv', {toolbox: tb, theme: Blockly.Themes.Dark});
-    }
-
-    function showPage(id, b) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        b.classList.add('active');
-        if(id === 'p1') Blockly.svgResize(Blockly.mainWorkspace);
-    }
-
-    function toggleBot() { const b = document.getElementById('bot-window'); b.style.display = (b.style.display==='flex')?'none':'flex'; }
-    function botTalk() {
-        const i = document.getElementById('chat-input'); const m = document.getElementById('chat-logs');
-        m.innerHTML += `<div><b>You:</b> ${i.value}</div>`;
-        setTimeout(() => { m.innerHTML += `<div style="color:cyan"><b>Bot:</b> Hello Chief! I am here.</div>`; m.scrollTop=m.scrollHeight; }, 300);
-        i.value = "";
-    }
-</script>
-</body>
-</html>
+        <input type="text" id="user-input" class="input-style" placeholder="Admin
