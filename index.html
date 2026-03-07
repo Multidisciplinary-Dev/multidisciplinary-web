@@ -2,150 +2,181 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>MD STUDIO | REGA ULTIMATE EDITION</title>
+    <title>MD STUDIO | Made with Retaj</title>
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/msg/en.js"></script>
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff0077; --green: #00ff88; --dark: #020205; }
-        body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        :root { --cyan: #00f2ff; --pink: #ff0077; --green: #00ff88; --dark: #05050a; }
+        body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
-        /* 🔐 شاشة الدخول */
-        #login-page { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .login-box { background: #0a0a15; border: 2px solid var(--cyan); padding: 50px; border-radius: 30px; text-align: center; box-shadow: 0 0 50px var(--cyan); }
-        .login-box input { display: block; width: 100%; padding: 15px; margin: 15px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 10px; box-sizing: border-box; }
-        
-        /* 📱 واجهة النظام */
-        #system-ui { display: none; height: 100vh; grid-template-columns: 280px 1fr; }
-        .sidebar { background: #05050a; border-right: 2px solid #1a1a25; padding: 30px; display: flex; flex-direction: column; gap: 15px; }
-        .nav-link { padding: 18px; background: #111; border: 1px solid #222; border-radius: 15px; cursor: pointer; color: #777; font-weight: bold; transition: 0.3s; }
-        .nav-link.active { background: var(--cyan); color: #000; box-shadow: 0 0 20px var(--cyan); }
+        /* 🔐 Login */
+        #login-gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: #0a0a15; padding: 40px; border: 2px solid var(--cyan); border-radius: 25px; text-align: center; width: 320px; box-shadow: 0 0 30px var(--cyan); }
+        .inp { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 10px; outline: none; box-sizing: border-box; }
 
-        .content { padding: 40px; overflow-y: auto; position: relative; }
-        .panel { display: none; }
-        .panel.active { display: block; }
+        /* 📱 Layout */
+        #main-shell { display: none; height: 100vh; grid-template-columns: 260px 1fr; }
+        .sidebar { background: #080810; border-right: 2px solid #111; padding: 25px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-btn { padding: 15px; background: #111; border: 1px solid #222; border-radius: 12px; cursor: pointer; color: #777; font-weight: bold; }
+        .nav-btn.active { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
 
-        /* 🎨 مختبر الرسم بالكود */
-        #art-input { width: 100%; height: 120px; background: #0a0a0f; color: var(--green); border: 2px solid #1a1a25; padding: 15px; font-family: 'Consolas', monospace; border-radius: 15px; }
-        #canvas-board { background: #fff; border-radius: 20px; margin-top: 20px; width: 100%; height: 350px; border: 5px solid #111; }
+        .view-port { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .page { display: none; }
+        .page.active { display: block; }
 
-        /* 🛡️ مصحح الأكواد */
-        .debugger-box { background: #0a0a15; border: 1px solid #222; padding: 25px; border-radius: 20px; }
-        #debug-result { margin-top: 20px; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 18px; }
+        /* 🧩 سكراتش */
+        #blocklyDiv { height: 75vh; width: 100%; border-radius: 15px; border: 1px solid #222; }
+
+        /* 👤 البروفايل المطور */
+        .profile-card { background: #0a0a15; padding: 30px; border-radius: 20px; border: 1px solid #222; max-width: 500px; margin: auto; text-align: center; }
+        .user-img { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--cyan); object-fit: cover; margin-bottom: 15px; }
 
         /* 🤖 البوت */
-        #bot-frame { position: fixed; bottom: 25px; left: 25px; width: 320px; height: 450px; background: #080810; border: 2px solid var(--cyan); border-radius: 25px; display: none; flex-direction: column; overflow: hidden; z-index: 500; }
-        #chat-area { flex: 1; padding: 20px; overflow-y: auto; background: #030307; }
-        .bot-input-field { border-top: 1px solid #222; display: flex; padding: 10px; }
-        .bot-input-field input { flex: 1; background: transparent; border: none; color: #fff; padding: 10px; outline: none; }
+        #bot-ui { position: fixed; bottom: 20px; left: 20px; width: 300px; height: 400px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 20px; display: none; flex-direction: column; overflow: hidden; z-index: 5000; }
+        #msgs { flex: 1; padding: 15px; overflow-y: auto; background: #05050a; font-size: 14px; }
+
+        /* Footer */
+        .footer { position: fixed; bottom: 10px; right: 20px; color: var(--cyan); font-weight: bold; letter-spacing: 1px; font-size: 14px; opacity: 0.8; }
     </style>
 </head>
 <body>
 
-<div id="login-page">
+<div id="login-gate">
     <div class="login-box">
-        <h1 style="color:var(--cyan)">MD ENGINE ACCESS</h1>
-        <input type="text" id="username" placeholder="Admin Name">
-        <input type="password" id="password" placeholder="6-Digit Code">
-        <button class="nav-link" style="width:100%; color:var(--cyan)" onclick="login()">INITIALIZE SYSTEM</button>
+        <h2 style="color:var(--cyan)">MD ACCESS</h2>
+        <input type="text" id="log-user" class="inp" placeholder="Username">
+        <input type="password" id="log-pass" class="inp" placeholder="Password">
+        <button class="nav-btn" style="width:100%; color:cyan" onclick="entry()">LOGIN</button>
     </div>
 </div>
 
-<div id="system-ui">
+<div id="main-shell">
     <div class="sidebar">
-        <h2 style="color:var(--cyan); margin-bottom:30px;">REGA STUDIO</h2>
-        <div class="nav-link active" onclick="openTab('tab1', this)">🎨 CODE ART LAB</div>
-        <div class="nav-link" onclick="openTab('tab2', this)">🛡️ SMART DEBUGGER</div>
-        <div class="nav-link" onclick="openTab('tab3', this)">👤 ADMIN PROFILE</div>
-        <div class="nav-link" onclick="openTab('tab4', this)" style="margin-top:auto">🔑 PASS GENERATOR</div>
+        <h2 style="color:var(--cyan)">REGA EMPIRE</h2>
+        <div class="nav-btn active" onclick="tab('t1', this)">🧩 FULL SCRATCH</div>
+        <div class="nav-btn" onclick="tab('t2', this)">🎨 CODE ART</div>
+        <div class="nav-btn" onclick="tab('t3', this)">👤 EDIT PROFILE</div>
+        <div class="nav-btn" onclick="tab('t4', this)">🛡️ DEBUGGER</div>
     </div>
 
-    <div class="content">
-        <div id="tab1" class="panel active">
+    <div class="view-port">
+        <div id="t1" class="page active">
+            <h1>Scratch Full Workspace</h1>
+            <div id="blocklyDiv"></div>
+        </div>
+
+        <div id="t2" class="page">
             <h1>Art by Code</h1>
-            <p>Type commands like: <b>circle</b>, <b>rect</b>, or JS code (ctx.fill() )</p>
-            <textarea id="art-input" placeholder="Enter your drawing logic here..."></textarea>
-            <button class="nav-link" style="background:var(--pink); color:white; margin-top:15px" onclick="renderArt()">RENDER IMAGE</button>
-            <canvas id="canvas-board"></canvas>
+            <textarea id="art-code" class="inp" style="height:100px; color:var(--green)" placeholder="Type 'circle' or JS code..."></textarea>
+            <button class="nav-btn" style="color:var(--pink); margin-top:10px" onclick="runArt()">RENDER</button>
+            <canvas id="cv" width="500" height="300" style="background:white; border-radius:15px; margin-top:15px; display:block;"></canvas>
         </div>
 
-        <div id="tab2" class="panel">
-            <h1>AI Code Debugger</h1>
-            <div class="debugger-box">
-                <textarea id="debug-code" style="width:100%; height:200px; background:#000; color:var(--cyan); border:1px solid #333; padding:15px;" placeholder="Paste code to debug..."></textarea>
-                <button class="nav-link" style="background:var(--green); color:black; margin-top:15px" onclick="runDebug()">CHECK & FIX CODE</button>
-                <div id="debug-result">Status: Awaiting Code...</div>
+        <div id="t3" class="page">
+            <div class="profile-card">
+                <img id="p-img" src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" class="user-img">
+                <h2 id="p-name" style="color:var(--cyan)">Retaj</h2>
+                <hr style="border:0.5px solid #222; margin:20px 0;">
+                <input type="text" id="edit-name" class="inp" placeholder="Change Name">
+                <input type="text" id="edit-pass" class="inp" placeholder="Change Password">
+                <input type="text" id="edit-img" class="inp" placeholder="Image URL (Link)">
+                <button class="nav-btn" style="width:100%; background:var(--green); color:black" onclick="updateProfile()">SAVE CHANGES</button>
             </div>
         </div>
 
-        <div id="tab3" class="panel">
-            <div class="debugger-box" style="text-align:center">
-                <img src="https://cdn-icons-png.flaticon.com/512/6997/6997662.png" width="130" style="border:3px solid var(--cyan); border-radius:50%; padding:10px;">
-                <h1 id="prof-name" style="color:var(--cyan)">Rega</h1>
-                <p>Official Role: <b>Multidisciplinary Developer</b></p>
-                <p>MD-System Access: <b>Granted (Root)</b></p>
-                <p>Connection Established: <b>4/12/2025</b></p>
-            </div>
-        </div>
-
-        <div id="tab4" class="panel">
-            <div class="debugger-box">
-                <h2>Secure Pass Gen</h2>
-                <div id="p-display" style="font-size:25px; color:var(--green); margin:30px 0; border:1px dashed #333; padding:20px;">********</div>
-                <button class="nav-link" onclick="makeP()">GENERATE 20-CHAR PASS</button>
-            </div>
+        <div id="t4" class="page">
+            <h1>Logic Debugger</h1>
+            <textarea id="dbg-inp" class="inp" style="height:150px" placeholder="Paste code to check..."></textarea>
+            <button class="nav-btn" style="color:var(--green)" onclick="debug()">CHECK CODE</button>
+            <div id="dbg-out" style="margin-top:20px; font-weight:bold;">Status: Ready.</div>
         </div>
     </div>
 </div>
 
-<div id="bot-frame">
-    <div style="background:var(--cyan); color:#000; padding:15px; font-weight:bold;">MD-ASSISTANT</div>
-    <div id="chat-area"></div>
-    <div class="bot-input-field">
-        <input type="text" id="bot-input" placeholder="Ask Rega Bot..." onkeypress="if(event.key==='Enter') botTalk()">
-    </div>
+<div class="footer">Made with Retaj</div>
+
+<div id="bot-ui">
+    <div style="background:var(--cyan); color:black; padding:10px; font-weight:bold;">MD BOT</div>
+    <div id="msgs"></div>
+    <input type="text" id="bin" class="inp" style="margin:5px" placeholder="Chat..." onkeypress="if(event.key==='Enter') chat()">
 </div>
-<button style="position:fixed; bottom:25px; left:25px; width:70px; height:70px; border-radius:50%; background:var(--cyan); border:none; cursor:pointer; font-size:35px;" onclick="toggleBot()">🤖</button>
+<button style="position:fixed; bottom:20px; left:20px; width:60px; height:60px; border-radius:50%; background:var(--cyan); border:none; cursor:pointer;" onclick="toggleBot()">🤖</button>
 
 <script>
-    // 1. نظام الدخول والصوت المظبوط
-    function login() {
-        const u = document.getElementById('username').value;
-        const p = document.getElementById('password').value;
-        if(u && p.length >= 6) {
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('system-ui').style.display = 'grid';
-            document.getElementById('prof-name').innerText = u;
+    let currentName = "Retaj";
+    let currentPass = "123456";
+
+    function entry() {
+        const u = document.getElementById('log-user').value;
+        const p = document.getElementById('log-pass').value;
+        if(u && p) {
+            currentName = u; currentPass = p;
+            document.getElementById('login-gate').style.display = 'none';
+            document.getElementById('main-shell').style.display = 'grid';
+            document.getElementById('p-name').innerText = u;
             
-            // 🎤 الترحيب الصوتي (Welcome Name فقط)
-            const speak = new SpeechSynthesisUtterance("Welcome " + u);
-            window.speechSynthesis.speak(speak);
-        } else {
-            alert("Enter name and 6-digit pass!");
+            // ترحيب صوتي
+            const s = new SpeechSynthesisUtterance("Welcome " + u);
+            window.speechSynthesis.speak(s);
+            
+            initScratch();
         }
     }
 
-    // 2. التنقل بين التبويبات
-    function openTab(id, btn) {
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+    function updateProfile() {
+        const newN = document.getElementById('edit-name').value;
+        const newP = document.getElementById('edit-pass').value;
+        const newI = document.getElementById('edit-img').value;
+        if(newN) { currentName = newN; document.getElementById('p-name').innerText = newN; }
+        if(newP) { currentPass = newP; }
+        if(newI) { document.getElementById('p-img').src = newI; }
+        alert("Profile Updated, Retaj!");
+    }
+
+    function initScratch() {
+        const toolbox = `<xml>
+            <category name="Logic" colour="210"><block type="controls_if"></block></category>
+            <category name="Loops" colour="120"><block type="controls_repeat_ext"></block></category>
+            <category name="Math" colour="230"><block type="math_number"></block></category>
+            <category name="Text" colour="160"><block type="text"></block></category>
+            <category name="Variables" colour="330" custom="VARIABLE"></category>
+        </xml>`;
+        Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: Blockly.Themes.Dark});
+    }
+
+    function tab(id, b) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
+        b.classList.add('active');
     }
 
-    // 3. مختبر الرسم (الكود اللي بيتحول لصورة)
-    function renderArt() {
-        const canvas = document.getElementById('canvas-board');
-        const ctx = canvas.getContext('2d');
-        const val = document.getElementById('art-input').value.toLowerCase();
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        
-        if(val.includes('circle')) {
-            ctx.beginPath(); ctx.arc(150, 75, 50, 0, Math.PI*2); ctx.fillStyle = "blue"; ctx.fill();
-        } else if(val.includes('rect')) {
-            ctx.fillStyle = "red"; ctx.fillRect(100, 50, 100, 100);
-        } else {
-            try { eval(val); } catch(e) { alert("Code Error: Use 'circle', 'rect' or JS commands"); }
-        }
+    function runArt() {
+        const c = document.getElementById('cv'); const ctx = c.getContext('2d');
+        const code = document.getElementById('art-code').value.toLowerCase();
+        ctx.clearRect(0,0,500,300);
+        if(code.includes('circle')) { ctx.beginPath(); ctx.arc(150,75,50,0,7); ctx.fill(); }
+        else { try{ eval(code); } catch(e){ alert("Error"); } }
     }
 
-    // 4. مصحح الأكواد (Debugger)
-    function runDebug() {
-        const code = document
+    function debug() {
+        const code = document.getElementById('dbg-inp').value;
+        const out = document.getElementById('dbg-out');
+        if(code.includes(';') || code.includes('{')) { out.style.color = "var(--green)"; out.innerText = "✅ Code Correct!"; }
+        else { out.style.color = "red"; out.innerText = "❌ Error: Missing syntax."; }
+    }
+
+    function toggleBot() { const b = document.getElementById('bot-ui'); b.style.display = (b.style.display==='flex')?'none':'flex'; }
+    function chat() {
+        const i = document.getElementById('bin'); const m = document.getElementById('msgs');
+        m.innerHTML += `<div><b>You:</b> ${i.value}</div>`;
+        let r = "I'm here to help, " + currentName + "!";
+        if(i.value.includes("hi")) r = "Hello Chief Retaj!";
+        setTimeout(() => { m.innerHTML += `<div style="color:cyan"><b>Bot:</b> ${r}</div>`; m.scrollTop=m.scrollHeight; }, 300);
+        i.value = "";
+    }
+</script>
+</body>
+</html>
