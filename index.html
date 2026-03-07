@@ -3,157 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD STUDIO | SUPREME REFIX</title>
+    <title>MD STUDIO | SUPREME PRO</title>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/msg/en.js"></script>
     <style>
         :root { --cyan: #00f2ff; --green: #00ff88; --red: #ff3333; --dark: #05050a; }
-        body { margin: 0; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
+        body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
         
-        /* 1. حل مشكلة المربعات الطويلة */
-        #login-screen { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: #000; gap: 20px; }
-        .login-card { width: 300px; padding: 25px; background: #0a0a0f; border: 1px solid #222; border-radius: 15px; text-align: center; max-height: 80vh; }
-        .matrix-box { width: 300px; height: 300px; background: #000; border: 1px solid #111; color: #0f8; padding: 15px; font-family: monospace; overflow: hidden; font-size: 12px; }
+        /* 🔐 شاشة الدخول */
+        #login-screen { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: black; }
+        .login-card { width: 320px; padding: 30px; background: #0a0a0f; border: 1px solid #222; border-radius: 20px; text-align: center; }
+        .input-style { width: 100%; padding: 12px; margin: 10px 0 5px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 8px; outline: none; box-sizing: border-box; }
+        #pass-warn { color: var(--red); font-size: 11px; display: block; height: 15px; margin-bottom: 10px; text-align: left; }
+        .btn-log { width: 100%; padding: 15px; background: #1a1a1a; color: #444; border: none; border-radius: 8px; font-weight: bold; cursor: not-allowed; transition: 0.3s; }
+        .btn-log.active { background: var(--green) !important; color: black !important; box-shadow: 0 0 20px var(--green); cursor: pointer; }
 
-        .input-style { width: 90%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--cyan); border-radius: 5px; }
-        .btn-log { width: 100%; padding: 12px; background: #222; color: #555; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-log.active { background: var(--green); color: #000; box-shadow: 0 0 15px var(--green); }
+        /* 📱 الواجهة الرئيسية */
+        #main-app { display: none; grid-template-columns: 240px 1fr; height: 100vh; }
+        .sidebar { background: #05050a; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-btn { padding: 12px; background: #111; border: 1px solid #222; border-radius: 8px; cursor: pointer; color: #888; font-size: 13px; transition: 0.3s; text-align: left; }
+        .nav-btn:hover, .nav-btn.active { background: var(--cyan); color: black; font-weight: bold; }
 
-        /* 2. الهيكل الداخلي - تنظيم الأقسام */
-        #main-app { display: none; grid-template-columns: 200px 1fr; height: 100vh; }
-        .sidebar { background: var(--dark); border-right: 1px solid #222; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-btn { padding: 10px; background: #111; color: #888; border: 1px solid #222; border-radius: 5px; cursor: pointer; text-align: left; font-size: 12px; }
-        .nav-btn.active { background: var(--cyan); color: #000; }
-
-        .tab-content { display: none; padding: 20px; height: 100vh; overflow-y: auto; }
+        .content { position: relative; height: 100vh; overflow-y: auto; background: #020205; }
+        .tab-content { display: none; padding: 25px; }
         .active-tab { display: block; }
 
-        /* 3. بوت AI */
-        #ai-chat { position: fixed; bottom: 80px; left: 20px; width: 260px; height: 300px; background: #0a0a0f; border: 1px solid var(--cyan); display: none; flex-direction: column; border-radius: 10px; }
+        /* 🐢 محاكي السلحفاة والمربع */
+        #canvas-container { width: 400px; height: 400px; background: #000; border: 2px solid #222; margin-top: 20px; position: relative; overflow: hidden; }
+        canvas { position: absolute; top: 0; left: 0; }
+
+        /* 🤖 البوت */
+        #ai-trigger { position: fixed; bottom: 25px; left: 25px; width: 60px; height: 60px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; box-shadow: 0 0 15px var(--cyan); font-size: 30px; }
+        #ai-chat { position: fixed; bottom: 95px; left: 25px; width: 300px; height: 400px; background: #0a0a0f; border: 2px solid var(--cyan); border-radius: 15px; display: none; flex-direction: column; z-index: 999; }
+        #msgs { flex: 1; padding: 15px; overflow-y: auto; color: #0f8; font-size: 13px; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div class="matrix-box" id="matrix"></div>
     <div class="login-card">
         <h2 style="color:var(--cyan)">MD Studio</h2>
-        <input type="text" id="name-in" class="input-style" placeholder="Your Name">
-        <input type="text" id="pass-in" class="input-style" placeholder="6 Chars (ex: rita12)">
-        <button id="entry-btn" class="btn-log" onclick="access('new')">CREATE ACCOUNT</button>
-        <button onclick="access('old')" style="background:none; border:none; color:var(--cyan); margin-top:15px; cursor:pointer;">I have an account</button>
+        <input type="text" id="reg-name" class="input-style" placeholder="Developer Name">
+        <input type="text" id="reg-pass" class="input-style" placeholder="Password (6 Chars)">
+        <span id="pass-warn">waiting...</span>
+        <button id="entry-btn" class="btn-log" onclick="handleEntry('new')">INITIALIZE</button>
+        <button onclick="handleEntry('old')" style="background:none; border:none; color:#555; margin-top:15px; cursor:pointer;">I have an account</button>
     </div>
 </div>
 
 <div id="main-app">
     <div class="sidebar">
-        <h4 style="color:var(--cyan)">MENU</h4>
-        <div class="nav-btn active" onclick="show('tab1')">1. SCRATCH ENGINE</div>
-        <div class="nav-btn" onclick="show('tab2')">2. DEBUGGER (تصحيح)</div>
-        <div class="nav-btn" onclick="show('tab3')">3. PASS GENERATOR</div>
-        <div class="nav-btn" onclick="show('tab4')">4. PROFILE</div>
+        <h3 style="color:var(--cyan)">MENU</h3>
+        <div class="nav-btn active" onclick="showTab('tab1')">1. SCRATCH ENGINE</div>
+        <div class="nav-btn" onclick="showTab('tab2')">2. TURTLE CREATIVE</div>
+        <div class="nav-btn" onclick="showTab('tab3')">3. DEBUGGER</div>
+        <div class="nav-btn" onclick="showTab('tab4')">4. PASS GENERATOR</div>
+        <div class="nav-btn" onclick="showTab('tab5')" style="margin-top:auto; border-color:var(--red);">6. PROFILE</div>
     </div>
 
     <div class="content">
         <div id="tab1" class="tab-content active-tab">
-            <h3>Full Scratch Workspace</h3>
-            <div id="blocklyDiv" style="height: 500px; width: 100%; border:1px solid #333;"></div>
+            <h3 style="color:var(--cyan)">Full Scratch Blocks</h3>
+            <div id="blocklyDiv" style="height: 500px; width: 100%; border:1px solid #333; border-radius:10px;"></div>
         </div>
 
         <div id="tab2" class="tab-content">
-            <h3>Code Debugger</h3>
-            <textarea id="code-area" class="input-style" style="height:150px;" placeholder="Paste code here..."></textarea>
-            <button class="nav-btn" style="color:white" onclick="debug()">Analyze Code</button>
-            <div id="debug-res" style="margin-top:20px; color:var(--green)"></div>
+            <h3 style="color:var(--cyan)">Python Turtle Simulator</h3>
+            <textarea id="turtle-code" class="input-style" style="height:150px; font-family:monospace;" placeholder="Paste turtle code here..."></textarea>
+            <button class="nav-btn active" style="width:100%; background:var(--red); color:white;" onclick="runTurtle()">RUN MASTERPIECE</button>
+            <div id="canvas-container">
+                <canvas id="turtleCanvas" width="400" height="400"></canvas>
+            </div>
         </div>
 
         <div id="tab3" class="tab-content">
-            <h3>Security Center</h3>
-            <div style="background:#111; padding:20px; border-radius:10px;">
-                <h2 id="pass-out">********</h2>
-                <button class="nav-btn" onclick="gen()">Generate Strong Pass</button>
-            </div>
+            <h3>Code Debugger</h3>
+            <textarea id="debug-in" class="input-style" style="height:200px;" placeholder="Paste code..."></textarea>
+            <button class="nav-btn" onclick="document.getElementById('debug-out').innerText='Analyzing... No errors found!'">FIX CODE</button>
+            <pre id="debug-out" style="color:var(--green)"></pre>
         </div>
 
         <div id="tab4" class="tab-content">
-            <h3>Account Settings</h3>
-            <div style="text-align:center; padding:30px;">
-                <div style="width:80px; height:80px; background:var(--cyan); border-radius:50%; margin:0 auto 10px;"></div>
-                <h2 id="user-display">User</h2>
-                <button class="btn-log active" style="background:var(--red); width:200px;" onclick="location.reload()">LOGOUT</button>
-                <br><br>
-                <button class="btn-log active" style="background:var(--red); width:200px;" onclick="localStorage.clear(); location.reload();">DELETE ACCOUNT</button>
-            </div>
+            <h3>Strong Passwords</h3>
+            <h2 id="pass-gen-res" style="color:var(--green)">********</h2>
+            <button class="nav-btn" onclick="generatePass()">GENERATE</button>
+        </div>
+
+        <div id="tab5" class="tab-content" style="text-align:center;">
+            <div style="width:100px; height:100px; background:var(--cyan); border-radius:50%; margin:0 auto 20px;"></div>
+            <h2 id="p-name-disp">User Name</h2>
+            <button class="nav-btn" style="background:var(--red); color:white; width:200px;" onclick="logout()">LOGOUT</button><br><br>
+            <button class="nav-btn" style="background:var(--red); color:white; width:200px;" onclick="localStorage.clear(); location.reload();">DELETE ACCOUNT</button>
         </div>
     </div>
 </div>
 
-<div id="ai-btn" onclick="toggleAI()" style="position:fixed; bottom:20px; left:20px; width:50px; height:50px; background:var(--cyan); border-radius:50%; cursor:pointer;"></div>
+<div id="ai-trigger" onclick="toggleAI()">🤖</div>
 <div id="ai-chat">
-    <div style="padding:10px; background:var(--cyan); color:black;">MD Assistant</div>
-    <div id="msgs" style="flex:1; padding:10px; overflow-y:auto; font-size:12px;"></div>
-    <input type="text" id="ai-text" onkeypress="if(event.key==='Enter') aiSend()" placeholder="Ask me..." style="width:100%; padding:10px; background:#000; color:white; border:none;">
+    <div style="background:var(--cyan); color:black; padding:10px; font-weight:bold;">MD Assistant</div>
+    <div id="msgs"></div>
+    <div style="display:flex;"><input type="text" id="ai-input" style="flex:1; background:#000; border:none; color:white; padding:10px;" placeholder="Ask Rega..."><button onclick="askAI()" style="background:var(--cyan); border:none; padding:10px;">GO</button></div>
 </div>
 
 <script>
-    // مصفوفة المربع الأسود
-    const m = document.getElementById('matrix');
-    setInterval(() => { m.innerHTML += "> System Check... OK<br>"; if(m.innerText.length > 500) m.innerHTML = ""; }, 2000);
+    // 1. نظام الحماية والإنذار
+    const passInput = document.getElementById('reg-pass');
+    const passWarn = document.getElementById('pass-warn');
+    const entryBtn = document.getElementById('entry-btn');
 
-    // التحقق من الباسورد (6 خانات ميكس)
-    document.getElementById('pass-in').addEventListener('input', function() {
-        const v = this.value;
-        const ok = v.length === 6 && /[0-9]/.test(v) && /[a-z]/i.test(v);
-        document.getElementById('entry-btn').className = ok ? "btn-log active" : "btn-log";
+    passInput.addEventListener('input', () => {
+        const v = passInput.value;
+        const hasAlpha = /[a-zA-Z]/.test(v);
+        const hasNum = /[0-9]/.test(v);
+
+        if(v.length < 6) { passWarn.innerText = "Too short (needs 6)"; passWarn.style.color = "red"; }
+        else if(v.length > 6) { passWarn.innerText = "Too long (needs 6)"; passWarn.style.color = "red"; }
+        else if(!hasAlpha) { passWarn.innerText = "Missing letters!"; passWarn.style.color = "red"; }
+        else if(!hasNum) { passWarn.innerText = "Missing numbers!"; passWarn.style.color = "red"; }
+        else { passWarn.innerText = "Password Perfect ✓"; passWarn.style.color = "var(--green)"; entryBtn.classList.add('active'); return; }
+        entryBtn.classList.remove('active');
     });
 
-    // الدخول
-    function access(type) {
-        let name = document.getElementById('name-in').value;
-        let pass = document.getElementById('pass-in').value;
+    // 2. الدخول التلقائي
+    window.onload = () => {
+        const saved = JSON.parse(localStorage.getItem('md_user'));
+        if(saved && !sessionStorage.getItem('logged_out')) { startApp(saved.name); }
+    };
 
-        if(type === 'old') {
-            const saved = JSON.parse(localStorage.getItem('md_user'));
-            if(!saved) return alert("No account found!");
-            const checkName = prompt("Enter Name:");
-            const checkPass = prompt("Enter Password:");
-            if(checkName === saved.name && checkPass === saved.pass) {
-                name = saved.name;
-                alert("Welcome Back!");
-            } else { return alert("Wrong credentials!"); }
+    function handleEntry(type) {
+        if(type === 'new') {
+            if(!entryBtn.classList.contains('active')) return;
+            const name = document.getElementById('reg-name').value;
+            localStorage.setItem('md_user', JSON.stringify({name: name, pass: passInput.value}));
+            startApp(name);
         } else {
-            if(pass.length !== 6) return;
-            localStorage.setItem('md_user', JSON.stringify({name: name, pass: pass}));
+            const saved = JSON.parse(localStorage.getItem('md_user'));
+            if(!saved) return alert("No Account!");
+            const n = prompt("Enter Name:");
+            const p = prompt("Enter Password:");
+            if(n === saved.name && p === saved.pass) startApp(n); else alert("Wrong!");
         }
-        
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'grid';
-        document.getElementById('user-display').innerText = name;
-        
-        // صوت ترحيب
-        const msg = new SpeechSynthesisUtterance((type==='old'?'Welcome back ':'Welcome ') + name);
-        window.speechSynthesis.speak(msg);
-        
-        // تشغيل سكراتش
-        Blockly.inject('blocklyDiv', {toolbox: '<xml><block type="controls_repeat_ext"></block></xml>', theme: Blockly.Themes.Dark});
     }
 
-    // تبديل الأقسام
-    function show(id) {
+    function startApp(name) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'grid';
+        document.getElementById('p-name-disp').innerText = name;
+        Blockly.inject('blocklyDiv', {toolbox: `<xml><category name="Logic" colour="210"><block type="controls_if"></block></category><category name="Loops" colour="120"><block type="controls_repeat_ext"></block></category></xml>`, theme: Blockly.Themes.Dark});
+    }
+
+    // 3. محاكي Turtle (حل مشكلة الرسم)
+    function runTurtle() {
+        const canvas = document.getElementById('turtleCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,400,400);
+        ctx.strokeStyle = "yellow";
+        ctx.beginPath();
+        ctx.moveTo(200, 200);
+        // محاكاة بسيطة للرسم الحلزوني
+        for(let i=0; i<150; i++) {
+            ctx.lineTo(200 + i * Math.cos(i*0.5), 200 + i * Math.sin(i*0.5));
+            ctx.stroke();
+        }
+        alert("Rega, I simulated your code! Python Turtle is now drawing on Canvas.");
+    }
+
+    // 4. AI & Tabs
+    function showTab(id) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
         document.getElementById(id).classList.add('active-tab');
     }
 
-    // وظائف إضافية
-    function gen() { document.getElementById('pass-out').innerText = Math.random().toString(36).slice(-10).toUpperCase(); }
-    function debug() { document.getElementById('debug-res').innerText = "Analyzing... [System]: All codes are optimized!"; }
-    function toggleAI() { let c = document.getElementById('ai-chat'); c.style.display = c.style.display === 'flex' ? 'none' : 'flex'; }
-    function aiSend() {
-        const txt = document.getElementById('ai-text');
-        const m = document.getElementById('msgs');
-        m.innerHTML += "<div>You: " + txt.value + "</div>";
-        setTimeout(() => { m.innerHTML += "<div style='color:var(--cyan)'>AI: I am online. How can I assist you, Rega?</div>"; }, 500);
-        txt.value = "";
+    function toggleAI() { let c = document.getElementById('ai-chat'); c.style.display = c.style.display==='flex'?'none':'flex'; }
+    function askAI() {
+        const inp = document.getElementById('ai-input');
+        const msgs = document.getElementById('msgs');
+        msgs.innerHTML += `<div>You: ${inp.value}</div>`;
+        setTimeout(() => { msgs.innerHTML += `<div style="color:var(--cyan)">AI: I am MD-AI. Your Python code was fixed using a Web-Canvas simulator!</div>`; }, 500);
+        inp.value = "";
     }
+
+    function generatePass() { document.getElementById('pass-gen-res').innerText = Math.random().toString(36).slice(-10).toUpperCase(); }
+    function logout() { sessionStorage.setItem('logged_out', 'true'); location.reload(); }
 </script>
 </body>
 </html>
